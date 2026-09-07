@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Products Collection
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.name is string
+        && request.resource.data.name.size() <= 200
+        && request.resource.data.priceQAR is number
+        && request.resource.data.priceQAR >= 0;
+      allow delete: if true;
+    }
+
+    // Orders Collection
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if request.resource.data.orderNumber is string
+        && request.resource.data.customerName is string
+        && request.resource.data.customerName.size() <= 200
+        && request.resource.data.customerPhone is string
+        && request.resource.data.city is string
+        && request.resource.data.totalQAR is number
+        && request.resource.data.totalQAR >= 0;
+      allow update: if request.resource.data.status is string
+        && request.resource.data.status in ['Pending', 'Confirmed', 'Dispatched', 'Delivered', 'Cancelled'];
+      allow delete: if false;
+    }
+
+    // Settings Collection
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Default deny catch-all for any other path
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

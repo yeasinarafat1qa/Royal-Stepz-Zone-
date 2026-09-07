@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Footwear item available in the store catalog",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product ID" },
+        "name": { "type": "string", "description": "Product title" },
+        "category": { "type": "string", "description": "Footwear category" },
+        "priceQAR": { "type": "number", "description": "Selling price in QAR" },
+        "originalPriceQAR": { "type": "number", "description": "Original retail price in QAR" },
+        "rating": { "type": "number", "description": "Star rating out of 5" },
+        "reviewsCount": { "type": "number", "description": "Total customer reviews count" },
+        "image": { "type": "string", "description": "Product image URL" },
+        "description": { "type": "string", "description": "Product details description" },
+        "sizes": { "type": "array", "description": "Available shoe sizes" },
+        "colors": { "type": "array", "description": "Available color variants" },
+        "inStock": { "type": "boolean", "description": "Inventory stock availability" },
+        "isBestSeller": { "type": "boolean", "description": "Bestseller badge status" },
+        "isDeal": { "type": "boolean", "description": "Special deal flag" },
+        "badge": { "type": "string", "description": "Promotional badge text" },
+        "createdAt": { "type": "string", "description": "Creation ISO timestamp" }
+      },
+      "required": ["id", "name", "category", "priceQAR", "image", "inStock"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order placed on Royal Stepz Zone Qatar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique order ID" },
+        "orderNumber": { "type": "string", "description": "Human readable order number like RSZ-QA-1234" },
+        "customerName": { "type": "string", "description": "Name of the customer" },
+        "customerPhone": { "type": "string", "description": "Customer mobile or WhatsApp contact" },
+        "city": { "type": "string", "description": "Delivery city in Qatar" },
+        "fullAddress": { "type": "string", "description": "Detailed street or apartment address" },
+        "notes": { "type": "string", "description": "Special delivery instructions" },
+        "paymentMethod": { "type": "string", "description": "Payment method chosen" },
+        "items": { "type": "array", "description": "List of ordered cart items" },
+        "subtotalQAR": { "type": "number", "description": "Items subtotal in QAR" },
+        "deliveryFeeQAR": { "type": "number", "description": "Delivery charge in QAR" },
+        "totalQAR": { "type": "number", "description": "Total order amount in QAR" },
+        "status": { "type": "string", "description": "Order processing status" },
+        "createdAt": { "type": "string", "description": "Order timestamp" },
+        "customerEmail": { "type": "string", "description": "Customer email if provided" },
+        "whatsappSent": { "type": "boolean", "description": "Whether WhatsApp dispatch message was generated" }
+      },
+      "required": ["id", "orderNumber", "customerName", "customerPhone", "city", "fullAddress", "totalQAR", "status", "createdAt"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Global store settings and WhatsApp configuration",
+      "type": "object",
+      "properties": {
+        "whatsappNumber": { "type": "string", "description": "WhatsApp dispatch contact number" },
+        "storeName": { "type": "string", "description": "Branded store name" },
+        "storeAddress": { "type": "string", "description": "Store physical hub in Qatar" },
+        "supportEmail": { "type": "string", "description": "Customer support email" },
+        "currency": { "type": "string", "description": "Base currency" },
+        "freeShippingThresholdQAR": { "type": "number", "description": "Minimum order for free delivery" }
+      },
+      "required": ["whatsappNumber", "storeName", "currency", "freeShippingThresholdQAR"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Product catalog entries"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Store orders placed by customers"
+    },
+    "/settings/{settingDoc}": {
+      "schema": "StoreSettings",
+      "description": "Global store configuration and parameters"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Royal Stepz Zone",
+  "description": "Premier E-Commerce Footwear & Sneaker Store in Qatar featuring Amazon-style experience, direct WhatsApp ordering in QAR, and secure Admin Dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
