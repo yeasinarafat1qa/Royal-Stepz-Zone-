@@ -198,7 +198,7 @@ export const AuthModal: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder={authMode === 'admin' ? 'yeasinarafat1.qa@gmail.com' : 'you@example.com'}
+                placeholder="Enter email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500"
@@ -245,17 +245,7 @@ export const AuthModal: React.FC = () => {
             )}
           </button>
 
-          {/* Helpful quick test button for Admin */}
-          <div className="pt-2 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={handleAutofillAdmin}
-              className="w-full py-1.5 px-2 bg-slate-950 hover:bg-slate-800 text-amber-400 text-[11px] rounded-lg border border-amber-500/20 flex items-center justify-center gap-1 font-semibold transition-colors"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Fill Authorized Admin Credentials (yeasinarafat1.qa@gmail.com)</span>
-            </button>
-          </div>
+          
         </form>
       </div>
     </div>
