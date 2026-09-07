@@ -53,7 +53,7 @@ export const AdminDashboard: React.FC = () => {
   } = useStore();
 
   // Admin login credentials state
-  const [adminEmailInput, setAdminEmailInput] = useState('yeasinarafat1.qa@gmail.com');
+  const [adminEmailInput, setAdminEmailInput] = useState('');
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -361,7 +361,7 @@ export const AdminDashboard: React.FC = () => {
                   required
                   value={adminEmailInput}
                   onChange={(e) => setAdminEmailInput(e.target.value)}
-                  placeholder="yeasinarafat1.qa@gmail.com"
+                  placeholder="Enter admin email"
                   className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
