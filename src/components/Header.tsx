@@ -250,7 +250,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
               <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 z-50 text-sm">
                 <div className="p-2 border-b border-slate-800">
                   <p className="font-bold text-slate-100 truncate">{user.name}</p>
-                  <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                 <p className="text-xs text-slate-400 truncate">
+  {user.isAdmin ? 'Qatar Store Headquarters' : user.email}
+</p>
                   {user.isAdmin && (
                     <span className="inline-block mt-1.5 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full border border-amber-500/30">
                       Master Administrator 👑
