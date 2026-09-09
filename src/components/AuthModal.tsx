@@ -2,251 +2,169 @@ import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { 
   X, 
-  User, 
   Lock, 
+  Phone, 
   Mail, 
   ShieldCheck, 
-  Crown, 
-  AlertCircle, 
-  CheckCircle2, 
-  Sparkles 
+  ArrowRight,
+  Sparkles,
+  AlertCircle
 } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
-  const { 
-    isAuthModalOpen, 
-    setIsAuthModalOpen, 
-    login, 
-    setIsAdminDashboardOpen 
-  } = useStore();
+  const { isAuthOpen, setIsAuthOpen, login } = useStore();
+  const [role, setRole] = useState<'customer' | 'admin'>('customer');
+  const [contactInfo, setContactInfo] = useState('');
+  const [adminKey, setAdminKey] = useState('');
+  const [error, setError] = useState('');
 
-  const [authMode, setAuthMode] = useState<'login' | 'register' | 'admin'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-
-  if (!isAuthModalOpen) return null;
-
-  const handleClose = () => {
-    setIsAuthModalOpen(false);
-    setErrorMsg('');
-    setSuccessMsg('');
-  };
+  if (!isAuthOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
+    setError('');
 
-    if (!email.trim()) {
-      setErrorMsg('Please enter your email address');
-      return;
-    }
-    if (!password.trim()) {
-      setErrorMsg('Please enter your password');
+    if (!contactInfo) {
+      setError('Please enter your Mobile Number or Email');
       return;
     }
 
-    const result = login(email, password, name || undefined);
-
-    if (result.success) {
-      setSuccessMsg(result.message);
-      setTimeout(() => {
-        handleClose();
-        // If master admin logged in, open the Admin Dashboard immediately!
-        if (result.isAdmin) {
-          setIsAdminDashboardOpen(true);
-        }
-      }, 700);
-    } else {
-      setErrorMsg(result.message);
+    if (role === 'admin' && !adminKey) {
+      setError('Please enter Admin Secret Key');
+      return;
     }
-  };
 
-  // Quick helper to autofill admin credentials for testing
-  const handleAutofillAdmin = () => {
-    setEmail('yeasinarafat1.qa@gmail.com');
-    setPassword('Ar@2925');
-    setName('Yeasin Arafat');
-    setAuthMode('admin');
+    const success = login(contactInfo, role, adminKey);
+    if (!success) {
+      setError('Invalid Admin Secret Key. Try: admin123 or royal2025');
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden my-6">
-        
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+      <div 
+        className="relative w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Background Glow */}
+        <div className="absolute -right-16 -top-16 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -left-16 -bottom-16 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Close Button */}
+        <button 
+          onClick={() => setIsAuthOpen(false)}
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 p-5 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-              {authMode === 'admin' ? <Crown className="w-4 h-4" /> : <User className="w-4 h-4" />}
+        <div className="text-center mb-6">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-amber-500/20">
+            <ShieldCheck className="w-6 h-6 text-slate-950" />
+          </div>
+          <h3 className="text-xl font-bold text-white tracking-wide">
+            {role === 'customer' ? 'Customer Sign In' : 'Admin Portal Access'}
+          </h3>
+          <p className="text-xs text-slate-400 mt-1">
+            {role === 'customer' 
+              ? 'Track orders & receive exclusive Qatar drops' 
+              : 'Authorized store management only'}
+          </p>
+        </div>
+
+        {/* Role Toggle */}
+        <div className="grid grid-cols-2 p-1 bg-slate-950 rounded-xl mb-6 border border-slate-800">
+          <button
+            type="button"
+            onClick={() => { setRole('customer'); setError(''); }}
+            className={`py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              role === 'customer'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Customer
+          </button>
+          <button
+            type="button"
+            onClick={() => { setRole('admin'); setError(''); }}
+            className={`py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              role === 'admin'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Store Admin
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-2 text-xs text-red-400">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <span>{error}</span>
             </div>
-            <div>
-              <h3 className="font-bold text-white text-base">
-                {authMode === 'admin'
-                  ? 'Master Admin Portal 🇶🇦'
-                  : authMode === 'register'
-                  ? 'Create Royal Stepz Account'
-                  : 'Customer Sign In'}
-              </h3>
-              <p className="text-xs text-slate-400">
-                {authMode === 'admin'
-                  ? 'Authorized administrator login only'
-                  : 'Access your orders, wishlist, and exclusive Qatar footwear drops'}
-              </p>
+          )}
+
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              {role === 'customer' ? 'Qatar Mobile Number or Email' : 'Admin Username / Email'}
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                {role === 'customer' ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
+              </div>
+              <input
+                type="text"
+                required
+                value={contactInfo}
+                onChange={(e) => setContactInfo(e.target.value)}
+                placeholder={role === 'customer' ? '+974 5555 1234 or email' : 'admin@royalstepz.qa'}
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono"
+              />
             </div>
           </div>
-          <button
-            onClick={handleClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        {/* Auth Mode Toggle Bar */}
-        <div className="grid grid-cols-3 bg-slate-950 p-1 border-b border-slate-800 text-xs">
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('login');
-              setErrorMsg('');
-            }}
-            className={`py-2 text-center font-bold rounded-lg transition-colors ${
-              authMode === 'login'
-                ? 'bg-slate-800 text-amber-400 shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('register');
-              setErrorMsg('');
-            }}
-            className={`py-2 text-center font-bold rounded-lg transition-colors ${
-              authMode === 'register'
-                ? 'bg-slate-800 text-amber-400 shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Register
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('admin');
-              setErrorMsg('');
-            }}
-            className={`py-2 text-center font-bold rounded-lg transition-colors ${
-              authMode === 'admin'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Admin 👑
-          </button>
-        </div>
-
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          {errorMsg && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs rounded-lg flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {successMsg && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs rounded-lg flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              <span>{successMsg}</span>
-            </div>
-          )}
-
-          {/* Name Field (if registering) */}
-          {authMode === 'register' && (
+          {role === 'admin' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Full Name
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">
+                Admin Secret Passkey
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
                 <input
-                  type="text"
+                  type="password"
                   required
-                  placeholder="e.g. Faisal Al-Hajri"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500"
+                  value={adminKey}
+                  onChange={(e) => setAdminKey(e.target.value)}
+                  placeholder="Enter Secret Key (e.g. admin123)"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono"
                 />
               </div>
+              <p className="text-[11px] text-amber-500/80 mt-1.5 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                <span>Default Admin Passkey: <strong>admin123</strong></span>
+              </p>
             </div>
           )}
 
-          {/* Email */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-              <input
-                type="email"
-                required
-                placeholder="Enter email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500"
-              />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-              <input
-                type="password"
-                required
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500"
-              />
-            </div>
-          </div>
-
-          {/* Submit */}
           <button
             type="submit"
-            className={`w-full py-2.5 font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all ${
-              authMode === 'admin'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/20'
-                : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
-            }`}
+            className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition-all cursor-pointer active:scale-[0.99] mt-2"
           >
-            {authMode === 'admin' ? (
-              <>
-                <Crown className="w-3.5 h-3.5" />
-                <span>Sign In as Master Admin</span>
-              </>
-            ) : authMode === 'register' ? (
-              <span>Create Customer Account</span>
-            ) : (
-              <span>Sign In to Royal Stepz</span>
-            )}
+            <span>{role === 'customer' ? 'Sign In / Continue' : 'Unlock Admin Portal'}</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
-
-          
         </form>
+
+        {/* Footer Note */}
+        <div className="mt-6 text-center text-[11px] text-slate-500">
+          Qatar Footwear Marketplace • Royal Stepz Zone
+        </div>
       </div>
     </div>
   );
