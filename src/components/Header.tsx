@@ -1,332 +1,272 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { 
+  ShoppingBag, 
   Search, 
-  ShoppingCart, 
-  MapPin, 
   User as UserIcon, 
-  Bell, 
-  Crown, 
-  ChevronDown, 
+  Menu, 
   X, 
-  ShieldCheck, 
-  LogOut, 
-  PackageCheck,
-  CheckCircle2,
-  Menu
+  Phone, 
+  ShieldAlert, 
+  LogOut,
+  Bell
 } from 'lucide-react';
 
-interface HeaderProps {
-  onToggleSidebar?: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
-  const {
-    user,
-    cart,
-    notifications,
-    unreadNotificationsCount,
+export const Header: React.FC = () => {
+  const { 
+    cart, 
+    setIsCartOpen, 
+    isAuthOpen,
+    setIsAuthOpen, 
+    user, 
+    logout, 
+    setIsAdminOpen,
     searchQuery,
     setSearchQuery,
     selectedCategory,
     setSelectedCategory,
-    setIsCartOpen,
-    setIsAuthModalOpen,
-    setIsAdminDashboardOpen,
     setIsNotificationsOpen,
-    logout,
-    settings,
+    notifications,
+    orders
   } = useStore();
 
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [showLocationTooltip, setShowLocationTooltip] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const cartTotalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const cartTotalPriceQAR = cart.reduce(
-    (acc, item) => acc + item.product.priceQAR * item.quantity,
-    0
-  );
+  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+  
+  // Calculate unread notifications & active orders count
+  const unreadCount = notifications.filter(n => !n.read).length;
+  const activeOrdersCount = orders.filter(o => o.status === 'Pending' || o.status === 'Confirmed' || o.status === 'Dispatched').length;
+  const notificationBadgeTotal = unreadCount > 0 ? unreadCount : (activeOrdersCount > 0 ? activeOrdersCount : 0);
 
-  const categories = [
-    'All Categories',
-    'Sneakers',
-    'Running',
-    'Formal',
-    'Loafers',
-    'Slides & Sandals',
-    'Limited Edition',
-  ];
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search is handled reactively by searchQuery
-    const catalogSection = document.getElementById('catalog-section');
-    if (catalogSection) {
-      catalogSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const categories = ['All', 'Sneakers', 'Casual', 'Running', 'Luxury', 'Slides'];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0f172a] text-white shadow-xl border-b border-slate-800">
-      {/* Top Banner for Qatar Delivery */}
-      <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 text-slate-950 font-semibold text-xs py-1.5 px-4 text-center flex items-center justify-center gap-2 tracking-wide">
-        <span className="inline-flex items-center gap-1 font-bold">
-          ROYAL STEPZ ZONE QATAR
-        </span>
-        <span className="hidden md:inline">•</span>
-        <span className="hidden md:inline">
-          Fast 24H Delivery in Doha, Lusail & Al Rayyan | Cash on Delivery Available
-        </span>
-        <span className="hidden sm:inline">•</span>
-        <span className="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[11px] font-bold">
-          Free Delivery
-        </span>
+    <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
+      {/* Top Banner - Qatar Hotline */}
+      <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 text-slate-950 text-xs py-1.5 px-4 font-semibold">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-slate-950 animate-pulse" />
+            <span>🇶🇦 Express 24h Delivery Across Qatar • Free on orders over 300 QAR</span>
+          </div>
+          <a 
+            href="https://wa.me/97455551234" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 hover:underline font-bold"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            <span>WhatsApp: +974 5555 1234</span>
+          </a>
+        </div>
       </div>
 
-      {/* Main Amazon-Style Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Left: Mobile Menu & Brand Logo */}
-        <div className="flex items-center gap-3">
-          {onToggleSidebar && (
-            <button
-              onClick={onToggleSidebar}
-              className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg lg:hidden"
-              aria-label="Open Menu"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          )}
-
-          <a href="#" className="flex items-center gap-2 group flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Crown className="w-5 h-5 text-amber-400" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-amber-400 bg-clip-text text-transparent leading-none">
-                ROYAL STEPZ
-              </span>
-              <span className="text-[10px] tracking-[0.25em] font-bold text-amber-400 uppercase">
-                ZONE • QATAR
-              </span>
-            </div>
-          </a>
-
-          {/* Deliver to Qatar Pill (Amazon style) */}
-          <div
-            className="relative hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:border hover:border-slate-700 cursor-pointer text-xs"
-            onClick={() => setShowLocationTooltip(!showLocationTooltip)}
+      {/* Main Navbar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
+          {/* Mobile menu trigger */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition-colors"
           >
-            <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0" />
-            <div className="flex flex-col text-left">
-              <span className="text-[11px] text-slate-400 leading-tight">Deliver to</span>
-              <span className="font-bold text-slate-100 flex items-center gap-1">
-                Doha, Qatar 🇶🇦
-              </span>
-            </div>
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
 
-            {showLocationTooltip && (
-              <div className="absolute top-12 left-0 w-64 bg-slate-900 border border-slate-700 rounded-lg p-3 shadow-2xl z-50 text-xs">
-                <div className="font-bold text-amber-400 mb-1">Coverage in Qatar</div>
-                <p className="text-slate-300">
-                  We offer 24h express delivery to all municipalities: Doha, Lusail, Al Rayyan, Al Wakrah, Al Khor, and Umm Salal.
-                </p>
-                <div className="mt-2 text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Cash on Delivery available
-                </div>
+          {/* Brand Logo */}
+          <div className="flex items-center gap-3">
+            <a href="/" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform duration-200">
+                <span className="text-slate-950 font-black text-xl tracking-tighter">RS</span>
               </div>
+              <div>
+                <span className="font-extrabold text-base sm:text-xl tracking-wider text-white flex items-center gap-1">
+                  ROYAL <span className="text-amber-400 font-black">STEPZ</span>
+                </span>
+                <span className="text-[10px] text-amber-500/90 font-mono tracking-widest block -mt-1 uppercase">
+                  ZONE • QATAR
+                </span>
+              </div>
+            </a>
+          </div>
+
+          {/* Desktop Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-md mx-4">
+            <div className="relative w-full">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search sneakers, Jordans, Yeezy, Panda..."
+                className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-full text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Desktop Categories */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-850'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </nav>
+
+          {/* Right Action Icons */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Orders & Notifications Bell */}
+            <button
+              onClick={() => setIsNotificationsOpen(true)}
+              className="relative p-2 sm:p-2.5 text-slate-300 hover:text-amber-400 transition-colors rounded-full hover:bg-slate-850"
+              title="My Orders & Notifications"
+            >
+              <Bell className="w-5 h-5" />
+              {notificationBadgeTotal > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center animate-pulse shadow">
+                  {notificationBadgeTotal}
+                </span>
+              )}
+            </button>
+
+            {/* User Account / Admin Action */}
+            {user ? (
+              <div className="flex items-center gap-1 sm:gap-2">
+                {user.isAdmin ? (
+                  <button
+                    onClick={() => setIsAdminOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-semibold transition-all shadow-sm"
+                    title="Open Admin Portal"
+                  >
+                    <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="hidden sm:inline font-mono uppercase tracking-wider">
+                      Admin
+                    </span>
+                  </button>
+                ) : (
+                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium">
+                    <UserIcon className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="truncate max-w-[90px]">{user.name}</span>
+                  </div>
+                )}
+                <button
+                  onClick={logout}
+                  title="Sign Out / Log Out"
+                  className="p-2 text-slate-400 hover:text-red-400 transition-colors rounded-full hover:bg-slate-800/80 cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsAuthOpen(!isAuthOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 hover:border-amber-500 text-slate-200 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-sm"
+                title="Customer / Admin Sign In"
+              >
+                <UserIcon className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline font-semibold">Sign In</span>
+              </button>
             )}
+
+            {/* Shopping Cart Trigger */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold px-3.5 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 cursor-pointer active:scale-95"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              <span className="text-xs hidden sm:inline">Bag</span>
+              {totalItems > 0 && (
+                <span className="bg-slate-950 text-amber-400 text-xs font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                  {totalItems}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Center: Amazon-Style Search Bar */}
-        <form
-          onSubmit={handleSearchSubmit}
-          className="flex-1 max-w-2xl mx-1 sm:mx-2 flex items-center rounded-lg overflow-hidden bg-slate-900 border border-slate-700 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/30 transition-all"
-        >
-          {/* Category Dropdown */}
-          <div className="relative hidden md:block">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              aria-label="Filter by Category"
-              className="h-10 bg-slate-800 text-slate-200 text-xs font-medium px-3 pr-7 border-r border-slate-700 focus:outline-none cursor-pointer appearance-none"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat === 'All Categories' ? 'All' : cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-3 pointer-events-none" />
-          </div>
-
-          {/* Search Input */}
-          <div className="relative flex-1 flex items-center">
+        {/* Mobile Search Bar */}
+        <div className="md:hidden pb-3">
+          <div className="relative w-full">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search sneakers, loafers, running shoes in QAR..."
-              className="w-full h-10 px-3.5 bg-slate-900 text-slate-100 text-sm placeholder:text-slate-500 focus:outline-none"
+              placeholder="Search shoes, sneakers..."
+              className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
             />
-            {searchQuery && (
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Drawer */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-slate-950 border-b border-slate-800 px-4 py-4 space-y-3">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+            Categories
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
               <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 p-1 text-slate-400 hover:text-white"
+                key={cat}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                  selectedCategory === cat
+                    ? 'bg-amber-500 text-slate-950'
+                    : 'bg-slate-900 text-slate-300 border border-slate-800'
+                }`}
               >
-                <X className="w-4 h-4" />
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div className="pt-2 border-t border-slate-800">
+            {user ? (
+              <div className="flex items-center justify-between text-xs text-slate-300">
+                <span>Signed in as: <strong>{user.name}</strong></span>
+                <button
+                  onClick={logout}
+                  className="text-red-400 hover:underline font-bold"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAuthOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer w-full text-left font-semibold"
+              >
+                <UserIcon className="w-4 h-4 text-amber-400" />
+                <span>Sign In / Admin Access</span>
               </button>
             )}
           </div>
-
-          {/* Search Button */}
-          <button
-            type="submit"
-            aria-label="Submit search"
-            className="h-10 px-4 sm:px-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold transition-colors flex items-center justify-center flex-shrink-0"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-        </form>
-
-        {/* Right Action Icons & User Controls */}
-        <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-          {/* Qatar Flag & Currency */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-xs text-slate-300 font-semibold border border-slate-800 rounded-md bg-slate-900/60">
-            <span className="text-sm">🇶🇦</span>
-            <span>QAR</span>
-          </div>
-
-          {/* Customer Notifications Bell */}
-          <button
-            onClick={() => setIsNotificationsOpen(true)}
-            className="relative p-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800/80 rounded-lg transition-colors"
-            title="Notifications & Order Updates"
-            aria-label="View notifications"
-          >
-            <Bell className="w-5 h-5" />
-            {unreadNotificationsCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white font-bold text-[10px] rounded-full flex items-center justify-center animate-pulse">
-                {unreadNotificationsCount}
-              </span>
-            )}
-          </button>
-
-          {/* Account / User Menu Dropdown (Amazon style) */}
-          <div className="relative">
-            <button
-              onClick={() => {
-                if (!user) {
-                  setIsAuthModalOpen(true);
-                } else {
-                  setIsUserMenuOpen(!isUserMenuOpen);
-                }
-              }}
-              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all text-left"
-            >
-              <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400">
-                {user?.isAdmin ? (
-                  <ShieldCheck className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <UserIcon className="w-4 h-4" />
-                )}
-              </div>
-              <div className="hidden sm:flex flex-col leading-none">
-                <span className="text-[10px] text-slate-400">
-                  {user ? 'Welcome,' : 'Hello, sign in'}
-                </span>
-                <span className="text-xs font-bold text-slate-100 truncate max-w-[90px] flex items-center gap-0.5">
-                  {user ? user.name.split(' ')[0] : 'Account'}
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </span>
-              </div>
-            </button>
-
-            {/* Dropdown Menu */}
-            {isUserMenuOpen && user && (
-              <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 z-50 text-sm">
-                <div className="p-2 border-b border-slate-800">
-                  <p className="font-bold text-slate-100 truncate">{user.name}</p>
-                 <p className="text-xs text-slate-400 truncate">
-  {user.isAdmin ? 'Qatar Store Headquarters' : user.email}
-</p>
-                  {user.isAdmin && (
-                    <span className="inline-block mt-1.5 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full border border-amber-500/30">
-                      Master Administrator 👑
-                    </span>
-                  )}
-                </div>
-
-                <div className="py-1">
-                  {/* ADMIN DASHBOARD LINK - ONLY APPEARS IF USER IS THE STRICT MASTER ADMIN! */}
-                  {user.isAdmin && (
-                    <button
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        setIsAdminDashboardOpen(true);
-                      }}
-                      className="w-full text-left px-3 py-2 text-amber-400 hover:bg-amber-500/10 font-bold rounded-lg flex items-center gap-2"
-                    >
-                      <Crown className="w-4 h-4 text-amber-400" />
-                      Admin Dashboard
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      setIsNotificationsOpen(true);
-                    }}
-                    className="w-full text-left px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg flex items-center gap-2 text-xs"
-                  >
-                    <PackageCheck className="w-4 h-4 text-amber-400" />
-                    My Orders & Notifications
-                  </button>
-                </div>
-
-                <div className="border-t border-slate-800 pt-1">
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      logout();
-                    }}
-                    className="w-full text-left px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2 text-xs"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Cart Icon & Total (Amazon style) */}
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="relative flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all text-slate-100"
-            title="View Cart"
-            aria-label="View shopping cart"
-          >
-            <div className="relative">
-              <ShoppingCart className="w-5 h-5 text-amber-400" />
-              {cartTotalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartTotalItems}
-                </span>
-              )}
-            </div>
-            <div className="hidden md:flex flex-col text-left leading-none">
-              <span className="text-[10px] text-amber-400 font-semibold">Cart</span>
-              <span className="text-xs font-bold text-white">
-                QAR {cartTotalPriceQAR}
-              </span>
-            </div>
-          </button>
         </div>
-      </div>
+      )}
     </header>
   );
 };
