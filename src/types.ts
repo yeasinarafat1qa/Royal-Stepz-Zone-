@@ -1,20 +1,18 @@
 export interface Product {
   id: string;
   name: string;
-  category: 'Sneakers' | 'Running' | 'Formal' | 'Loafers' | 'Slides & Sandals' | 'Limited Edition';
+  category: 'Men' | 'Women' | 'Running' | 'Sneakers' | 'Formal' | 'Boots';
   priceQAR: number;
   originalPriceQAR?: number;
-  rating: number;
-  reviewsCount: number;
   image: string;
-  description: string;
+  images?: string[];
   sizes: string[];
   colors: string[];
+  description: string;
   inStock: boolean;
-  isBestSeller?: boolean;
-  isDeal?: boolean;
-  badge?: string;
-  createdAt: string;
+  featured?: boolean;
+  isNew?: boolean;
+  brand?: string;
 }
 
 export interface CartItem {
@@ -40,13 +38,14 @@ export interface Order {
   status: 'Pending' | 'Confirmed' | 'Dispatched' | 'Delivered' | 'Cancelled';
   createdAt: string;
   customerEmail?: string;
-  whatsappSent: boolean;
+  deviceId?: string;
+  whatsappSent?: boolean;
 }
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   phone?: string;
   isAdmin: boolean;
 }
@@ -59,13 +58,18 @@ export interface NotificationItem {
   read: boolean;
   type: 'order' | 'deal' | 'system';
   orderId?: string;
+  recipientEmail?: string;
+  deviceId?: string;
 }
 
 export interface StoreSettings {
-  whatsappNumber: string;
   storeName: string;
-  storeAddress: string;
-  supportEmail: string;
   currency: string;
+  whatsappNumber: string;
+  adminEmail: string;
+  deliveryFeeQAR: number;
   freeShippingThresholdQAR: number;
+  bannerAnnouncement: string;
+  heroTitle: string;
+  heroSubtitle: string;
 }
