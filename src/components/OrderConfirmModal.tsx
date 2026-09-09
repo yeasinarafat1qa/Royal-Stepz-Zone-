@@ -226,9 +226,7 @@ export const OrderConfirmModal: React.FC = () => {
         {/* Modal Body */}
         <div className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-6">
           {activeDisplayOrder ? (
-            /* =========================================================================
-               DEDICATED FULL ORDER CONFIRMATION RECEIPT PAGE
-               ========================================================================= */
+            /* DEDICATED FULL ORDER CONFIRMATION RECEIPT PAGE */
             <div className="space-y-6 animate-fadeIn">
               {/* Celebration Icon & Main Status */}
               <div className="text-center space-y-3">
@@ -249,7 +247,7 @@ export const OrderConfirmModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* PROMINENT ORDER NUMBER CARD (Large & Copyable) */}
+              {/* PROMINENT ORDER NUMBER CARD */}
               <div className="bg-slate-950 border-2 border-amber-500/50 rounded-2xl p-4 sm:p-5 text-center space-y-3 shadow-xl shadow-amber-500/10 relative overflow-hidden">
                 <div className="text-xs font-black text-amber-500 uppercase tracking-widest">
                   YOUR ORDER NUMBER / অর্ডার নম্বর
@@ -474,9 +472,7 @@ export const OrderConfirmModal: React.FC = () => {
               </div>
             </div>
           ) : (
-            /* =========================================================================
-               ORDER CHECKOUT FORM VIEW
-               ========================================================================= */
+            /* ORDER CHECKOUT FORM VIEW */
             <form onSubmit={handleOrderSubmit} className="space-y-5">
               {/* Validation error message banner */}
               {formError && (
