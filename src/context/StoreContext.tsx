@@ -1,10 +1,84 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, CartItem, Order, User, StoreSettings, NotificationItem } from '../types';
-import { initialProducts, initialSettings } from '../data/products';
 import { db } from '../firebase';
 import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-// Standalone local device ID generator (No external file needed)
+// Default initial store settings (Self-contained)
+const defaultInitialSettings: StoreSettings = {
+  storeName: 'Royal Stepz Zone Qatar',
+  currency: 'QAR',
+  deliveryFeeQAR: 25,
+  freeShippingThresholdQAR: 300,
+  whatsappNumber: '+974 5555 1234',
+  supportEmail: 'support@royalstepz.qa',
+  adminKey: 'admin123',
+};
+
+// Default initial products (Self-contained)
+const defaultInitialProducts: Product[] = [
+  {
+    id: 'shoe-1',
+    name: 'Air Jordan 1 Retro High OG "Chicago"',
+    brand: 'Nike',
+    category: 'Sneakers',
+    priceQAR: 650,
+    originalPriceQAR: 850,
+    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
+    image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800&q=80',
+    description: 'Iconic Chicago colorway silhouette designed with premium leather and legendary Nike Air cushioning for maximum Qatar streetwear prestige.',
+    rating: 4.9,
+    reviewCount: 128,
+    isFeatured: true,
+    isNewArrival: true,
+    isBestseller: true,
+  },
+  {
+    id: 'shoe-2',
+    name: 'Yeezy Boost 350 V2 "Onyx"',
+    brand: 'Adidas',
+    category: 'Sneakers',
+    priceQAR: 720,
+    originalPriceQAR: 900,
+    sizes: ['EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&q=80',
+    description: 'Triple black Primeknit upper with full-length Boost sole technology providing exceptional walking comfort in Doha heat.',
+    rating: 4.8,
+    reviewCount: 95,
+    isFeatured: true,
+    isBestseller: true,
+  },
+  {
+    id: 'shoe-3',
+    name: 'Nike Dunk Low Retro "Panda"',
+    brand: 'Nike',
+    category: 'Casual',
+    priceQAR: 420,
+    originalPriceQAR: 520,
+    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&q=80',
+    description: 'Classic monochrome black and white Dunk Low styling perfect for daily lifestyle comfort and easy outfit pairing.',
+    rating: 4.9,
+    reviewCount: 210,
+    isFeatured: true,
+    isBestseller: true,
+  },
+  {
+    id: 'shoe-4',
+    name: 'New Balance 9060 "Sea Salt"',
+    brand: 'New Balance',
+    category: 'Running',
+    priceQAR: 580,
+    originalPriceQAR: 690,
+    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43'],
+    image: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&q=80',
+    description: 'Futuristic chunky aesthetic with ABZORB and SBS cushioning engineered for all-day cushioning and luxury lifestyle.',
+    rating: 4.7,
+    reviewCount: 64,
+    isNewArrival: true,
+  }
+];
+
+// Standalone local device ID generator
 const getDeviceId = (): string => {
   if (typeof window === 'undefined') return 'server_device';
   let devId = localStorage.getItem('rsz_device_id');
@@ -92,32 +166,14 @@ const USER_KEY = 'rsz_user_v3';
 const SETTINGS_KEY = 'rsz_settings_v3';
 const MY_ORDER_IDS_KEY = 'rsz_my_order_ids';
 
-export enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    operationType,
-    path,
-  };
-  console.warn('Firestore Operation Info: ', JSON.stringify(errInfo));
-}
-
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Products
   const [products, setProducts] = useState<Product[]>(() => {
     try {
       const local = localStorage.getItem(PRODUCTS_KEY);
-      return local ? JSON.parse(local) : initialProducts;
+      return local ? JSON.parse(local) : defaultInitialProducts;
     } catch {
-      return initialProducts;
+      return defaultInitialProducts;
     }
   });
 
@@ -165,9 +221,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [settings, setSettings] = useState<StoreSettings>(() => {
     try {
       const local = localStorage.getItem(SETTINGS_KEY);
-      return local ? JSON.parse(local) : initialSettings;
+      return local ? JSON.parse(local) : defaultInitialSettings;
     } catch {
-      return initialSettings;
+      return defaultInitialSettings;
     }
   });
 
@@ -188,7 +244,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
     } catch (e) {
-      console.warn('Storage quota exceeded for products', e);
+      console.warn('Storage error', e);
     }
   }, [products]);
 
@@ -196,7 +252,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
     } catch (e) {
-      console.warn('Storage quota exceeded for cart', e);
+      console.warn('Storage error', e);
     }
   }, [cart]);
 
@@ -204,7 +260,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     } catch (e) {
-      console.warn('Storage quota exceeded for orders', e);
+      console.warn('Storage error', e);
     }
   }, [orders]);
 
@@ -212,7 +268,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
     } catch (e) {
-      console.warn('Storage quota exceeded for notifications', e);
+      console.warn('Storage error', e);
     }
   }, [notifications]);
 
@@ -228,7 +284,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (e) {
-      console.warn('Storage quota exceeded for settings', e);
+      console.warn('Storage error', e);
     }
   }, [settings]);
 
@@ -243,20 +299,16 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const cloudProducts = snapshot.docs.map(d => d.data() as Product);
             setProducts(cloudProducts);
           } else {
-            initialProducts.forEach(prod => {
-              setDoc(doc(db, 'products', prod.id), prod).catch(err => {
-                handleFirestoreError(err, OperationType.CREATE, `products/${prod.id}`);
-              });
+            defaultInitialProducts.forEach(prod => {
+              setDoc(doc(db, 'products', prod.id), prod).catch(() => {});
             });
           }
         },
-        (error) => {
-          handleFirestoreError(error, OperationType.LIST, 'products');
-        }
+        () => {}
       );
       return () => unsubscribe();
     } catch (e) {
-      console.warn('Firestore products listener initialization:', e);
+      console.warn(e);
     }
   }, []);
 
@@ -273,13 +325,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setOrders(cloudOrders);
           }
         },
-        (error) => {
-          handleFirestoreError(error, OperationType.LIST, 'orders');
-        }
+        () => {}
       );
       return () => unsubscribe();
     } catch (e) {
-      console.warn('Firestore orders listener initialization:', e);
+      console.warn(e);
     }
   }, []);
 
@@ -306,13 +356,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             });
           }
         },
-        (error) => {
-          handleFirestoreError(error, OperationType.LIST, 'notifications');
-        }
+        () => {}
       );
       return () => unsubscribe();
     } catch (e) {
-      console.warn('Firestore notifications listener initialization:', e);
+      console.warn(e);
     }
   }, []);
 
@@ -329,18 +377,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               setSettings(generalDoc.data() as StoreSettings);
             }
           } else {
-            setDoc(doc(db, 'settings', 'general'), initialSettings).catch(err => {
-              handleFirestoreError(err, OperationType.CREATE, 'settings/general');
-            });
+            setDoc(doc(db, 'settings', 'general'), defaultInitialSettings).catch(() => {});
           }
         },
-        (error) => {
-          handleFirestoreError(error, OperationType.LIST, 'settings');
-        }
+        () => {}
       );
       return () => unsubscribe();
     } catch (e) {
-      console.warn('Firestore settings listener initialization:', e);
+      console.warn(e);
     }
   }, []);
 
@@ -466,7 +510,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setOrders(prev => [newOrder, ...prev]);
     setLastConfirmedOrder(newOrder);
 
-    // Save order ID to local storage so this browser device can ALWAYS view & edit its own order
+    // Save order ID to local storage for persistent guest tracking
     try {
       const raw = localStorage.getItem(MY_ORDER_IDS_KEY);
       const list: string[] = raw ? JSON.parse(raw) : [];
@@ -478,12 +522,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       localStorage.setItem(MY_ORDER_IDS_KEY, JSON.stringify(list));
     } catch (e) {
-      console.warn('Could not save order id to localStorage:', e);
+      console.warn(e);
     }
 
-    setDoc(doc(db, 'orders', newOrder.id), JSON.parse(JSON.stringify(newOrder))).catch(err => {
-      handleFirestoreError(err, OperationType.CREATE, `orders/${newOrder.id}`);
-    });
+    setDoc(doc(db, 'orders', newOrder.id), JSON.parse(JSON.stringify(newOrder))).catch(() => {});
 
     // Create Notification for Customer
     const customerNotification: NotificationItem = {
@@ -499,9 +541,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [customerNotification, ...prev]);
 
-    setDoc(doc(db, 'notifications', customerNotification.id), JSON.parse(JSON.stringify(customerNotification))).catch(err => {
-      handleFirestoreError(err, OperationType.CREATE, `notifications/${customerNotification.id}`);
-    });
+    setDoc(doc(db, 'notifications', customerNotification.id), JSON.parse(JSON.stringify(customerNotification))).catch(() => {});
 
     if (!targetCheckoutItem) {
       clearCart();
@@ -538,9 +578,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       prev.map(order => (order.id === orderId ? { ...order, status } : order))
     );
 
-    updateDoc(doc(db, 'orders', orderId), { status }).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, `orders/${orderId}`);
-    });
+    updateDoc(doc(db, 'orders', orderId), { status }).catch(() => {});
   };
 
   const cancelOrder = (orderId: string, reason?: string) => {
@@ -567,9 +605,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     updateDoc(doc(db, 'orders', orderId), {
       status: updatedStatus,
       notes: targetOrder.notes ? `${targetOrder.notes} | ${cancellationNote}` : cancellationNote,
-    }).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, `orders/${orderId}`);
-    });
+    }).catch(() => {});
 
     const cancelNotif: NotificationItem = {
       id: 'notif-cancel-' + Date.now(),
@@ -583,9 +619,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [cancelNotif, ...prev]);
 
-    setDoc(doc(db, 'notifications', cancelNotif.id), JSON.parse(JSON.stringify(cancelNotif))).catch(err => {
-      handleFirestoreError(err, OperationType.CREATE, `notifications/${cancelNotif.id}`);
-    });
+    setDoc(doc(db, 'notifications', cancelNotif.id), JSON.parse(JSON.stringify(cancelNotif))).catch(() => {});
   };
 
   const editOrder = (
@@ -620,9 +654,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     const payload: any = { ...updatedFields, subtotalQAR: subtotal, deliveryFeeQAR: deliveryFee, totalQAR: total };
-    updateDoc(doc(db, 'orders', orderId), JSON.parse(JSON.stringify(payload))).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, `orders/${orderId}`);
-    });
+    updateDoc(doc(db, 'orders', orderId), JSON.parse(JSON.stringify(payload))).catch(() => {});
 
     const editNotif: NotificationItem = {
       id: 'notif-edit-' + Date.now(),
@@ -637,9 +669,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [editNotif, ...prev]);
 
-    setDoc(doc(db, 'notifications', editNotif.id), JSON.parse(JSON.stringify(editNotif))).catch(err => {
-      handleFirestoreError(err, OperationType.CREATE, `notifications/${editNotif.id}`);
-    });
+    setDoc(doc(db, 'notifications', editNotif.id), JSON.parse(JSON.stringify(editNotif))).catch(() => {});
   };
 
   const deleteOrder = (orderId: string) => {
@@ -647,9 +677,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (lastConfirmedOrder && lastConfirmedOrder.id === orderId) {
       setLastConfirmedOrder(null);
     }
-    deleteDoc(doc(db, 'orders', orderId)).catch(err => {
-      handleFirestoreError(err, OperationType.DELETE, `orders/${orderId}`);
-    });
+    deleteDoc(doc(db, 'orders', orderId)).catch(() => {});
   };
 
   const sendCustomerNotification = (notification: {
@@ -673,34 +701,26 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [newNotif, ...prev]);
 
-    setDoc(doc(db, 'notifications', newNotif.id), JSON.parse(JSON.stringify(newNotif))).catch(err => {
-      handleFirestoreError(err, OperationType.CREATE, `notifications/${newNotif.id}`);
-    });
+    setDoc(doc(db, 'notifications', newNotif.id), JSON.parse(JSON.stringify(newNotif))).catch(() => {});
   };
 
   const deleteNotification = (notificationId: string) => {
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
-    deleteDoc(doc(db, 'notifications', notificationId)).catch(err => {
-      handleFirestoreError(err, OperationType.DELETE, `notifications/${notificationId}`);
-    });
+    deleteDoc(doc(db, 'notifications', notificationId)).catch(() => {});
   };
 
   const updateNotification = (notificationId: string, title: string, message: string) => {
     setNotifications(prev =>
       prev.map(n => (n.id === notificationId ? { ...n, title, message } : n))
     );
-    updateDoc(doc(db, 'notifications', notificationId), { title, message }).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, `notifications/${notificationId}`);
-    });
+    updateDoc(doc(db, 'notifications', notificationId), { title, message }).catch(() => {});
   };
 
   const markNotificationAsRead = (notificationId: string) => {
     setNotifications(prev =>
       prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
     );
-    updateDoc(doc(db, 'notifications', notificationId), { read: true }).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, `notifications/${notificationId}`);
-    });
+    updateDoc(doc(db, 'notifications', notificationId), { read: true }).catch(() => {});
   };
 
   // Product Management
@@ -712,9 +732,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setProducts(prev => [productWithId, ...prev]);
 
-    setDoc(doc(db, 'products', newId), productWithId).catch(err => {
-      handleFirestoreError(err, OperationType.CREATE, `products/${newId}`);
-    });
+    setDoc(doc(db, 'products', newId), productWithId).catch(() => {});
   };
 
   const updateProduct = (id: string, updatedFields: Partial<Product>) => {
@@ -722,16 +740,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       prev.map(p => (p.id === id ? { ...p, ...updatedFields } : p))
     );
 
-    updateDoc(doc(db, 'products', id), updatedFields).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, `products/${id}`);
-    });
+    updateDoc(doc(db, 'products', id), updatedFields).catch(() => {});
   };
 
   const deleteProduct = (id: string) => {
     setProducts(prev => prev.filter(p => p.id !== id));
-    deleteDoc(doc(db, 'products', id)).catch(err => {
-      handleFirestoreError(err, OperationType.DELETE, `products/${id}`);
-    });
+    deleteDoc(doc(db, 'products', id)).catch(() => {});
   };
 
   // Settings Management
@@ -739,9 +753,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const merged = { ...settings, ...newSettings };
     setSettings(merged);
 
-    setDoc(doc(db, 'settings', 'general'), merged).catch(err => {
-      handleFirestoreError(err, OperationType.UPDATE, 'settings/general');
-    });
+    setDoc(doc(db, 'settings', 'general'), merged).catch(() => {});
   };
 
   return (
