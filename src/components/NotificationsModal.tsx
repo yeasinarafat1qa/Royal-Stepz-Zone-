@@ -11,12 +11,8 @@ import {
   ShoppingBag, 
   MapPin, 
   Calendar,
-  Phone,
-  MessageCircle,
   FileText,
-  AlertCircle,
   Edit2,
-  Trash2,
   Check,
   Save,
   ChevronRight
@@ -41,16 +37,14 @@ export const NotificationsModal: React.FC = () => {
     notifications,
     orders,
     user,
-    markNotificationAsRead,
     cancelOrder,
     editOrder,
-    settings,
     setIsOrderConfirmModalOpen,
     setLastConfirmedOrder,
     setTargetCheckoutItem,
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'notifications' | 'orders'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'notifications'>('orders');
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState<string>('');
   
@@ -73,8 +67,8 @@ export const NotificationsModal: React.FC = () => {
     try {
       const raw = localStorage.getItem('rsz_my_order_ids');
       if (raw) storedOrderIds = JSON.parse(raw);
-    } catch (e) {
-      console.warn('Error reading stored order IDs:', e);
+    } catch {
+      storedOrderIds = [];
     }
 
     return orders.filter(o => {
@@ -271,7 +265,7 @@ export const NotificationsModal: React.FC = () => {
                             </span>
                             <button
                               onClick={() => setEditingOrderId(null)}
-                              className="text-[11px] text-slate-400 hover:text-white"
+                              className="text-[11px] text-slate-400 hover:text-white cursor-pointer"
                             >
                               Cancel Edit
                             </button>
@@ -342,7 +336,7 @@ export const NotificationsModal: React.FC = () => {
                           <div className="flex justify-end gap-2 pt-2">
                             <button
                               onClick={() => handleSaveEdit(ord.id)}
-                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1.5 shadow"
+                              className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs flex items-center gap-1.5 shadow cursor-pointer"
                             >
                               <Save className="w-3.5 h-3.5" />
                               <span>Save Changes</span>
@@ -385,13 +379,13 @@ export const NotificationsModal: React.FC = () => {
                               <div className="flex justify-end gap-2 pt-1">
                                 <button
                                   onClick={() => setCancellingOrderId(null)}
-                                  className="px-2.5 py-1 text-slate-400 hover:text-white"
+                                  className="px-2.5 py-1 text-slate-400 hover:text-white cursor-pointer"
                                 >
                                   Keep Order
                                 </button>
                                 <button
                                   onClick={() => handleConfirmCancel(ord.id)}
-                                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg text-xs"
+                                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg text-xs cursor-pointer"
                                 >
                                   Confirm Cancel
                                 </button>
@@ -409,7 +403,7 @@ export const NotificationsModal: React.FC = () => {
                                 setIsNotificationsOpen(false);
                                 setIsOrderConfirmModalOpen(true);
                               }}
-                              className="px-2.5 py-1.5 bg-slate-850 hover:bg-slate-800 text-slate-200 font-bold rounded-lg text-xs border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-xs border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
                             >
                               <FileText className="w-3.5 h-3.5 text-amber-400" />
                               <span>View Golden Receipt</span>
