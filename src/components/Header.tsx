@@ -34,7 +34,6 @@ export const Header: React.FC = () => {
 
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   
-  // Calculate unread notifications & active orders count
   const unreadCount = notifications.filter(n => !n.read).length;
   const activeOrdersCount = orders.filter(o => o.status === 'Pending' || o.status === 'Confirmed' || o.status === 'Dispatched').length;
   const notificationBadgeTotal = unreadCount > 0 ? unreadCount : (activeOrdersCount > 0 ? activeOrdersCount : 0);
@@ -134,7 +133,7 @@ export const Header: React.FC = () => {
             {/* Orders & Notifications Bell */}
             <button
               onClick={() => setIsNotificationsOpen(true)}
-              className="relative p-2 sm:p-2.5 text-slate-300 hover:text-amber-400 transition-colors rounded-full hover:bg-slate-850"
+              className="relative p-2 sm:p-2.5 text-slate-300 hover:text-amber-400 transition-colors rounded-full hover:bg-slate-850 cursor-pointer"
               title="My Orders & Notifications"
             >
               <Bell className="w-5 h-5" />
@@ -145,44 +144,42 @@ export const Header: React.FC = () => {
               )}
             </button>
 
-            {/* User Account / Admin Action */}
-            {user ? (
-              <div className="flex items-center gap-1 sm:gap-2">
-                {user.isAdmin ? (
-                  <button
-                    onClick={() => setIsAdminOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-semibold transition-all shadow-sm"
-                    title="Open Admin Portal"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="hidden sm:inline font-mono uppercase tracking-wider">
-                      Admin
-                    </span>
-                  </button>
-                ) : (
-                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium">
-                    <UserIcon className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="truncate max-w-[90px]">{user.name}</span>
-                  </div>
-                )}
-                <button
-                  onClick={logout}
-                  title="Sign Out / Log Out"
-                  className="p-2 text-slate-400 hover:text-red-400 transition-colors rounded-full hover:bg-slate-800/80 cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
+            {/* DIRECT ADMIN & SIGN IN ACTIONS */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Direct 1-Click Admin Button */}
               <button
-                onClick={() => setIsAuthOpen(!isAuthOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 hover:border-amber-500 text-slate-200 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-sm"
-                title="Customer / Admin Sign In"
+                onClick={() => setIsAdminOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+                title="Open Store Admin Dashboard"
               >
-                <UserIcon className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden sm:inline font-semibold">Sign In</span>
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Admin</span>
               </button>
-            )}
+
+              {user ? (
+                <div className="flex items-center gap-1">
+                  <span className="hidden sm:inline text-xs text-slate-300 font-medium px-2 py-1 rounded bg-slate-800 border border-slate-700 truncate max-w-[80px]">
+                    {user.name}
+                  </span>
+                  <button
+                    onClick={logout}
+                    title="Sign Out / Log Out"
+                    className="p-1.5 text-slate-400 hover:text-red-400 rounded-full hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsAuthOpen(!isAuthOpen)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 hover:border-amber-500 text-slate-200 hover:text-white text-xs font-medium transition-all cursor-pointer"
+                  title="Customer Sign In"
+                >
+                  <UserIcon className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Sign In</span>
+                </button>
+              )}
+            </div>
 
             {/* Shopping Cart Trigger */}
             <button
@@ -240,10 +237,22 @@ export const Header: React.FC = () => {
             ))}
           </div>
 
-          <div className="pt-2 border-t border-slate-800">
+          <div className="pt-2 border-t border-slate-800 space-y-2">
+            {/* Mobile Direct Admin Portal Button */}
+            <button
+              onClick={() => {
+                setIsAdminOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-950 bg-amber-500 hover:bg-amber-400 font-bold rounded-lg transition-colors cursor-pointer w-full text-left shadow"
+            >
+              <ShieldAlert className="w-4 h-4" />
+              <span>Admin Dashboard (নতুন জুতো যোগ / এডিট)</span>
+            </button>
+
             {user ? (
-              <div className="flex items-center justify-between text-xs text-slate-300">
-                <span>Signed in as: <strong>{user.name}</strong></span>
+              <div className="flex items-center justify-between text-xs text-slate-300 px-1 pt-1">
+                <span>Signed in: <strong>{user.name}</strong></span>
                 <button
                   onClick={logout}
                   className="text-red-400 hover:underline font-bold"
@@ -253,15 +262,14 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
+                onClick={() => {
                   setIsAuthOpen(true);
                   setIsMobileMenuOpen(false);
                 }}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer w-full text-left font-semibold"
               >
                 <UserIcon className="w-4 h-4 text-amber-400" />
-                <span>Sign In / Admin Access</span>
+                <span>Customer Sign In</span>
               </button>
             )}
           </div>
