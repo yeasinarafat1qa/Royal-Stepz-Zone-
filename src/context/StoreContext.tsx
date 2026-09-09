@@ -3,7 +3,7 @@ import { Product, CartItem, Order, User, StoreSettings, NotificationItem } from 
 import { db } from '../firebase';
 import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-// Default initial store settings (Self-contained)
+// Default initial store settings
 const defaultInitialSettings: StoreSettings = {
   storeName: 'Royal Stepz Zone Qatar',
   currency: 'QAR',
@@ -14,8 +14,8 @@ const defaultInitialSettings: StoreSettings = {
   adminKey: 'admin123',
 };
 
-// Default initial products (Self-contained)
-const defaultInitialProducts: Product[] = [
+// Initial Footwear Collection
+const initialDefaultProducts: Product[] = [
   {
     id: 'shoe-1',
     name: 'Air Jordan 1 Retro High OG "Chicago"',
@@ -75,6 +75,64 @@ const defaultInitialProducts: Product[] = [
     rating: 4.7,
     reviewCount: 64,
     isNewArrival: true,
+  },
+  {
+    id: 'shoe-5',
+    name: 'Air Jordan 4 Retro "Military Black"',
+    brand: 'Nike',
+    category: 'Sneakers',
+    priceQAR: 780,
+    originalPriceQAR: 950,
+    sizes: ['EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
+    image: 'https://images.unsplash.com/photo-1575537302964-96cd47c06b1b?w=800&q=80',
+    description: 'Premium smooth white leather accented with neutral grey suede and crisp black accents for Qatar sneakerheads.',
+    rating: 4.9,
+    reviewCount: 180,
+    isFeatured: true,
+    isBestseller: true,
+  },
+  {
+    id: 'shoe-6',
+    name: 'Nike Air Force 1 07 "Triple White"',
+    brand: 'Nike',
+    category: 'Casual',
+    priceQAR: 390,
+    originalPriceQAR: 460,
+    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
+    image: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=800&q=80',
+    description: 'The radiance lives on in the Nike Air Force 1 07, the b-ball icon that puts a fresh spin on crisp leather and clean lines.',
+    rating: 4.9,
+    reviewCount: 340,
+    isFeatured: true,
+    isBestseller: true,
+  },
+  {
+    id: 'shoe-7',
+    name: 'Adidas Samba Classic "Cloud White"',
+    brand: 'Adidas',
+    category: 'Casual',
+    priceQAR: 350,
+    originalPriceQAR: 430,
+    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    image: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=800&q=80',
+    description: 'Full grain leather upper with gritty suede overlays and signature gum rubber outsole for timeless street appeal.',
+    rating: 4.8,
+    reviewCount: 156,
+    isNewArrival: true,
+  },
+  {
+    id: 'shoe-8',
+    name: 'ASICS GEL-Kayano 14 "White Slate"',
+    brand: 'Asics',
+    category: 'Running',
+    priceQAR: 620,
+    originalPriceQAR: 750,
+    sizes: ['EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    image: 'https://images.unsplash.com/photo-1582588678413-dbf45f4823e9?w=800&q=80',
+    description: 'Late 2000s aesthetic reimagined with mirrored GEL technology cushioning for premium running performance in Qatar.',
+    rating: 4.8,
+    reviewCount: 78,
+    isFeatured: true,
   }
 ];
 
@@ -157,13 +215,12 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-// Local Storage Keys
-const PRODUCTS_KEY = 'rsz_products_v3';
-const CART_KEY = 'rsz_cart_v3';
-const ORDERS_KEY = 'rsz_orders_v3';
-const NOTIFICATIONS_KEY = 'rsz_notifications_v3';
-const USER_KEY = 'rsz_user_v3';
-const SETTINGS_KEY = 'rsz_settings_v3';
+const PRODUCTS_KEY = 'rsz_products_v4';
+const CART_KEY = 'rsz_cart_v4';
+const ORDERS_KEY = 'rsz_orders_v4';
+const NOTIFICATIONS_KEY = 'rsz_notifications_v4';
+const USER_KEY = 'rsz_user_v4';
+const SETTINGS_KEY = 'rsz_settings_v4';
 const MY_ORDER_IDS_KEY = 'rsz_my_order_ids';
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -171,9 +228,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [products, setProducts] = useState<Product[]>(() => {
     try {
       const local = localStorage.getItem(PRODUCTS_KEY);
-      return local ? JSON.parse(local) : defaultInitialProducts;
+      return local ? JSON.parse(local) : initialDefaultProducts;
     } catch {
-      return defaultInitialProducts;
+      return initialDefaultProducts;
     }
   });
 
@@ -227,7 +284,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
 
-  // Filters & State
+  // Filters & Modal State
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedBrand, setSelectedBrand] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -239,12 +296,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [targetCheckoutItem, setTargetCheckoutItem] = useState<CartItem | null>(null);
   const [lastConfirmedOrder, setLastConfirmedOrder] = useState<Order | null>(null);
 
-  // Sync to localStorage
+  // Sync state to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
     } catch (e) {
-      console.warn('Storage error', e);
+      console.warn(e);
     }
   }, [products]);
 
@@ -252,7 +309,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
     } catch (e) {
-      console.warn('Storage error', e);
+      console.warn(e);
     }
   }, [cart]);
 
@@ -260,7 +317,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     } catch (e) {
-      console.warn('Storage error', e);
+      console.warn(e);
     }
   }, [orders]);
 
@@ -268,7 +325,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
     } catch (e) {
-      console.warn('Storage error', e);
+      console.warn(e);
     }
   }, [notifications]);
 
@@ -284,11 +341,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (e) {
-      console.warn('Storage error', e);
+      console.warn(e);
     }
   }, [settings]);
 
-  // Real-time Firestore Sync for Products
+  // Real-time Firestore Sync for Products (Loads all saved shoes from Database)
   useEffect(() => {
     try {
       const productsRef = collection(db, 'products');
@@ -299,12 +356,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const cloudProducts = snapshot.docs.map(d => d.data() as Product);
             setProducts(cloudProducts);
           } else {
-            defaultInitialProducts.forEach(prod => {
+            // If completely empty, initialize with defaults
+            initialDefaultProducts.forEach(prod => {
               setDoc(doc(db, 'products', prod.id), prod).catch(() => {});
             });
           }
         },
-        () => {}
+        (error) => {
+          console.warn('Products sync:', error);
+        }
       );
       return () => unsubscribe();
     } catch (e) {
@@ -723,7 +783,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     updateDoc(doc(db, 'notifications', notificationId), { read: true }).catch(() => {});
   };
 
-  // Product Management
+  // Product Management (Syncs directly with Firebase)
   const addProduct = (newProductData: Omit<Product, 'id'>) => {
     const newId = 'shoe-' + Date.now();
     const productWithId: Product = {
