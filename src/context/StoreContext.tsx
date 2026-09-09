@@ -1,9 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, CartItem, Order, User, StoreSettings, NotificationItem } from '../types';
-import { initialProducts, initialSettings, qatarLocations } from '../data/products';
+import { initialProducts, initialSettings } from '../data/products';
 import { db } from '../firebase';
 import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { getDeviceId } from '../utils/device';
+
+// Standalone local device ID generator (No external file needed)
+const getDeviceId = (): string => {
+  if (typeof window === 'undefined') return 'server_device';
+  let devId = localStorage.getItem('rsz_device_id');
+  if (!devId) {
+    devId = 'dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
+    localStorage.setItem('rsz_device_id', devId);
+  }
+  return devId;
+};
 
 interface StoreContextType {
   products: Product[];
@@ -233,7 +243,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const cloudProducts = snapshot.docs.map(d => d.data() as Product);
             setProducts(cloudProducts);
           } else {
-            // Seed initial products to Firestore if empty
             initialProducts.forEach(prod => {
               setDoc(doc(db, 'products', prod.id), prod).catch(err => {
                 handleFirestoreError(err, OperationType.CREATE, `products/${prod.id}`);
@@ -260,7 +269,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         (snapshot) => {
           if (!snapshot.empty) {
             const cloudOrders = snapshot.docs.map(d => d.data() as Order);
-            // Sort orders descending by createdAt
             cloudOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             setOrders(cloudOrders);
           }
@@ -321,7 +329,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               setSettings(generalDoc.data() as StoreSettings);
             }
           } else {
-            // Seed settings if empty
             setDoc(doc(db, 'settings', 'general'), initialSettings).catch(err => {
               handleFirestoreError(err, OperationType.CREATE, 'settings/general');
             });
@@ -456,7 +463,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       createdAt: new Date().toISOString(),
     };
 
-    // Save order locally and record as last confirmed
     setOrders(prev => [newOrder, ...prev]);
     setLastConfirmedOrder(newOrder);
 
@@ -475,7 +481,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       console.warn('Could not save order id to localStorage:', e);
     }
 
-    // Save to Firestore with error handling
     setDoc(doc(db, 'orders', newOrder.id), JSON.parse(JSON.stringify(newOrder))).catch(err => {
       handleFirestoreError(err, OperationType.CREATE, `orders/${newOrder.id}`);
     });
@@ -494,17 +499,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [customerNotification, ...prev]);
 
-    // Persist customer notification to Firestore
     setDoc(doc(db, 'notifications', customerNotification.id), JSON.parse(JSON.stringify(customerNotification))).catch(err => {
       handleFirestoreError(err, OperationType.CREATE, `notifications/${customerNotification.id}`);
     });
 
-    // Clear cart if target was whole cart
     if (!targetCheckoutItem) {
       clearCart();
     }
 
-    // Format WhatsApp confirmation text
     const itemsList = items
       .map(i => `• ${i.quantity}x ${i.product.name} (Size: ${i.selectedSize}) - QAR ${i.product.priceQAR * i.quantity}`)
       .join('\n');
@@ -581,7 +583,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [cancelNotif, ...prev]);
 
-    // Persist cancel notification to Firestore
     setDoc(doc(db, 'notifications', cancelNotif.id), JSON.parse(JSON.stringify(cancelNotif))).catch(err => {
       handleFirestoreError(err, OperationType.CREATE, `notifications/${cancelNotif.id}`);
     });
@@ -636,7 +637,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setNotifications(prev => [editNotif, ...prev]);
 
-    // Persist edit notification to Firestore
     setDoc(doc(db, 'notifications', editNotif.id), JSON.parse(JSON.stringify(editNotif))).catch(err => {
       handleFirestoreError(err, OperationType.CREATE, `notifications/${editNotif.id}`);
     });
