@@ -1,27 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
-import { getDeviceId } from '../utils/device';
 import { 
   X, 
   Bell, 
   Package, 
-  CheckCheck, 
   Clock, 
-  AlertCircle, 
   Truck, 
   CheckCircle, 
   XCircle, 
   ShoppingBag,
-  ExternalLink,
-  Edit3,
-  Trash2,
-  Save,
-  ArrowRight,
-  Sparkles,
-  ChevronDown,
   FileText
 } from 'lucide-react';
-import { Order, CartItem, Product } from '../types';
+import { Order } from '../types';
+
+// Self-contained device identifier for privacy
+const getCustomerDeviceId = (): string => {
+  if (typeof window === 'undefined') return 'server_id';
+  let id = localStorage.getItem('rsz_device_id');
+  if (!id) {
+    id = 'dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
+    localStorage.setItem('rsz_device_id', id);
+  }
+  return id;
+};
 
 export const NotificationsModal: React.FC = () => {
   const {
@@ -30,23 +31,13 @@ export const NotificationsModal: React.FC = () => {
     notifications,
     orders,
     user,
-    markNotificationsAsRead,
-    products,
-    settings,
-    editOrder,
-    cancelOrder,
     setIsOrderConfirmModalOpen,
     setLastConfirmedOrder,
     setTargetCheckoutItem,
   } = useStore();
 
   const [activeTab, setActiveTab] = useState<'notifications' | 'orders'>('orders');
-  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
-  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
-  const [cancelReason, setCancelReason] = useState('Changed mind');
-
-  // Customer Privacy Isolation
-  const currentDeviceId = useMemo(() => getDeviceId(), []);
+  const currentDeviceId = useMemo(() => getCustomerDeviceId(), []);
 
   // Filter orders strictly for the current customer / device (Admins see all)
   const myOrders = useMemo(() => {
@@ -83,8 +74,6 @@ export const NotificationsModal: React.FC = () => {
 
   const handleClose = () => {
     setIsNotificationsOpen(false);
-    setEditingOrderId(null);
-    setCancellingOrderId(null);
   };
 
   const getStatusBadge = (status: Order['status']) => {
