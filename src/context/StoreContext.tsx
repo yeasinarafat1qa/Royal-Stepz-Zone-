@@ -7,11 +7,11 @@ import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from 'fireb
 const defaultInitialSettings: StoreSettings = {
   storeName: 'Royal Stepz Zone Qatar',
   currency: 'QAR',
-  deliveryFeeQAR: 25,
-  freeShippingThresholdQAR: 300,
-  whatsappNumber: '+974 5555 1234',
+  deliveryFeeQAR: ,
+  freeShippingThresholdQAR: ,
+  whatsappNumber: '+974 30408610',
   supportEmail: 'support@royalstepz.qa',
-  adminKey: 'admin123',
+  adminKey: '',
 };
 
 // Initial Footwear Collection
