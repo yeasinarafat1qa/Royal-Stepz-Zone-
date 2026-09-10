@@ -1,3 +1,4 @@
+```tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { StoreProvider, useStore } from './context/StoreContext';
 
@@ -52,7 +53,6 @@ function StoreContent() {
   const [detailsSelectedSize, setDetailsSelectedSize] = useState<string>('');
   const [detailsAdded, setDetailsAdded] = useState(false);
 
-  // Secret admin keyboard shortcut: Ctrl + F12
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'F12') {
@@ -73,7 +73,6 @@ function StoreContent() {
     };
   }, [user, setIsAdminOpen]);
 
-  // Brand list
   const brands = useMemo(() => {
     const brandSet = new Set<string>();
 
@@ -86,10 +85,15 @@ function StoreContent() {
     return ['All', ...Array.from(brandSet)];
   }, [products]);
 
-  // Available categories
-  const categories = ['All', 'Sneakers', 'Casual', 'Running', 'Luxury', 'Slides'];
+  const categories = [
+    'All',
+    'Sneakers',
+    'Casual',
+    'Running',
+    'Luxury',
+    'Slides',
+  ];
 
-  // Filter and sort products
   const filteredProducts = useMemo(() => {
     return products
       .filter((product) => {
@@ -163,7 +167,7 @@ function StoreContent() {
         }
 
         if (sortBy === 'rating') {
-          return b.rating - a.rating;
+          return (b.rating ?? 0) - (a.rating ?? 0);
         }
 
         if (sortBy === 'newest') {
@@ -222,173 +226,120 @@ function StoreContent() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
       <Header />
 
-      {/* ================= HERO ================= */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-b border-slate-800/80 pt-8 pb-12 sm:pt-14 sm:pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>QATAR&apos;S EXCLUSIVE FOOTWEAR VAULT</span>
-              </div>
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-slate-800">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950/30" />
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                STEP INTO{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">
-                  ROYALTY
-                </span>
-              </h1>
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm text-amber-300">
+              <Sparkles className="h-4 w-4" />
+              Premium Footwear in Qatar
+            </div>
 
-              <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Discover 100% verified authentic Air Jordans, Yeezys,
-                Dunks, and luxury lifestyle footwear in Qatar. Express
-                24h delivery with Cash on Delivery across Qatar.
+            <h1 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
+              Step Into Royalty.
+            </h1>
+
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+              Premium footwear for every step. Discover your next
+              favourite pair at Royal Stepz Zone.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                onClick={() =>
+                  document
+                    .getElementById('shop')
+                    ?.scrollIntoView({ behavior: 'smooth' })
+                }
+                className="rounded-xl bg-amber-500 px-6 py-3 font-bold text-slate-950 transition hover:bg-amber-400"
+              >
+                Shop Collection
+              </button>
+
+              <button
+                onClick={() =>
+                  setSelectedCategory('Sneakers')
+                }
+                className="rounded-xl border border-slate-700 bg-slate-900 px-6 py-3 font-bold text-white transition hover:border-amber-500"
+              >
+                Explore Sneakers
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Highlights */}
+      <section className="border-b border-slate-800 bg-slate-900/60">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 sm:grid-cols-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Truck className="h-6 w-6 text-amber-400" />
+            <div>
+              <p className="font-semibold">Fast Delivery</p>
+              <p className="text-xs text-slate-400">Across Qatar</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="h-6 w-6 text-amber-400" />
+            <div>
+              <p className="font-semibold">Quality Guaranteed</p>
+              <p className="text-xs text-slate-400">Premium products</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <RotateCcw className="h-6 w-6 text-amber-400" />
+            <div>
+              <p className="font-semibold">Easy Support</p>
+              <p className="text-xs text-slate-400">Customer friendly</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Headphones className="h-6 w-6 text-amber-400" />
+            <div>
+              <p className="font-semibold">WhatsApp Support</p>
+              <p className="text-xs text-slate-400">
+                +974 3040 8610
               </p>
-
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
-                <a
-                  href="#collection"
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
-                >
-                  Explore Collection
-                </a>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none">
-                <div className="relative bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-4 shadow-2xl">
-                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800&q=80"
-                      alt="Featured footwear"
-                      className="w-full h-full object-cover"
-                    />
-
-                    <div className="absolute top-3 left-3 bg-amber-500 text-slate-950 text-xs font-black px-2.5 py-1 rounded-full uppercase">
-                      Hot in Qatar
-                    </div>
-                  </div>
-
-                  <div className="p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono text-amber-400 font-semibold">
-                        AIR JORDAN 1
-                      </span>
-
-                      <span className="text-sm font-black text-white">
-                        QAR 650
-                      </span>
-                    </div>
-
-                    <h3 className="text-base font-bold text-white mt-1">
-                      Retro High OG &quot;Chicago&quot;
-                    </h3>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ================= TRUST HIGHLIGHTS ================= */}
-      <section className="bg-slate-900/60 border-b border-slate-800/80 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="flex items-center gap-3 p-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Truck className="w-5 h-5" />
-              </div>
-
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">
-                  Fast Qatar Delivery
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  Within 24 Hours in Doha
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">
-                  100% Genuine
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  Verified Authentic
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <RotateCcw className="w-5 h-5" />
-              </div>
-
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">
-                  Size Exchange
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  Easy size swap
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Headphones className="w-5 h-5" />
-              </div>
-
-              <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">
-                  24/7 WhatsApp
-                </h4>
-                <p className="text-[11px] text-slate-400">
-                  +974 5555 1234
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= MAIN SHOP ================= */}
+      {/* Shop */}
       <main
-        id="collection"
-        className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12"
+        id="shop"
+        className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8"
       >
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+        <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-              <span>EXPLORE COLLECTION</span>
+            <p className="text-sm font-semibold uppercase tracking-widest text-amber-400">
+              Royal Collection
+            </p>
 
-              <span className="text-xs font-mono font-bold text-amber-400 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30">
-                {filteredProducts.length} Items
-              </span>
+            <h2 className="mt-2 text-3xl font-black text-white">
+              Shop Footwear
             </h2>
 
-            <p className="text-xs text-slate-400 mt-0.5">
-              Available for immediate delivery in Qatar
+            <p className="mt-2 text-slate-400">
+              {filteredProducts.length} product
+              {filteredProducts.length === 1 ? '' : 's'} available
             </p>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div className="flex flex-wrap gap-3">
             <button
-              type="button"
               onClick={() =>
                 setIsFilterDrawerOpen((prev) => !prev)
               }
-              className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2 cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold hover:border-amber-500"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
-              <span>Filters</span>
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
             </button>
 
             <div className="relative">
@@ -404,59 +355,44 @@ function StoreContent() {
                       | 'newest'
                   )
                 }
-                className="appearance-none bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 pr-8 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer"
+                className="appearance-none rounded-xl border border-slate-700 bg-slate-900 py-2.5 pl-4 pr-10 text-sm font-semibold text-white outline-none focus:border-amber-500"
               >
-                <option value="featured">Featured First</option>
-                <option value="newest">New Arrivals</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
+                <option value="featured">Featured</option>
+                <option value="newest">Newest</option>
+                <option value="price-low">
+                  Price: Low to High
+                </option>
+                <option value="price-high">
+                  Price: High to Low
+                </option>
                 <option value="rating">Top Rated</option>
               </select>
 
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             </div>
           </div>
         </div>
 
-        {/* ================= FILTERS ================= */}
+        {/* Filters */}
         {isFilterDrawerOpen && (
-          <div className="mt-4 p-4 bg-slate-900/90 border border-slate-800 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-white uppercase">
-                Filter Options
-              </span>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedCategory('All');
-                  setSelectedBrand('All');
-                  setShowDiscountsOnly(false);
-                }}
-                className="text-xs text-amber-400 hover:underline"
-              >
-                Reset All
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-900 p-5">
+            <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <label className="block text-slate-400 mb-1 font-semibold">
-                  Category:
-                </label>
+                <p className="mb-3 text-sm font-semibold text-slate-300">
+                  Category
+                </p>
 
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {categories.map((category) => (
                     <button
                       key={category}
-                      type="button"
                       onClick={() =>
                         setSelectedCategory(category)
                       }
-                      className={`px-2.5 py-1 rounded-lg transition-all ${
+                      className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
                         selectedCategory === category
-                          ? 'bg-amber-500 text-slate-950 font-bold'
-                          : 'bg-slate-950 text-slate-300 border border-slate-800'
+                          ? 'bg-amber-500 text-slate-950'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                       }`}
                     >
                       {category}
@@ -466,20 +402,19 @@ function StoreContent() {
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1 font-semibold">
-                  Brand:
-                </label>
+                <p className="mb-3 text-sm font-semibold text-slate-300">
+                  Brand
+                </p>
 
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {brands.map((brand) => (
                     <button
                       key={brand}
-                      type="button"
                       onClick={() => setSelectedBrand(brand)}
-                      className={`px-2.5 py-1 rounded-lg transition-all ${
+                      className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
                         selectedBrand === brand
-                          ? 'bg-amber-500 text-slate-950 font-bold'
-                          : 'bg-slate-950 text-slate-300 border border-slate-800'
+                          ? 'bg-amber-500 text-slate-950'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                       }`}
                     >
                       {brand}
@@ -489,59 +424,57 @@ function StoreContent() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+            <label className="mt-5 flex cursor-pointer items-center gap-3 text-sm text-slate-300">
               <input
-                id="discount-only"
                 type="checkbox"
                 checked={showDiscountsOnly}
                 onChange={(e) =>
                   setShowDiscountsOnly(e.target.checked)
                 }
-                className="accent-amber-500"
+                className="h-4 w-4 accent-amber-500"
               />
-
-              <label
-                htmlFor="discount-only"
-                className="text-xs text-slate-300 cursor-pointer"
-              >
-                Show discounted products only
-              </label>
-            </div>
+              Show discounted products only
+            </label>
           </div>
         )}
 
-        {/* ================= PRODUCTS ================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-6">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
+        {/* Products */}
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
-                onQuickView={openProductDetails}
+                onClick={() => openProductDetails(product)}
               />
-            ))
-          ) : (
-            <div className="col-span-full py-16 text-center">
-              <div className="text-slate-500 text-4xl mb-3">
-                🔍
-              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 px-6 py-16 text-center">
+            <p className="text-xl font-bold text-white">
+              No products found
+            </p>
 
-              <h3 className="text-lg font-bold text-white">
-                No products found
-              </h3>
+            <p className="mt-2 text-slate-400">
+              Try another search, category, or brand.
+            </p>
 
-              <p className="text-sm text-slate-400 mt-1">
-                Try changing your search or filter options.
-              </p>
-            </div>
-          )}
-        </div>
+            <button
+              onClick={() => {
+                setSelectedCategory('All');
+                setSelectedBrand('All');
+                setShowDiscountsOnly(false);
+              }}
+              className="mt-5 rounded-xl bg-amber-500 px-5 py-2.5 font-bold text-slate-950 hover:bg-amber-400"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </main>
 
-      {/* ================= FOOTER ================= */}
       <Footer />
 
-      {/* ================= GLOBAL MODALS ================= */}
       <CartDrawer />
       <AuthModal />
 
@@ -560,103 +493,116 @@ function StoreContent() {
 
       <NotificationsModal />
 
-      {/* ================= PRODUCT DETAILS MODAL ================= */}
+      {/* Product Details Modal */}
       {detailsProduct && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-sm"
-          onClick={closeProductDetails}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Product details"
-        >
-          <div
-            className="relative w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-5 sm:p-6 overflow-hidden max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
             <button
-              type="button"
               onClick={closeProductDetails}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors cursor-pointer z-10"
+              className="absolute right-4 top-4 z-10 rounded-full bg-slate-950/80 p-2 text-slate-300 hover:text-white"
               aria-label="Close product details"
-              title="Close"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-              <div className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+            <div className="grid md:grid-cols-2">
+              <div className="aspect-square bg-slate-800">
                 <img
-                  src={detailsProduct.image}
+                  src={
+                    detailsProduct.image ||
+                    detailsProduct.images?.[0]
+                  }
                   alt={detailsProduct.name}
-                  className="w-full h-full object-cover object-center"
+                  className="h-full w-full object-cover"
                 />
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+              <div className="p-6">
+                {detailsProduct.brand && (
+                  <p className="text-sm font-semibold uppercase tracking-wider text-amber-400">
                     {detailsProduct.brand}
-                  </span>
+                  </p>
+                )}
 
-                  <h2 className="text-xl font-black text-white mt-1 leading-snug">
-                    {detailsProduct.name}
-                  </h2>
+                <h3 className="mt-2 text-2xl font-black text-white">
+                  {detailsProduct.name}
+                </h3>
 
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-2xl font-black text-amber-400">
-                      QAR {detailsProduct.priceQAR}
-                    </span>
-
-                    {detailsProduct.originalPriceQAR &&
-                      detailsProduct.originalPriceQAR >
-                        detailsProduct.priceQAR && (
-                        <span className="text-sm text-slate-500 line-through">
-                          QAR {detailsProduct.originalPriceQAR}
-                        </span>
-                      )}
-                  </div>
-                </div>
-
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="mt-4 text-slate-400">
                   {detailsProduct.description}
                 </p>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-2">
-                    Select Shoe Size / সাইজ নির্বাচন করুন:
-                  </label>
+                <div className="mt-5 flex items-center gap-3">
+                  <span className="text-2xl font-black text-amber-400">
+                    QAR {detailsProduct.priceQAR.toFixed(2)}
+                  </span>
 
-                  <div className="flex flex-wrap gap-1.5">
-                    {(detailsProduct.sizes || []).map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() =>
-                          setDetailsSelectedSize(size)
-                        }
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          detailsSelectedSize === size
-                            ? 'bg-amber-500 text-slate-950 shadow-md font-black'
-                            : 'bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                  {detailsProduct.originalPriceQAR &&
+                    detailsProduct.originalPriceQAR >
+                      detailsProduct.priceQAR && (
+                      <span className="text-sm text-slate-500 line-through">
+                        QAR{' '}
+                        {detailsProduct.originalPriceQAR.toFixed(
+                          2
+                        )}
+                      </span>
+                    )}
+                </div>
+
+                {detailsProduct.sizes?.length > 0 && (
+                  <div className="mt-6">
+                    <p className="mb-3 text-sm font-semibold text-slate-300">
+                      Select Size
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {detailsProduct.sizes.map((size) => (
+                        <button
+                          key={size}
+                          onClick={() =>
+                            setDetailsSelectedSize(size)
+                          }
+                          className={`rounded-lg border px-4 py-2 text-sm font-semibold ${
+                            detailsSelectedSize === size
+                              ? 'border-amber-500 bg-amber-500 text-slate-950'
+                              : 'border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-500'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="pt-2 flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAddDetailsProduct}
-                    className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-colors"
-                  >
-                    {detailsAdded
-                      ? 'Added to Bag! ✓'
-                      : 'Add to Bag (ব্যাগে যোগ করুন)'}
-                  </button>
-                </div>
+                {detailsProduct.colors?.length > 0 && (
+                  <div className="mt-5">
+                    <p className="mb-3 text-sm font-semibold text-slate-300">
+                      Available Colors
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {detailsProduct.colors.map((color) => (
+                        <span
+                          key={color}
+                          className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-300"
+                        >
+                          {color}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={handleAddDetailsProduct}
+                  disabled={detailsAdded}
+                  className="mt-7 w-full rounded-xl bg-amber-500 px-5 py-3 font-bold text-slate-950 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {detailsAdded
+                    ? 'Added to Cart ✓'
+                    : 'Add to Cart'}
+                </button>
               </div>
             </div>
           </div>
@@ -675,3 +621,4 @@ export function App() {
 }
 
 export default App;
+```
