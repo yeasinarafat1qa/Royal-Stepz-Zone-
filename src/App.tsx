@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useStore } from './context/StoreContext';
+import { StoreProvider, useStore } from './context/StoreContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ProductCard } from './components/ProductCard';
@@ -19,7 +19,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-export function App() {
+function StoreContent() {
   const { 
     products, 
     selectedCategory, 
@@ -324,6 +324,14 @@ export function App() {
       {isOrderConfirmModalOpen && <OrderConfirmModal />}
       <NotificationsModal />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <StoreProvider>
+      <StoreContent />
+    </StoreProvider>
   );
 }
 
