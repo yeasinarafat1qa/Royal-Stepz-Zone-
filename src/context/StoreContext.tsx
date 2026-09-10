@@ -1,880 +1,1588 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product, CartItem, Order, User, StoreSettings, NotificationItem } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+
+import {
+  Product,
+  CartItem,
+  Order,
+  User,
+  StoreSettings,
+  NotificationItem,
+} from '../types';
+
 import { db } from '../firebase';
-import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-// Default initial store settings
-const defaultInitialSettings: StoreSettings = {
-  storeName: 'Royal Stepz Zone Qatar',
-  currency: 'QAR',
-  deliveryFeeQAR: ,
-  freeShippingThresholdQAR: ,
-  whatsappNumber: '+974 30408610',
-  supportEmail: 'support@royalstepz.qa',
-  adminKey: '',
-};
+import {
+  ref,
+  onValue,
+  set,
+  update,
+  remove,
+  push,
+  get,
+} from 'firebase/database';
 
-// Initial Footwear Collection
-const initialDefaultProducts: Product[] = [
-  {
-    id: 'shoe-1',
-    name: 'Air Jordan 1 Retro High OG "Chicago"',
-    brand: 'Nike',
-    category: 'Sneakers',
-    priceQAR: 650,
-    originalPriceQAR: 850,
-    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
-    image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800&q=80',
-    description: 'Iconic Chicago colorway silhouette designed with premium leather and legendary Nike Air cushioning for maximum Qatar streetwear prestige.',
-    rating: 4.9,
-    reviewCount: 128,
-    isFeatured: true,
-    isNewArrival: true,
-    isBestseller: true,
-  },
-  {
-    id: 'shoe-2',
-    name: 'Yeezy Boost 350 V2 "Onyx"',
-    brand: 'Adidas',
-    category: 'Sneakers',
-    priceQAR: 720,
-    originalPriceQAR: 900,
-    sizes: ['EU 41', 'EU 42', 'EU 43', 'EU 44'],
-    image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=800&q=80',
-    description: 'Triple black Primeknit upper with full-length Boost sole technology providing exceptional walking comfort in Doha heat.',
-    rating: 4.8,
-    reviewCount: 95,
-    isFeatured: true,
-    isBestseller: true,
-  },
-  {
-    id: 'shoe-3',
-    name: 'Nike Dunk Low Retro "Panda"',
-    brand: 'Nike',
-    category: 'Casual',
-    priceQAR: 420,
-    originalPriceQAR: 520,
-    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
-    image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&q=80',
-    description: 'Classic monochrome black and white Dunk Low styling perfect for daily lifestyle comfort and easy outfit pairing.',
-    rating: 4.9,
-    reviewCount: 210,
-    isFeatured: true,
-    isBestseller: true,
-  },
-  {
-    id: 'shoe-4',
-    name: 'New Balance 9060 "Sea Salt"',
-    brand: 'New Balance',
-    category: 'Running',
-    priceQAR: 580,
-    originalPriceQAR: 690,
-    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43'],
-    image: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&q=80',
-    description: 'Futuristic chunky aesthetic with ABZORB and SBS cushioning engineered for all-day cushioning and luxury lifestyle.',
-    rating: 4.7,
-    reviewCount: 64,
-    isNewArrival: true,
-  },
-  {
-    id: 'shoe-5',
-    name: 'Air Jordan 4 Retro "Military Black"',
-    brand: 'Nike',
-    category: 'Sneakers',
-    priceQAR: 780,
-    originalPriceQAR: 950,
-    sizes: ['EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
-    image: 'https://images.unsplash.com/photo-1575537302964-96cd47c06b1b?w=800&q=80',
-    description: 'Premium smooth white leather accented with neutral grey suede and crisp black accents for Qatar sneakerheads.',
-    rating: 4.9,
-    reviewCount: 180,
-    isFeatured: true,
-    isBestseller: true,
-  },
-  {
-    id: 'shoe-6',
-    name: 'Nike Air Force 1 07 "Triple White"',
-    brand: 'Nike',
-    category: 'Casual',
-    priceQAR: 390,
-    originalPriceQAR: 460,
-    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
-    image: 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=800&q=80',
-    description: 'The radiance lives on in the Nike Air Force 1 07, the b-ball icon that puts a fresh spin on crisp leather and clean lines.',
-    rating: 4.9,
-    reviewCount: 340,
-    isFeatured: true,
-    isBestseller: true,
-  },
-  {
-    id: 'shoe-7',
-    name: 'Adidas Samba Classic "Cloud White"',
-    brand: 'Adidas',
-    category: 'Casual',
-    priceQAR: 350,
-    originalPriceQAR: 430,
-    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
-    image: 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=800&q=80',
-    description: 'Full grain leather upper with gritty suede overlays and signature gum rubber outsole for timeless street appeal.',
-    rating: 4.8,
-    reviewCount: 156,
-    isNewArrival: true,
-  },
-  {
-    id: 'shoe-8',
-    name: 'ASICS GEL-Kayano 14 "White Slate"',
-    brand: 'Asics',
-    category: 'Running',
-    priceQAR: 620,
-    originalPriceQAR: 750,
-    sizes: ['EU 41', 'EU 42', 'EU 43', 'EU 44'],
-    image: 'https://images.unsplash.com/photo-1582588678413-dbf45f4823e9?w=800&q=80',
-    description: 'Late 2000s aesthetic reimagined with mirrored GEL technology cushioning for premium running performance in Qatar.',
-    rating: 4.8,
-    reviewCount: 78,
-    isFeatured: true,
-  }
-];
-
-// Standalone local device ID generator
-const getDeviceId = (): string => {
-  if (typeof window === 'undefined') return 'server_device';
-  let devId = localStorage.getItem('rsz_device_id');
-  if (!devId) {
-    devId = 'dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now().toString(36);
-    localStorage.setItem('rsz_device_id', devId);
-  }
-  return devId;
-};
+// ============================================================
+// TYPES
+// ============================================================
 
 interface StoreContextType {
-  products: Product[];
-  cart: CartItem[];
-  orders: Order[];
-  notifications: NotificationItem[];
-  user: User | null;
-  settings: StoreSettings;
-  selectedCategory: string;
-  selectedBrand: string;
-  searchQuery: string;
-  isCartOpen: boolean;
-  isAuthOpen: boolean;
-  isAdminOpen: boolean;
-  isOrderConfirmModalOpen: boolean;
-  isNotificationsOpen: boolean;
-  targetCheckoutItem: CartItem | null;
-  lastConfirmedOrder: Order | null;
-  setSelectedCategory: (category: string) => void;
-  setSelectedBrand: (brand: string) => void;
-  setSearchQuery: (query: string) => void;
-  setIsCartOpen: (isOpen: boolean) => void;
-  setIsAuthOpen: (isOpen: boolean) => void;
-  setIsAdminOpen: (isOpen: boolean) => void;
-  setIsOrderConfirmModalOpen: (isOpen: boolean) => void;
-  setIsNotificationsOpen: (isOpen: boolean) => void;
-  setTargetCheckoutItem: (item: CartItem | null) => void;
-  setLastConfirmedOrder: (order: Order | null) => void;
-  addToCart: (product: Product, size: string, color?: string) => void;
-  removeFromCart: (productId: string, size: string) => void;
-  updateQuantity: (productId: string, size: string, quantity: number) => void;
-  clearCart: () => void;
-  login: (phoneOrEmail: string, role?: 'admin' | 'customer', adminKey?: string) => boolean;
-  logout: () => void;
-  placeOrder: (orderData: {
-    customerName: string;
-    customerPhone: string;
-    city: string;
-    fullAddress: string;
-    notes?: string;
-    paymentMethod: Order['paymentMethod'];
-    items: CartItem[];
-  }) => { order: Order; whatsappUrl: string };
-  updateOrderStatus: (orderId: string, status: Order['status']) => void;
-  cancelOrder: (orderId: string, reason?: string) => void;
-  editOrder: (
-    orderId: string, 
-    updatedFields: Partial<Omit<Order, 'id' | 'orderNumber' | 'createdAt'>>
-  ) => void;
-  deleteOrder: (orderId: string) => void;
-  sendCustomerNotification: (notification: {
-    title: string;
-    message: string;
-    type?: 'order' | 'deal' | 'system';
-    recipientEmail?: string;
-    deviceId?: string;
-    orderId?: string;
-  }) => void;
-  deleteNotification: (notificationId: string) => void;
-  updateNotification: (notificationId: string, title: string, message: string) => void;
-  markNotificationAsRead: (notificationId: string) => void;
-  addProduct: (product: Omit<Product, 'id'>) => void;
-  updateProduct: (id: string, product: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
-  updateSettings: (newSettings: Partial<StoreSettings>) => void;
-}
-
-const StoreContext = createContext<StoreContextType | undefined>(undefined);
-
-const PRODUCTS_KEY = 'rsz_products_v4';
-const CART_KEY = 'rsz_cart_v4';
-const ORDERS_KEY = 'rsz_orders_v4';
-const NOTIFICATIONS_KEY = 'rsz_notifications_v4';
-const USER_KEY = 'rsz_user_v4';
-const SETTINGS_KEY = 'rsz_settings_v4';
-const MY_ORDER_IDS_KEY = 'rsz_my_order_ids';
-
-export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Products
-  const [products, setProducts] = useState<Product[]>(() => {
-    try {
-      const local = localStorage.getItem(PRODUCTS_KEY);
-      return local ? JSON.parse(local) : initialDefaultProducts;
-    } catch {
-      return initialDefaultProducts;
-    }
-  });
+  products: Product[];
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (
+    productId: string,
+    updates: Partial<Product>
+  ) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
 
   // Cart
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    try {
-      const local = localStorage.getItem(CART_KEY);
-      return local ? JSON.parse(local) : [];
-    } catch {
-      return [];
-    }
-  });
+  cart: CartItem[];
+  addToCart: (
+    product: Product,
+    selectedSize?: string,
+    selectedColor?: string
+  ) => void;
+  removeFromCart: (
+    productId: string,
+    selectedSize?: string,
+    selectedColor?: string
+  ) => void;
+  updateQuantity: (
+    productId: string,
+    selectedSize: string,
+    quantity: number,
+    selectedColor?: string
+  ) => void;
+  clearCart: () => void;
+
+  // Cart UI
+  isCartOpen: boolean;
+  setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Authentication
+  user: User | null;
+  login: (
+    phoneOrEmail: string,
+    password?: string
+  ) => Promise<boolean>;
+  logout: () => void;
+
+  // Auth modal
+  isAuthOpen: boolean;
+  setIsAuthOpen: React.Dispatch<React.SetStateAction<boolean>>;
+
+  // Search / filters
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+
+  selectedCategory: string;
+  setSelectedCategory: React.Dispatch<
+    React.SetStateAction<string>
+  >;
+
+  selectedBrand: string;
+  setSelectedBrand: React.Dispatch<
+    React.SetStateAction<string>
+  >;
 
   // Orders
-  const [orders, setOrders] = useState<Order[]>(() => {
-    try {
-      const local = localStorage.getItem(ORDERS_KEY);
-      return local ? JSON.parse(local) : [];
-    } catch {
-      return [];
-    }
-  });
+  orders: Order[];
+  createOrder: (
+    orderData: Omit<
+      Order,
+      'id' | 'orderNumber' | 'createdAt' | 'status'
+    >
+  ) => Promise<Order>;
+
+  updateOrderStatus: (
+    orderId: string,
+    status: Order['status']
+  ) => Promise<void>;
+
+  // Admin
+  isAdminOpen: boolean;
+  setIsAdminOpen: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+
+  // Order confirmation
+  isOrderConfirmModalOpen: boolean;
+  setIsOrderConfirmModalOpen: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
 
   // Notifications
-  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+  notifications: NotificationItem[];
+
+  isNotificationsOpen: boolean;
+  setIsNotificationsOpen: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+
+  markNotificationAsRead: (
+    notificationId: string
+  ) => Promise<void>;
+
+  markAllNotificationsAsRead: () => Promise<void>;
+
+  // Settings
+  settings: StoreSettings;
+
+  updateSettings: (
+    updates: Partial<StoreSettings>
+  ) => Promise<void>;
+
+  // Helpers
+  getProductById: (productId: string) => Product | undefined;
+}
+
+// ============================================================
+// DEFAULT SETTINGS
+// ============================================================
+
+const defaultInitialSettings: StoreSettings = {
+  storeName: 'Royal Stepz Zone Qatar',
+
+  currency: 'QAR',
+
+  whatsappNumber: '+97455551234',
+
+  adminEmail: 'admin@royalstepz.qa',
+
+  deliveryFeeQAR: 20,
+
+  freeShippingThresholdQAR: 300,
+
+  bannerAnnouncement:
+    '🇶🇦 Express 24h Delivery Across Qatar • Free delivery on orders over 300 QAR',
+
+  heroTitle: 'Step Into Royalty.',
+
+  heroSubtitle:
+    'Premium footwear for every step. Discover your next favourite pair.',
+};
+
+// ============================================================
+// DEFAULT PRODUCTS
+// ============================================================
+
+const initialDefaultProducts: Product[] = [
+  {
+    id: 'royal-air-black',
+    name: 'Royal Air Black',
+    category: 'Sneakers',
+    brand: 'Royal Stepz',
+    priceQAR: 249,
+    originalPriceQAR: 299,
+    image:
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
+    ],
+    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    colors: ['Black', 'White'],
+    description:
+      'Premium everyday sneakers designed for comfort and modern street style.',
+    inStock: true,
+    stock: 25,
+    featured: true,
+    isFeatured: true,
+    isNew: true,
+    isNewArrival: true,
+    isBestseller: true,
+    rating: 4.8,
+    reviewCount: 124,
+  },
+
+  {
+    id: 'royal-runner-white',
+    name: 'Royal Runner White',
+    category: 'Running',
+    brand: 'Royal Stepz',
+    priceQAR: 279,
+    originalPriceQAR: 329,
+    image:
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80',
+    ],
+    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    colors: ['White'],
+    description:
+      'Lightweight running shoes with a responsive sole for daily training.',
+    inStock: true,
+    stock: 18,
+    featured: true,
+    isFeatured: true,
+    isNew: true,
+    isNewArrival: true,
+    rating: 4.7,
+    reviewCount: 86,
+  },
+
+  {
+    id: 'royal-casual-brown',
+    name: 'Royal Casual Brown',
+    category: 'Casual',
+    brand: 'Royal Stepz',
+    priceQAR: 199,
+    originalPriceQAR: 239,
+    image:
+      'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80',
+    ],
+    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43'],
+    colors: ['Brown'],
+    description:
+      'Clean casual footwear made for comfortable everyday wear.',
+    inStock: true,
+    stock: 30,
+    featured: false,
+    isFeatured: false,
+    isBestseller: true,
+    rating: 4.6,
+    reviewCount: 73,
+  },
+
+  {
+    id: 'royal-luxury-black',
+    name: 'Royal Luxury Black',
+    category: 'Luxury',
+    brand: 'Royal Stepz',
+    priceQAR: 449,
+    originalPriceQAR: 549,
+    image:
+      'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80',
+    ],
+    sizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
+    colors: ['Black'],
+    description:
+      'Premium luxury footwear with an elegant finish for special occasions.',
+    inStock: true,
+    stock: 10,
+    featured: true,
+    isFeatured: true,
+    isNew: true,
+    isNewArrival: true,
+    rating: 4.9,
+    reviewCount: 42,
+  },
+
+  {
+    id: 'royal-slides-sand',
+    name: 'Royal Comfort Slides',
+    category: 'Slides',
+    brand: 'Royal Stepz',
+    priceQAR: 99,
+    originalPriceQAR: 129,
+    image:
+      'https://images.unsplash.com/photo-1603487742131-4160ec999306?auto=format&fit=crop&w=900&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1603487742131-4160ec999306?auto=format&fit=crop&w=900&q=80',
+    ],
+    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43'],
+    colors: ['Sand', 'Black'],
+    description:
+      'Comfortable slides perfect for home, beach and everyday casual use.',
+    inStock: true,
+    stock: 45,
+    featured: false,
+    isFeatured: false,
+    isBestseller: true,
+    rating: 4.5,
+    reviewCount: 91,
+  },
+];
+
+// ============================================================
+// CONTEXT
+// ============================================================
+
+const StoreContext =
+  createContext<StoreContextType | undefined>(undefined);
+
+// ============================================================
+// PROVIDER
+// ============================================================
+
+export const StoreProvider: React.FC<{
+  children: ReactNode;
+}> = ({ children }) => {
+  // ==========================================================
+  // PRODUCT STATE
+  // ==========================================================
+
+  const [products, setProducts] = useState<Product[]>(() => {
     try {
-      const local = localStorage.getItem(NOTIFICATIONS_KEY);
-      return local ? JSON.parse(local) : [];
-    } catch {
-      return [];
+      const saved = localStorage.getItem(
+        'royal_stepz_products'
+      );
+
+      if (saved) {
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        'Unable to load local products:',
+        error
+      );
     }
+
+    return initialDefaultProducts;
   });
 
-  // User
+  // ==========================================================
+  // CART STATE
+  // ==========================================================
+
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(
+        'royal_stepz_cart'
+      );
+
+      if (saved) {
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        'Unable to load cart:',
+        error
+      );
+    }
+
+    return [];
+  });
+
+  // ==========================================================
+  // USER STATE
+  // ==========================================================
+
   const [user, setUser] = useState<User | null>(() => {
     try {
-      const local = localStorage.getItem(USER_KEY);
-      return local ? JSON.parse(local) : null;
-    } catch {
-      return null;
+      const saved = localStorage.getItem(
+        'royal_stepz_user'
+      );
+
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.warn(
+        'Unable to load user:',
+        error
+      );
     }
+
+    return null;
   });
 
-  // Store Settings
-  const [settings, setSettings] = useState<StoreSettings>(() => {
+  // ==========================================================
+  // ORDERS
+  // ==========================================================
+
+  const [orders, setOrders] = useState<Order[]>(() => {
     try {
-      const local = localStorage.getItem(SETTINGS_KEY);
-      return local ? JSON.parse(local) : defaultInitialSettings;
-    } catch {
-      return defaultInitialSettings;
+      const saved = localStorage.getItem(
+        'royal_stepz_orders'
+      );
+
+      if (saved) {
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        'Unable to load orders:',
+        error
+      );
     }
+
+    return [];
   });
 
-  // Filters & Modal State
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedBrand, setSelectedBrand] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
-  const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
-  const [isAdminOpen, setIsAdminOpen] = useState<boolean>(false);
-  const [isOrderConfirmModalOpen, setIsOrderConfirmModalOpen] = useState<boolean>(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState<boolean>(false);
-  const [targetCheckoutItem, setTargetCheckoutItem] = useState<CartItem | null>(null);
-  const [lastConfirmedOrder, setLastConfirmedOrder] = useState<Order | null>(null);
+  // ==========================================================
+  // NOTIFICATIONS
+  // ==========================================================
 
-  // Sync state to localStorage
+  const [notifications, setNotifications] =
+    useState<NotificationItem[]>(() => {
+      try {
+        const saved = localStorage.getItem(
+          'royal_stepz_notifications'
+        );
+
+        if (saved) {
+          const parsed = JSON.parse(saved);
+
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        }
+      } catch (error) {
+        console.warn(
+          'Unable to load notifications:',
+          error
+        );
+      }
+
+      return [];
+    });
+
+  // ==========================================================
+  // SETTINGS
+  // ==========================================================
+
+  const [settings, setSettings] =
+    useState<StoreSettings>(defaultInitialSettings);
+
+  // ==========================================================
+  // UI STATE
+  // ==========================================================
+
+  const [isCartOpen, setIsCartOpen] =
+    useState(false);
+
+  const [isAuthOpen, setIsAuthOpen] =
+    useState(false);
+
+  const [isAdminOpen, setIsAdminOpen] =
+    useState(false);
+
+  const [isOrderConfirmModalOpen, setIsOrderConfirmModalOpen] =
+    useState(false);
+
+  const [isNotificationsOpen, setIsNotificationsOpen] =
+    useState(false);
+
+  // ==========================================================
+  // FILTER STATE
+  // ==========================================================
+
+  const [searchQuery, setSearchQuery] =
+    useState('');
+
+  const [selectedCategory, setSelectedCategory] =
+    useState('All');
+
+  const [selectedBrand, setSelectedBrand] =
+    useState('All');
+
+  // ==========================================================
+  // LOCAL STORAGE SYNC
+  // ==========================================================
+
   useEffect(() => {
     try {
-      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-    } catch (e) {
-      console.warn(e);
+      localStorage.setItem(
+        'royal_stepz_products',
+        JSON.stringify(products)
+      );
+    } catch (error) {
+      console.warn(
+        'Unable to save products:',
+        error
+      );
     }
   }, [products]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-    } catch (e) {
-      console.warn(e);
+      localStorage.setItem(
+        'royal_stepz_cart',
+        JSON.stringify(cart)
+      );
+    } catch (error) {
+      console.warn(
+        'Unable to save cart:',
+        error
+      );
     }
   }, [cart]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-    } catch (e) {
-      console.warn(e);
-    }
-  }, [orders]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
-    } catch (e) {
-      console.warn(e);
-    }
-  }, [notifications]);
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(USER_KEY);
+      if (user) {
+        localStorage.setItem(
+          'royal_stepz_user',
+          JSON.stringify(user)
+        );
+      } else {
+        localStorage.removeItem(
+          'royal_stepz_user'
+        );
+      }
+    } catch (error) {
+      console.warn(
+        'Unable to save user:',
+        error
+      );
     }
   }, [user]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    } catch (e) {
-      console.warn(e);
+      localStorage.setItem(
+        'royal_stepz_orders',
+        JSON.stringify(orders)
+      );
+    } catch (error) {
+      console.warn(
+        'Unable to save orders:',
+        error
+      );
     }
-  }, [settings]);
+  }, [orders]);
 
-  // Real-time Firestore Sync for Products (Loads all saved shoes from Database)
   useEffect(() => {
     try {
-      const productsRef = collection(db, 'products');
-      const unsubscribe = onSnapshot(
-        productsRef,
-        (snapshot) => {
-          if (!snapshot.empty) {
-            const cloudProducts = snapshot.docs.map(d => d.data() as Product);
-            setProducts(cloudProducts);
-          } else {
-            // If completely empty, initialize with defaults
-            initialDefaultProducts.forEach(prod => {
-              setDoc(doc(db, 'products', prod.id), prod).catch(() => {});
-            });
-          }
-        },
-        (error) => {
-          console.warn('Products sync:', error);
+      localStorage.setItem(
+        'royal_stepz_notifications',
+        JSON.stringify(notifications)
+      );
+    } catch (error) {
+      console.warn(
+        'Unable to save notifications:',
+        error
+      );
+    }
+  }, [notifications]);
+
+  // ==========================================================
+  // FIREBASE - PRODUCTS
+  // ==========================================================
+
+  useEffect(() => {
+    const productsRef = ref(db, 'products');
+
+    const unsubscribe = onValue(
+      productsRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          return;
         }
-      );
-      return () => unsubscribe();
-    } catch (e) {
-      console.warn(e);
-    }
-  }, []);
 
-  // Real-time Firestore Sync for Orders
-  useEffect(() => {
-    try {
-      const ordersRef = collection(db, 'orders');
-      const unsubscribe = onSnapshot(
-        ordersRef,
-        (snapshot) => {
-          if (!snapshot.empty) {
-            const cloudOrders = snapshot.docs.map(d => d.data() as Order);
-            cloudOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            setOrders(cloudOrders);
-          }
-        },
-        () => {}
-      );
-      return () => unsubscribe();
-    } catch (e) {
-      console.warn(e);
-    }
-  }, []);
+        const data = snapshot.val();
 
-  // Real-time Firestore Sync for Notifications
-  useEffect(() => {
-    try {
-      const notifsRef = collection(db, 'notifications');
-      const unsubscribe = onSnapshot(
-        notifsRef,
-        (snapshot) => {
-          if (!snapshot.empty) {
-            const cloudNotifs = snapshot.docs.map(d => d.data() as NotificationItem);
-            setNotifications(prev => {
-              const map = new Map<string, NotificationItem>();
-              cloudNotifs.forEach(n => map.set(n.id, n));
-              prev.forEach(n => {
-                if (!map.has(n.id)) {
-                  map.set(n.id, n);
-                }
-              });
-              const merged = Array.from(map.values());
-              merged.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-              return merged;
-            });
-          }
-        },
-        () => {}
-      );
-      return () => unsubscribe();
-    } catch (e) {
-      console.warn(e);
-    }
-  }, []);
+        const firebaseProducts: Product[] =
+          Object.entries(data).map(
+            ([id, value]) => {
+              const product =
+                value as Partial<Product>;
 
-  // Real-time Firestore Sync for Settings
-  useEffect(() => {
-    try {
-      const settingsRef = collection(db, 'settings');
-      const unsubscribe = onSnapshot(
-        settingsRef,
-        (snapshot) => {
-          if (!snapshot.empty) {
-            const generalDoc = snapshot.docs.find(d => d.id === 'general');
-            if (generalDoc) {
-              setSettings(generalDoc.data() as StoreSettings);
+              const priceQAR = Number(
+                product.priceQAR ??
+                  product.price ??
+                  0
+              );
+
+              const originalPriceQAR =
+                product.originalPriceQAR ??
+                product.oldPrice;
+
+              return {
+                ...product,
+
+                id,
+
+                name:
+                  product.name ||
+                  'Unnamed Product',
+
+                category:
+                  product.category ||
+                  'Sneakers',
+
+                brand:
+                  product.brand ||
+                  'Royal Stepz',
+
+                priceQAR,
+
+                originalPriceQAR:
+                  originalPriceQAR !== undefined
+                    ? Number(originalPriceQAR)
+                    : undefined,
+
+                price:
+                  product.price !== undefined
+                    ? Number(product.price)
+                    : priceQAR,
+
+                oldPrice:
+                  product.oldPrice !== undefined
+                    ? Number(product.oldPrice)
+                    : originalPriceQAR,
+
+                image:
+                  product.image ||
+                  product.images?.[0] ||
+                  '',
+
+                images:
+                  Array.isArray(product.images)
+                    ? product.images
+                    : product.image
+                      ? [product.image]
+                      : [],
+
+                sizes:
+                  Array.isArray(product.sizes)
+                    ? product.sizes
+                    : [],
+
+                colors:
+                  Array.isArray(product.colors)
+                    ? product.colors
+                    : [],
+
+                description:
+                  product.description || '',
+
+                inStock:
+                  product.inStock ??
+                  ((product.stock ?? 0) > 0),
+
+                stock:
+                  product.stock !== undefined
+                    ? Number(product.stock)
+                    : undefined,
+
+                featured:
+                  product.featured ??
+                  product.isFeatured ??
+                  false,
+
+                isFeatured:
+                  product.isFeatured ??
+                  product.featured ??
+                  false,
+
+                isNew:
+                  product.isNew ??
+                  product.isNewArrival ??
+                  false,
+
+                isNewArrival:
+                  product.isNewArrival ??
+                  product.isNew ??
+                  false,
+
+                isBestseller:
+                  product.isBestseller ??
+                  false,
+
+                rating:
+                  product.rating !== undefined
+                    ? Number(product.rating)
+                    : 0,
+
+                reviewCount:
+                  product.reviewCount !== undefined
+                    ? Number(product.reviewCount)
+                    : 0,
+              } as Product;
             }
-          } else {
-            setDoc(doc(db, 'settings', 'general'), defaultInitialSettings).catch(() => {});
-          }
-        },
-        () => {}
-      );
-      return () => unsubscribe();
-    } catch (e) {
-      console.warn(e);
-    }
-  }, []);
+          );
 
-  // Cart Management
-  const addToCart = (product: Product, size: string, color?: string) => {
-    setCart(prev => {
-      const existing = prev.find(
-        item => item.product.id === product.id && item.selectedSize === size && item.selectedColor === color
-      );
-      if (existing) {
-        return prev.map(item =>
-          item.product.id === product.id && item.selectedSize === size && item.selectedColor === color
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        setProducts(firebaseProducts);
+      },
+      (error) => {
+        console.warn(
+          'Firebase products listener error:',
+          error
         );
       }
-      return [...prev, { product, selectedSize: size, selectedColor: color, quantity: 1 }];
-    });
-    setIsCartOpen(true);
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  // ==========================================================
+  // FIREBASE - ORDERS
+  // ==========================================================
+
+  useEffect(() => {
+    const ordersRef = ref(db, 'orders');
+
+    const unsubscribe = onValue(
+      ordersRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          return;
+        }
+
+        const data = snapshot.val();
+
+        const firebaseOrders: Order[] =
+          Object.entries(data).map(
+            ([id, value]) => ({
+              ...(value as Order),
+              id,
+            })
+          );
+
+        firebaseOrders.sort(
+          (a, b) =>
+            Number(b.createdAt) -
+            Number(a.createdAt)
+        );
+
+        setOrders(firebaseOrders);
+      },
+      (error) => {
+        console.warn(
+          'Firebase orders listener error:',
+          error
+        );
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  // ==========================================================
+  // FIREBASE - NOTIFICATIONS
+  // ==========================================================
+
+  useEffect(() => {
+    const notificationsRef = ref(
+      db,
+      'notifications'
+    );
+
+    const unsubscribe = onValue(
+      notificationsRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          return;
+        }
+
+        const data = snapshot.val();
+
+        const firebaseNotifications: NotificationItem[] =
+          Object.entries(data).map(
+            ([id, value]) => ({
+              ...(value as NotificationItem),
+              id,
+            })
+          );
+
+        firebaseNotifications.sort(
+          (a, b) =>
+            Number(b.timestamp) -
+            Number(a.timestamp)
+        );
+
+        setNotifications(
+          firebaseNotifications
+        );
+      },
+      (error) => {
+        console.warn(
+          'Firebase notifications listener error:',
+          error
+        );
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  // ==========================================================
+  // FIREBASE - SETTINGS
+  // ==========================================================
+
+  useEffect(() => {
+    const settingsRef = ref(
+      db,
+      'settings'
+    );
+
+    const unsubscribe = onValue(
+      settingsRef,
+      (snapshot) => {
+        if (!snapshot.exists()) {
+          return;
+        }
+
+        const data =
+          snapshot.val() as Partial<StoreSettings>;
+
+        setSettings((previous) => ({
+          ...previous,
+          ...data,
+
+          currency:
+            data.currency || 'QAR',
+
+          deliveryFeeQAR:
+            Number(
+              data.deliveryFeeQAR ??
+                previous.deliveryFeeQAR
+            ),
+
+          freeShippingThresholdQAR:
+            Number(
+              data.freeShippingThresholdQAR ??
+                previous.freeShippingThresholdQAR
+            ),
+        }));
+      },
+      (error) => {
+        console.warn(
+          'Firebase settings listener error:',
+          error
+        );
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  // ==========================================================
+  // PRODUCT HELPERS
+  // ==========================================================
+
+  const getProductById = (
+    productId: string
+  ): Product | undefined => {
+    return products.find(
+      (product) =>
+        product.id === productId
+    );
   };
 
-  const removeFromCart = (productId: string, size: string) => {
-    setCart(prev => prev.filter(item => !(item.product.id === productId && item.selectedSize === size)));
+  // ==========================================================
+  // ADD PRODUCT
+  // ==========================================================
+
+  const addProduct = async (
+    product: Product
+  ): Promise<void> => {
+    const productRef = ref(
+      db,
+      `products/${product.id}`
+    );
+
+    await set(productRef, product);
+
+    setProducts((previous) => [
+      ...previous.filter(
+        (item) => item.id !== product.id
+      ),
+      product,
+    ]);
   };
 
-  const updateQuantity = (productId: string, size: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId, size);
-      return;
-    }
-    setCart(prev =>
-      prev.map(item =>
-        item.product.id === productId && item.selectedSize === size ? { ...item, quantity } : item
+  // ==========================================================
+  // UPDATE PRODUCT
+  // ==========================================================
+
+  const updateProduct = async (
+    productId: string,
+    updates: Partial<Product>
+  ): Promise<void> => {
+    const productRef = ref(
+      db,
+      `products/${productId}`
+    );
+
+    await update(
+      productRef,
+      updates
+    );
+
+    setProducts((previous) =>
+      previous.map((product) =>
+        product.id === productId
+          ? {
+              ...product,
+              ...updates,
+            }
+          : product
       )
     );
   };
+
+  // ==========================================================
+  // DELETE PRODUCT
+  // ==========================================================
+
+  const deleteProduct = async (
+    productId: string
+  ): Promise<void> => {
+    const productRef = ref(
+      db,
+      `products/${productId}`
+    );
+
+    await remove(productRef);
+
+    setProducts((previous) =>
+      previous.filter(
+        (product) =>
+          product.id !== productId
+      )
+    );
+
+    setCart((previous) =>
+      previous.filter(
+        (item) =>
+          item.product.id !== productId
+      )
+    );
+  };
+
+  // ==========================================================
+  // ADD TO CART
+  // ==========================================================
+
+  const addToCart = (
+    product: Product,
+    selectedSize = product.sizes?.[0] || 'EU 42',
+    selectedColor = product.colors?.[0]
+  ) => {
+    setCart((previous) => {
+      const existingIndex =
+        previous.findIndex(
+          (item) =>
+            item.product.id ===
+              product.id &&
+            item.selectedSize ===
+              selectedSize &&
+            item.selectedColor ===
+              selectedColor
+        );
+
+      if (existingIndex !== -1) {
+        return previous.map(
+          (item, index) =>
+            index === existingIndex
+              ? {
+                  ...item,
+                  quantity:
+                    item.quantity + 1,
+                }
+              : item
+        );
+      }
+
+      return [
+        ...previous,
+        {
+          product,
+          selectedSize,
+          selectedColor,
+          quantity: 1,
+        },
+      ];
+    });
+  };
+
+  // ==========================================================
+  // REMOVE FROM CART
+  // ==========================================================
+
+  const removeFromCart = (
+    productId: string,
+    selectedSize?: string,
+    selectedColor?: string
+  ) => {
+    setCart((previous) =>
+      previous.filter(
+        (item) =>
+          !(
+            item.product.id ===
+              productId &&
+            (!selectedSize ||
+              item.selectedSize ===
+                selectedSize) &&
+            (!selectedColor ||
+              item.selectedColor ===
+                selectedColor)
+          )
+      )
+    );
+  };
+
+  // ==========================================================
+  // UPDATE QUANTITY
+  // ==========================================================
+
+  const updateQuantity = (
+    productId: string,
+    selectedSize: string,
+    quantity: number,
+    selectedColor?: string
+  ) => {
+    if (quantity <= 0) {
+      removeFromCart(
+        productId,
+        selectedSize,
+        selectedColor
+      );
+      return;
+    }
+
+    setCart((previous) =>
+      previous.map((item) =>
+        item.product.id ===
+            productId &&
+        item.selectedSize ===
+            selectedSize &&
+        item.selectedColor ===
+            selectedColor
+          ? {
+              ...item,
+              quantity,
+            }
+          : item
+      )
+    );
+  };
+
+  // ==========================================================
+  // CLEAR CART
+  // ==========================================================
 
   const clearCart = () => {
     setCart([]);
   };
 
-  // Auth Management
-  const login = (phoneOrEmail: string, role: 'admin' | 'customer' = 'customer', adminKey?: string): boolean => {
-    if (role === 'admin') {
-      if (adminKey === 'admin123' || adminKey === 'royal2025' || adminKey === 'doha2025') {
-        const adminUser: User = {
-          id: 'admin-1',
-          name: 'Store Administrator (Qatar)',
-          email: phoneOrEmail.includes('@') ? phoneOrEmail : 'admin@royalstepz.qa',
-          phone: phoneOrEmail.includes('@') ? '+974 5555 1234' : phoneOrEmail,
-          isAdmin: true,
-        };
-        setUser(adminUser);
-        setIsAuthOpen(false);
-        setIsAdminOpen(true);
-        return true;
-      }
+  // ==========================================================
+  // LOGIN
+  // ==========================================================
+
+  const login = async (
+    phoneOrEmail: string,
+    password?: string
+  ): Promise<boolean> => {
+    const identifier =
+      phoneOrEmail.trim();
+
+    if (!identifier) {
       return false;
     }
 
+    // --------------------------------------------------------
+    // Admin account
+    // --------------------------------------------------------
+
+    if (
+      identifier.toLowerCase() ===
+      settings.adminEmail.toLowerCase()
+    ) {
+      const adminUser: User = {
+        id: 'admin',
+        name: 'Royal Stepz Admin',
+        email: settings.adminEmail,
+        isAdmin: true,
+        createdAt:
+          new Date().toISOString(),
+      };
+
+      setUser(adminUser);
+      setIsAuthOpen(false);
+
+      return true;
+    }
+
+    // --------------------------------------------------------
+    // Customer login
+    // --------------------------------------------------------
+
+    try {
+      const usersSnapshot = await get(
+        ref(db, 'users')
+      );
+
+      if (usersSnapshot.exists()) {
+        const data =
+          usersSnapshot.val();
+
+        const foundEntry =
+          Object.entries(data).find(
+            ([, value]) => {
+              const customer =
+                value as Partial<User> & {
+                  password?: string;
+                };
+
+              const emailMatch =
+                customer.email
+                  ?.toLowerCase() ===
+                identifier.toLowerCase();
+
+              const phoneMatch =
+                customer.phone ===
+                identifier;
+
+              const passwordMatch =
+                !password ||
+                customer.password ===
+                  password;
+
+              return (
+                (emailMatch ||
+                  phoneMatch) &&
+                passwordMatch
+              );
+            }
+          );
+
+        if (foundEntry) {
+          const [
+            id,
+            value,
+          ] = foundEntry;
+
+          const customer =
+            value as Partial<User>;
+
+          const loggedUser: User = {
+            id,
+            name:
+              customer.name ||
+              'Royal Stepz Customer',
+            email:
+              customer.email,
+            phone:
+              customer.phone,
+            isAdmin:
+              customer.isAdmin === true,
+            createdAt:
+              customer.createdAt,
+          };
+
+          setUser(loggedUser);
+          setIsAuthOpen(false);
+
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        'Customer login lookup failed:',
+        error
+      );
+    }
+
+    // --------------------------------------------------------
+    // Fallback guest customer session
+    // --------------------------------------------------------
+
     const customerUser: User = {
-      id: 'cust-' + Date.now(),
-      name: phoneOrEmail.split('@')[0] || 'Royal Stepz Customer',
-      email: phoneOrEmail.includes('@') ? phoneOrEmail : undefined,
-      phone: !phoneOrEmail.includes('@') ? phoneOrEmail : undefined,
+      id:
+        'cust-' +
+        Date.now(),
+
+      name: identifier.includes('@')
+        ? identifier.split('@')[0]
+        : 'Royal Stepz Customer',
+
+      email: identifier.includes('@')
+        ? identifier
+        : undefined,
+
+      phone: identifier.includes('@')
+        ? undefined
+        : identifier,
+
       isAdmin: false,
+
+      createdAt:
+        new Date().toISOString(),
     };
+
     setUser(customerUser);
     setIsAuthOpen(false);
+
     return true;
   };
+
+  // ==========================================================
+  // LOGOUT
+  // ==========================================================
 
   const logout = () => {
     setUser(null);
     setIsAdminOpen(false);
   };
 
-  // Order Placement
-  const placeOrder = ({
-    customerName,
-    customerPhone,
-    city,
-    fullAddress,
-    notes,
-    paymentMethod,
-    items,
-  }: {
-    customerName: string;
-    customerPhone: string;
-    city: string;
-    fullAddress: string;
-    notes?: string;
-    paymentMethod: Order['paymentMethod'];
-    items: CartItem[];
-  }): { order: Order; whatsappUrl: string } => {
-    const subtotal = items.reduce((acc, item) => acc + item.product.priceQAR * item.quantity, 0);
-    const deliveryFee = subtotal >= settings.freeShippingThresholdQAR ? 0 : 25;
-    const total = subtotal + deliveryFee;
+  // ==========================================================
+  // CREATE ORDER
+  // ==========================================================
 
-    const orderNumber = 'RSZ-QA-' + Math.floor(1000 + Math.random() * 9000);
-    const orderId = 'ord-' + Date.now();
-    const currentDeviceId = getDeviceId();
+  const createOrder = async (
+    orderData: Omit<
+      Order,
+      'id' | 'orderNumber' | 'createdAt' | 'status'
+    >
+  ): Promise<Order> => {
+    const now =
+      Date.now();
 
-    const newOrder: Order = {
+    const orderNumber =
+      `RSZ-${now.toString().slice(-8)}`;
+
+    const orderId =
+      `order-${now}`;
+
+    const order: Order = {
+      ...orderData,
+
       id: orderId,
+
       orderNumber,
-      customerName,
-      customerPhone,
-      customerEmail: user?.email,
-      deviceId: currentDeviceId,
-      city,
-      fullAddress,
-      notes,
-      paymentMethod,
-      items,
-      subtotalQAR: subtotal,
-      deliveryFeeQAR: deliveryFee,
-      totalQAR: total,
+
       status: 'Pending',
-      createdAt: new Date().toISOString(),
+
+      createdAt: now,
     };
 
-    setOrders(prev => [newOrder, ...prev]);
-    setLastConfirmedOrder(newOrder);
+    // --------------------------------------------------------
+    // Save to Firebase
+    // --------------------------------------------------------
 
-    // Save order ID to local storage for persistent guest tracking
     try {
-      const raw = localStorage.getItem(MY_ORDER_IDS_KEY);
-      const list: string[] = raw ? JSON.parse(raw) : [];
-      if (!list.includes(newOrder.id)) {
-        list.push(newOrder.id);
-      }
-      if (!list.includes(newOrder.orderNumber)) {
-        list.push(newOrder.orderNumber);
-      }
-      localStorage.setItem(MY_ORDER_IDS_KEY, JSON.stringify(list));
-    } catch (e) {
-      console.warn(e);
+      await set(
+        ref(
+          db,
+          `orders/${orderId}`
+        ),
+        order
+      );
+    } catch (error) {
+      console.warn(
+        'Firebase order save failed:',
+        error
+      );
     }
 
-    setDoc(doc(db, 'orders', newOrder.id), JSON.parse(JSON.stringify(newOrder))).catch(() => {});
+    // --------------------------------------------------------
+    // Update local state
+    // --------------------------------------------------------
 
-    // Create Notification for Customer
-    const customerNotification: NotificationItem = {
-      id: 'notif-' + Date.now(),
-      title: `Order Received #${orderNumber}`,
-      message: `Your order for ${items.length} item(s) has been placed successfully! 24h Express Delivery across Qatar. Total: QAR ${total}`,
-      type: 'order',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    setOrders((previous) => [
+      order,
+      ...previous,
+    ]);
+
+    // --------------------------------------------------------
+    // Create notification
+    // --------------------------------------------------------
+
+    const notificationId =
+      `notification-${now}`;
+
+    const notification: NotificationItem = {
+      id: notificationId,
+
+      title: 'Order Received',
+
+      message:
+        `Your order ${orderNumber} has been received successfully.`,
+
+      timestamp: now,
+
       read: false,
-      recipientEmail: user?.email,
-      deviceId: currentDeviceId,
-      orderId: newOrder.id,
+
+      type: 'order',
+
+      orderId,
+
+      recipientEmail:
+        order.customerEmail,
+
+      deviceId:
+        order.deviceId,
     };
-    setNotifications(prev => [customerNotification, ...prev]);
 
-    setDoc(doc(db, 'notifications', customerNotification.id), JSON.parse(JSON.stringify(customerNotification))).catch(() => {});
-
-    if (!targetCheckoutItem) {
-      clearCart();
+    try {
+      await set(
+        ref(
+          db,
+          `notifications/${notificationId}`
+        ),
+        notification
+      );
+    } catch (error) {
+      console.warn(
+        'Notification save failed:',
+        error
+      );
     }
 
-    const itemsList = items
-      .map(i => `• ${i.quantity}x ${i.product.name} (Size: ${i.selectedSize}) - QAR ${i.product.priceQAR * i.quantity}`)
-      .join('\n');
-
-    const message = `🛍️ *NEW FOOTWEAR ORDER - ROYAL STEPZ ZONE QATAR*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `📦 *Order Number:* #${orderNumber}\n` +
-      `👤 *Customer Name:* ${customerName}\n` +
-      `📱 *Mobile / WhatsApp:* ${customerPhone}\n` +
-      `📍 *Location:* ${city}, Qatar\n` +
-      `🏠 *Delivery Address:* ${fullAddress}\n` +
-      (notes ? `📝 *Notes:* ${notes}\n` : '') +
-      `💳 *Payment Method:* ${paymentMethod}\n\n` +
-      `👟 *Ordered Items:*\n${itemsList}\n\n` +
-      `💰 *Subtotal:* QAR ${subtotal}\n` +
-      `🚚 *Qatar Courier:* ${deliveryFee === 0 ? 'FREE' : `QAR ${deliveryFee}`}\n` +
-      `💎 *Grand Total Payable:* QAR ${total}\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `⚡ *Delivery Window:* Within 24 Hours Express Qatar Delivery`;
-
-    const cleanAdminPhone = settings.whatsappNumber.replace(/[^0-9]/g, '');
-    const whatsappUrl = `https://wa.me/${cleanAdminPhone}?text=${encodeURIComponent(message)}`;
-
-    return { order: newOrder, whatsappUrl };
-  };
-
-  const updateOrderStatus = (orderId: string, status: Order['status']) => {
-    setOrders(prev =>
-      prev.map(order => (order.id === orderId ? { ...order, status } : order))
+    setNotifications(
+      (previous) => [
+        notification,
+        ...previous,
+      ]
     );
 
-    updateDoc(doc(db, 'orders', orderId), { status }).catch(() => {});
+    return order;
   };
 
-  const cancelOrder = (orderId: string, reason?: string) => {
-    const targetOrder = orders.find(o => o.id === orderId);
-    if (!targetOrder) return;
+  // ==========================================================
+  // UPDATE ORDER STATUS
+  // ==========================================================
 
-    const updatedStatus: Order['status'] = 'Cancelled';
-    const cancellationNote = reason
-      ? `Cancelled: ${reason}`
-      : 'Order cancelled by customer request.';
+  const updateOrderStatus = async (
+    orderId: string,
+    status: Order['status']
+  ): Promise<void> => {
+    await update(
+      ref(
+        db,
+        `orders/${orderId}`
+      ),
+      {
+        status,
+        updatedAt:
+          Date.now(),
+      }
+    );
 
-    setOrders(prev =>
-      prev.map(o =>
-        o.id === orderId
+    setOrders((previous) =>
+      previous.map((order) =>
+        order.id === orderId
           ? {
-              ...o,
-              status: updatedStatus,
-              notes: o.notes ? `${o.notes} | ${cancellationNote}` : cancellationNote,
+              ...order,
+              status,
+              updatedAt:
+                Date.now(),
             }
-          : o
+          : order
       )
     );
-
-    updateDoc(doc(db, 'orders', orderId), {
-      status: updatedStatus,
-      notes: targetOrder.notes ? `${targetOrder.notes} | ${cancellationNote}` : cancellationNote,
-    }).catch(() => {});
-
-    const cancelNotif: NotificationItem = {
-      id: 'notif-cancel-' + Date.now(),
-      title: `Order #${targetOrder.orderNumber} Cancelled`,
-      message: `Your order #${targetOrder.orderNumber} has been successfully cancelled. ${reason ? `Reason: ${reason}` : ''}`,
-      type: 'order',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false,
-      recipientEmail: targetOrder.customerEmail,
-      deviceId: targetOrder.deviceId || getDeviceId(),
-    };
-    setNotifications(prev => [cancelNotif, ...prev]);
-
-    setDoc(doc(db, 'notifications', cancelNotif.id), JSON.parse(JSON.stringify(cancelNotif))).catch(() => {});
   };
 
-  const editOrder = (
-    orderId: string, 
-    updatedFields: Partial<Omit<Order, 'id' | 'orderNumber' | 'createdAt'>>
-  ) => {
-    const targetOrder = orders.find(o => o.id === orderId);
-    if (!targetOrder) return;
+  // ==========================================================
+  // NOTIFICATION - MARK READ
+  // ==========================================================
 
-    let subtotal = targetOrder.subtotalQAR;
-    let deliveryFee = targetOrder.deliveryFeeQAR;
-    let total = targetOrder.totalQAR;
+  const markNotificationAsRead =
+    async (
+      notificationId: string
+    ): Promise<void> => {
+      await update(
+        ref(
+          db,
+          `notifications/${notificationId}`
+        ),
+        {
+          read: true,
+        }
+      );
 
-    if (updatedFields.items) {
-      subtotal = updatedFields.items.reduce((acc, it) => acc + it.product.priceQAR * it.quantity, 0);
-      deliveryFee = subtotal >= settings.freeShippingThresholdQAR ? 0 : 25;
-      total = subtotal + deliveryFee;
-    }
-
-    const mergedOrder: Order = {
-      ...targetOrder,
-      ...updatedFields,
-      subtotalQAR: subtotal,
-      deliveryFeeQAR: deliveryFee,
-      totalQAR: total,
+      setNotifications(
+        (previous) =>
+          previous.map(
+            (notification) =>
+              notification.id ===
+              notificationId
+                ? {
+                    ...notification,
+                    read: true,
+                  }
+                : notification
+          )
+      );
     };
 
-    setOrders(prev => prev.map(o => o.id === orderId ? mergedOrder : o));
+  // ==========================================================
+  // NOTIFICATION - MARK ALL READ
+  // ==========================================================
 
-    if (lastConfirmedOrder && lastConfirmedOrder.id === orderId) {
-      setLastConfirmedOrder(mergedOrder);
-    }
+  const markAllNotificationsAsRead =
+    async (): Promise<void> => {
+      const unread =
+        notifications.filter(
+          (notification) =>
+            !notification.read
+        );
 
-    const payload: any = { ...updatedFields, subtotalQAR: subtotal, deliveryFeeQAR: deliveryFee, totalQAR: total };
-    updateDoc(doc(db, 'orders', orderId), JSON.parse(JSON.stringify(payload))).catch(() => {});
+      if (unread.length > 0) {
+        const updates: Record<
+          string,
+          boolean
+        > = {};
 
-    const editNotif: NotificationItem = {
-      id: 'notif-edit-' + Date.now(),
-      title: `Order #${targetOrder.orderNumber} Updated`,
-      message: `Your order details/sizes for #${targetOrder.orderNumber} have been updated. New Total: QAR ${total}`,
-      type: 'order',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false,
-      recipientEmail: targetOrder.customerEmail,
-      deviceId: targetOrder.deviceId || getDeviceId(),
-      orderId: targetOrder.id,
+        unread.forEach(
+          (notification) => {
+            updates[
+              `notifications/${notification.id}/read`
+            ] = true;
+          }
+        );
+
+        await update(
+          ref(db),
+          updates
+        );
+      }
+
+      setNotifications(
+        (previous) =>
+          previous.map(
+            (notification) => ({
+              ...notification,
+              read: true,
+            })
+          )
+      );
     };
-    setNotifications(prev => [editNotif, ...prev]);
 
-    setDoc(doc(db, 'notifications', editNotif.id), JSON.parse(JSON.stringify(editNotif))).catch(() => {});
-  };
+  // ==========================================================
+  // UPDATE SETTINGS
+  // ==========================================================
 
-  const deleteOrder = (orderId: string) => {
-    setOrders(prev => prev.filter(o => o.id !== orderId));
-    if (lastConfirmedOrder && lastConfirmedOrder.id === orderId) {
-      setLastConfirmedOrder(null);
-    }
-    deleteDoc(doc(db, 'orders', orderId)).catch(() => {});
-  };
-
-  const sendCustomerNotification = (notification: {
-    title: string;
-    message: string;
-    type?: 'order' | 'deal' | 'system';
-    recipientEmail?: string;
-    deviceId?: string;
-    orderId?: string;
-  }) => {
-    const newNotif: NotificationItem = {
-      id: 'notif-' + Date.now(),
-      title: notification.title,
-      message: notification.message,
-      type: notification.type || 'system',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false,
-      recipientEmail: notification.recipientEmail,
-      deviceId: notification.deviceId,
-      orderId: notification.orderId,
-    };
-    setNotifications(prev => [newNotif, ...prev]);
-
-    setDoc(doc(db, 'notifications', newNotif.id), JSON.parse(JSON.stringify(newNotif))).catch(() => {});
-  };
-
-  const deleteNotification = (notificationId: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== notificationId));
-    deleteDoc(doc(db, 'notifications', notificationId)).catch(() => {});
-  };
-
-  const updateNotification = (notificationId: string, title: string, message: string) => {
-    setNotifications(prev =>
-      prev.map(n => (n.id === notificationId ? { ...n, title, message } : n))
-    );
-    updateDoc(doc(db, 'notifications', notificationId), { title, message }).catch(() => {});
-  };
-
-  const markNotificationAsRead = (notificationId: string) => {
-    setNotifications(prev =>
-      prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
-    );
-    updateDoc(doc(db, 'notifications', notificationId), { read: true }).catch(() => {});
-  };
-
-  // Product Management (Syncs directly with Firebase)
-  const addProduct = (newProductData: Omit<Product, 'id'>) => {
-    const newId = 'shoe-' + Date.now();
-    const productWithId: Product = {
-      ...newProductData,
-      id: newId,
-    };
-    setProducts(prev => [productWithId, ...prev]);
-
-    setDoc(doc(db, 'products', newId), productWithId).catch(() => {});
-  };
-
-  const updateProduct = (id: string, updatedFields: Partial<Product>) => {
-    setProducts(prev =>
-      prev.map(p => (p.id === id ? { ...p, ...updatedFields } : p))
+  const updateSettings = async (
+    updates: Partial<StoreSettings>
+  ): Promise<void> => {
+    await update(
+      ref(db, 'settings'),
+      updates
     );
 
-    updateDoc(doc(db, 'products', id), updatedFields).catch(() => {});
+    setSettings((previous) => ({
+      ...previous,
+      ...updates,
+    }));
   };
 
-  const deleteProduct = (id: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    deleteDoc(doc(db, 'products', id)).catch(() => {});
-  };
+  // ==========================================================
+  // CONTEXT VALUE
+  // ==========================================================
 
-  // Settings Management
-  const updateSettings = (newSettings: Partial<StoreSettings>) => {
-    const merged = { ...settings, ...newSettings };
-    setSettings(merged);
-
-    setDoc(doc(db, 'settings', 'general'), merged).catch(() => {});
-  };
-
-  return (
-    <StoreContext.Provider
-      value={{
+  const contextValue =
+    useMemo<StoreContextType>(
+      () => ({
+        // Products
         products,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+
+        // Cart
         cart,
-        orders,
-        notifications,
-        user,
-        settings,
-        selectedCategory,
-        selectedBrand,
-        searchQuery,
-        isCartOpen,
-        isAuthOpen,
-        isAdminOpen,
-        isOrderConfirmModalOpen,
-        isNotificationsOpen,
-        targetCheckoutItem,
-        lastConfirmedOrder,
-        setSelectedCategory,
-        setSelectedBrand,
-        setSearchQuery,
-        setIsCartOpen,
-        setIsAuthOpen,
-        setIsAdminOpen,
-        setIsOrderConfirmModalOpen,
-        setIsNotificationsOpen,
-        setTargetCheckoutItem,
-        setLastConfirmedOrder,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+
+        // Cart UI
+        isCartOpen,
+        setIsCartOpen,
+
+        // Auth
+        user,
         login,
         logout,
-        placeOrder,
+
+        isAuthOpen,
+        setIsAuthOpen,
+
+        // Search
+        searchQuery,
+        setSearchQuery,
+
+        selectedCategory,
+        setSelectedCategory,
+
+        selectedBrand,
+        setSelectedBrand,
+
+        // Orders
+        orders,
+        createOrder,
         updateOrderStatus,
-        cancelOrder,
-        editOrder,
-        deleteOrder,
-        sendCustomerNotification,
-        deleteNotification,
-        updateNotification,
+
+        // Admin
+        isAdminOpen,
+        setIsAdminOpen,
+
+        // Order modal
+        isOrderConfirmModalOpen,
+        setIsOrderConfirmModalOpen,
+
+        // Notifications
+        notifications,
+        isNotificationsOpen,
+        setIsNotificationsOpen,
         markNotificationAsRead,
-        addProduct,
-        updateProduct,
-        deleteProduct,
+        markAllNotificationsAsRead,
+
+        // Settings
+        settings,
         updateSettings,
-      }}
+
+        // Helper
+        getProductById,
+      }),
+      [
+        products,
+        cart,
+        isCartOpen,
+        user,
+        isAuthOpen,
+        searchQuery,
+        selectedCategory,
+        selectedBrand,
+        orders,
+        isAdminOpen,
+        isOrderConfirmModalOpen,
+        notifications,
+        isNotificationsOpen,
+        settings,
+      ]
+    );
+
+  return (
+    <StoreContext.Provider
+      value={contextValue}
     >
       {children}
     </StoreContext.Provider>
   );
 };
 
-export const useStore = () => {
-  const context = useContext(StoreContext);
-  if (!context) {
-    throw new Error('useStore must be used within a StoreProvider');
-  }
-  return context;
-};
+// ============================================================
+// HOOK
+// ============================================================
+
+export const useStore =
+  (): StoreContextType => {
+    const context =
+      useContext(StoreContext);
+
+    if (!context) {
+      throw new Error(
+        'useStore must be used inside StoreProvider'
+      );
+    }
+
+    return context;
+  };
