@@ -9,14 +9,19 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { OrderConfirmModal } from './components/OrderConfirmModal';
 import { NotificationsModal } from './components/NotificationsModal';
+import { Product } from './types';
 import { 
   Sparkles, 
   ShieldCheck, 
   Truck, 
   RotateCcw, 
-  Headphones,
-  SlidersHorizontal,
-  ChevronDown
+  Headphones, 
+  SlidersHorizontal, 
+  ChevronDown,
+  X,
+  Eye,
+  Star,
+  Check
 } from 'lucide-react';
 
 function StoreContent() {
@@ -30,6 +35,7 @@ function StoreContent() {
     isAdminOpen,
     setIsAdminOpen,
     isOrderConfirmModalOpen,
+    addToCart,
     user,
   } = useStore();
 
@@ -38,6 +44,9 @@ function StoreContent() {
   const [showDiscountsOnly, setShowDiscountsOnly] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isSecretAdminModalOpen, setIsSecretAdminModalOpen] = useState(false);
+  const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
+  const [detailsSelectedSize, setDetailsSelectedSize] = useState<string>('');
+  const [detailsAdded, setDetailsAdded] = useState(false);
 
   // Secret Keyboard Shortcut: Ctrl + F12
   useEffect(() => {
@@ -95,7 +104,6 @@ function StoreContent() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
-      {/* Header */}
       <Header />
 
       {/* Hero Banner */}
@@ -304,6 +312,10 @@ function StoreContent() {
             <ProductCard
               key={product.id}
               product={product}
+              onQuickView={(p) => { 
+                setDetailsProduct(p); 
+                setDetailsSelectedSize(p.sizes[0] || 'EU 42'); 
+              }}
             />
           ))}
         </div>
@@ -323,6 +335,83 @@ function StoreContent() {
       {isAdminOpen && <AdminDashboard />}
       {isOrderConfirmModalOpen && <OrderConfirmModal />}
       <NotificationsModal />
+
+      {/* Product Details Modal */}
+      {detailsProduct && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-sm">
+          <div 
+            className="relative w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-5 sm:p-6 overflow-hidden max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setDetailsProduct(null)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors cursor-pointer z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+              <div className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+                <img 
+                  src={detailsProduct.image} 
+                  alt={detailsProduct.name} 
+                  className="w-full h-full object-cover object-center" 
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">{detailsProduct.brand}</span>
+                  <h2 className="text-xl font-black text-white mt-1 leading-snug">{detailsProduct.name}</h2>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-2xl font-black text-amber-400">QAR {detailsProduct.priceQAR}</span>
+                    {detailsProduct.originalPriceQAR && (
+                      <span className="text-sm text-slate-500 line-through">QAR {detailsProduct.originalPriceQAR}</span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-300 leading-relaxed">{detailsProduct.description}</p>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-2">Select Shoe Size / সাইজ নির্বাচন করুন:</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {detailsProduct.sizes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setDetailsSelectedSize(s)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          detailsSelectedSize === s
+                            ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                            : 'bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-2">
+                  <button
+                    onClick={() => {
+                      addToCart(detailsProduct, detailsSelectedSize || detailsProduct.sizes[0]);
+                      setDetailsAdded(true);
+                      setTimeout(() => { 
+                        setDetailsAdded(false); 
+                        setDetailsProduct(null); 
+                      }, 1000);
+                    }}
+                    className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                  >
+                    {detailsAdded ? 'Added to Bag! ✓' : 'Add to Bag (ব্যাগে যোগ করুন)'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
