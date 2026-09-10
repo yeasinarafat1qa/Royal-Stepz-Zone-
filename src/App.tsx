@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StoreProvider, useStore } from './context/StoreContext';
+
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ProductCard } from './components/ProductCard';
@@ -9,27 +10,26 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { OrderConfirmModal } from './components/OrderConfirmModal';
 import { NotificationsModal } from './components/NotificationsModal';
+
 import { Product } from './types';
-import { 
-  Sparkles, 
-  ShieldCheck, 
-  Truck, 
-  RotateCcw, 
-  Headphones, 
-  SlidersHorizontal, 
+
+import {
+  Sparkles,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  Headphones,
+  SlidersHorizontal,
   ChevronDown,
   X,
-  Eye,
-  Star,
-  Check
 } from 'lucide-react';
 
 function StoreContent() {
-  const { 
-    products, 
-    selectedCategory, 
+  const {
+    products,
+    selectedCategory,
     setSelectedCategory,
-    selectedBrand, 
+    selectedBrand,
     setSelectedBrand,
     searchQuery,
     isAdminOpen,
@@ -39,89 +39,210 @@ function StoreContent() {
     user,
   } = useStore();
 
-  const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'>('featured');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1500]);
+  const [sortBy, setSortBy] = useState<
+    'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'
+  >('featured');
+
+  const [priceRange] = useState<[number, number]>([0, 1500]);
   const [showDiscountsOnly, setShowDiscountsOnly] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isSecretAdminModalOpen, setIsSecretAdminModalOpen] = useState(false);
+
   const [detailsProduct, setDetailsProduct] = useState<Product | null>(null);
   const [detailsSelectedSize, setDetailsSelectedSize] = useState<string>('');
   const [detailsAdded, setDetailsAdded] = useState(false);
 
-  // Secret Keyboard Shortcut: Ctrl + F12
+  // Secret admin keyboard shortcut: Ctrl + F12
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'F12' || e.code === 'F12')) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'F12') {
         e.preventDefault();
+
         if (user?.isAdmin) {
           setIsAdminOpen(true);
         } else {
-          setIsSecretAdminModalOpen(prev => !prev);
+          setIsSecretAdminModalOpen((prev) => !prev);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [user, setIsAdminOpen]);
 
-  // Brands list
+  // Brand list
   const brands = useMemo(() => {
-    const set = new Set<string>();
-    products.forEach(p => set.add(p.brand));
-    return ['All', ...Array.from(set)];
+    const brandSet = new Set<string>();
+
+    products.forEach((product) => {
+      if (product.brand) {
+        brandSet.add(product.brand);
+      }
+    });
+
+    return ['All', ...Array.from(brandSet)];
   }, [products]);
 
+  // Available categories
   const categories = ['All', 'Sneakers', 'Casual', 'Running', 'Luxury', 'Slides'];
 
-  // Filtered Products
+  // Filter and sort products
   const filteredProducts = useMemo(() => {
     return products
       .filter((product) => {
-        if (selectedCategory !== 'All' && product.category !== selectedCategory) return false;
-        if (selectedBrand !== 'All' && product.brand !== selectedBrand) return false;
-        if (searchQuery.trim() !== '') {
-          const q = searchQuery.toLowerCase();
-          const matchName = product.name.toLowerCase().includes(q);
-          const matchBrand = product.brand.toLowerCase().includes(q);
-          const matchCategory = product.category.toLowerCase().includes(q);
-          if (!matchName && !matchBrand && !matchCategory) return false;
+        if (
+          selectedCategory !== 'All' &&
+          product.category !== selectedCategory
+        ) {
+          return false;
         }
-        if (product.priceQAR < priceRange[0] || product.priceQAR > priceRange[1]) return false;
-        if (showDiscountsOnly && (!product.originalPriceQAR || product.originalPriceQAR <= product.priceQAR)) return false;
+
+        if (
+          selectedBrand !== 'All' &&
+          product.brand !== selectedBrand
+        ) {
+          return false;
+        }
+
+        if (searchQuery.trim() !== '') {
+          const query = searchQuery.toLowerCase().trim();
+
+          const matchName = product.name
+            ?.toLowerCase()
+            .includes(query);
+
+          const matchBrand = product.brand
+            ?.toLowerCase()
+            .includes(query);
+
+          const matchCategory = product.category
+            ?.toLowerCase()
+            .includes(query);
+
+          const matchDescription = product.description
+            ?.toLowerCase()
+            .includes(query);
+
+          if (
+            !matchName &&
+            !matchBrand &&
+            !matchCategory &&
+            !matchDescription
+          ) {
+            return false;
+          }
+        }
+
+        if (
+          product.priceQAR < priceRange[0] ||
+          product.priceQAR > priceRange[1]
+        ) {
+          return false;
+        }
+
+        if (
+          showDiscountsOnly &&
+          (!product.originalPriceQAR ||
+            product.originalPriceQAR <= product.priceQAR)
+        ) {
+          return false;
+        }
+
         return true;
       })
       .sort((a, b) => {
-        if (sortBy === 'price-low') return a.priceQAR - b.priceQAR;
-        if (sortBy === 'price-high') return b.priceQAR - a.priceQAR;
-        if (sortBy === 'rating') return b.rating - a.rating;
-        if (sortBy === 'newest') return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
-        return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
+        if (sortBy === 'price-low') {
+          return a.priceQAR - b.priceQAR;
+        }
+
+        if (sortBy === 'price-high') {
+          return b.priceQAR - a.priceQAR;
+        }
+
+        if (sortBy === 'rating') {
+          return b.rating - a.rating;
+        }
+
+        if (sortBy === 'newest') {
+          return (
+            Number(Boolean(b.isNewArrival)) -
+            Number(Boolean(a.isNewArrival))
+          );
+        }
+
+        return (
+          Number(Boolean(b.isFeatured)) -
+          Number(Boolean(a.isFeatured))
+        );
       });
-  }, [products, selectedCategory, selectedBrand, searchQuery, priceRange, showDiscountsOnly, sortBy]);
+  }, [
+    products,
+    selectedCategory,
+    selectedBrand,
+    searchQuery,
+    priceRange,
+    showDiscountsOnly,
+    sortBy,
+  ]);
+
+  const openProductDetails = (product: Product) => {
+    setDetailsProduct(product);
+    setDetailsSelectedSize(product.sizes?.[0] || 'EU 42');
+    setDetailsAdded(false);
+  };
+
+  const closeProductDetails = () => {
+    setDetailsProduct(null);
+    setDetailsSelectedSize('');
+    setDetailsAdded(false);
+  };
+
+  const handleAddDetailsProduct = () => {
+    if (!detailsProduct) return;
+
+    const size =
+      detailsSelectedSize ||
+      detailsProduct.sizes?.[0] ||
+      'EU 42';
+
+    addToCart(detailsProduct, size);
+    setDetailsAdded(true);
+
+    window.setTimeout(() => {
+      setDetailsAdded(false);
+      setDetailsProduct(null);
+      setDetailsSelectedSize('');
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
       <Header />
 
-      {/* Hero Banner */}
+      {/* ================= HERO ================= */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-b border-slate-800/80 pt-8 pb-12 sm:pt-14 sm:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>QATAR'S EXCLUSIVE FOOTWEAR VAULT</span>
+                <span>QATAR&apos;S EXCLUSIVE FOOTWEAR VAULT</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-                STEP INTO <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">ROYALTY</span>
+                STEP INTO{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">
+                  ROYALTY
+                </span>
               </h1>
 
               <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Discover 100% verified authentic Air Jordans, Yeezys, Dunks, and luxury lifestyle footwear in Qatar. Express 24h delivery with Cash on Delivery across Qatar.
+                Discover 100% verified authentic Air Jordans, Yeezys,
+                Dunks, and luxury lifestyle footwear in Qatar. Express
+                24h delivery with Cash on Delivery across Qatar.
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
@@ -140,19 +261,29 @@ function StoreContent() {
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 relative">
                     <img
                       src="https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800&q=80"
-                      alt="Air Jordan 1"
+                      alt="Featured footwear"
                       className="w-full h-full object-cover"
                     />
+
                     <div className="absolute top-3 left-3 bg-amber-500 text-slate-950 text-xs font-black px-2.5 py-1 rounded-full uppercase">
                       Hot in Qatar
                     </div>
                   </div>
+
                   <div className="p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono text-amber-400 font-semibold">AIR JORDAN 1</span>
-                      <span className="text-sm font-black text-white">QAR 650</span>
+                      <span className="text-xs font-mono text-amber-400 font-semibold">
+                        AIR JORDAN 1
+                      </span>
+
+                      <span className="text-sm font-black text-white">
+                        QAR 650
+                      </span>
                     </div>
-                    <h3 className="text-base font-bold text-white mt-1">Retro High OG "Chicago"</h3>
+
+                    <h3 className="text-base font-bold text-white mt-1">
+                      Retro High OG &quot;Chicago&quot;
+                    </h3>
                   </div>
                 </div>
               </div>
@@ -161,7 +292,7 @@ function StoreContent() {
         </div>
       </section>
 
-      {/* Trust Highlights */}
+      {/* ================= TRUST HIGHLIGHTS ================= */}
       <section className="bg-slate-900/60 border-b border-slate-800/80 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
@@ -169,9 +300,14 @@ function StoreContent() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <Truck className="w-5 h-5" />
               </div>
+
               <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">Fast Qatar Delivery</h4>
-                <p className="text-[11px] text-slate-400">Within 24 Hours in Doha</p>
+                <h4 className="text-xs sm:text-sm font-bold text-white">
+                  Fast Qatar Delivery
+                </h4>
+                <p className="text-[11px] text-slate-400">
+                  Within 24 Hours in Doha
+                </p>
               </div>
             </div>
 
@@ -179,9 +315,14 @@ function StoreContent() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
+
               <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">100% Genuine</h4>
-                <p className="text-[11px] text-slate-400">Verified Authentic</p>
+                <h4 className="text-xs sm:text-sm font-bold text-white">
+                  100% Genuine
+                </h4>
+                <p className="text-[11px] text-slate-400">
+                  Verified Authentic
+                </p>
               </div>
             </div>
 
@@ -189,9 +330,14 @@ function StoreContent() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <RotateCcw className="w-5 h-5" />
               </div>
+
               <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">Size Exchange</h4>
-                <p className="text-[11px] text-slate-400">Easy size swap</p>
+                <h4 className="text-xs sm:text-sm font-bold text-white">
+                  Size Exchange
+                </h4>
+                <p className="text-[11px] text-slate-400">
+                  Easy size swap
+                </p>
               </div>
             </div>
 
@@ -199,31 +345,46 @@ function StoreContent() {
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                 <Headphones className="w-5 h-5" />
               </div>
+
               <div>
-                <h4 className="text-xs sm:text-sm font-bold text-white">24/7 WhatsApp</h4>
-                <p className="text-[11px] text-slate-400">+974 5555 1234</p>
+                <h4 className="text-xs sm:text-sm font-bold text-white">
+                  24/7 WhatsApp
+                </h4>
+                <p className="text-[11px] text-slate-400">
+                  +974 5555 1234
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Main Shop */}
-      <main id="collection" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      {/* ================= MAIN SHOP ================= */}
+      <main
+        id="collection"
+        className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12"
+      >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
           <div>
             <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
               <span>EXPLORE COLLECTION</span>
+
               <span className="text-xs font-mono font-bold text-amber-400 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30">
                 {filteredProducts.length} Items
               </span>
             </h2>
-            <p className="text-xs text-slate-400 mt-0.5">Available for immediate delivery in Qatar</p>
+
+            <p className="text-xs text-slate-400 mt-0.5">
+              Available for immediate delivery in Qatar
+            </p>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <button
-              onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
+              type="button"
+              onClick={() =>
+                setIsFilterDrawerOpen((prev) => !prev)
+              }
               className="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center gap-2 cursor-pointer"
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
@@ -233,7 +394,16 @@ function StoreContent() {
             <div className="relative">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) =>
+                  setSortBy(
+                    e.target.value as
+                      | 'featured'
+                      | 'price-low'
+                      | 'price-high'
+                      | 'rating'
+                      | 'newest'
+                  )
+                }
                 className="appearance-none bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 pr-8 text-xs font-semibold text-slate-200 focus:outline-none cursor-pointer"
               >
                 <option value="featured">Featured First</option>
@@ -242,17 +412,22 @@ function StoreContent() {
                 <option value="price-high">Price: High to Low</option>
                 <option value="rating">Top Rated</option>
               </select>
+
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>
 
-        {/* Filters Box */}
+        {/* ================= FILTERS ================= */}
         {isFilterDrawerOpen && (
           <div className="mt-4 p-4 bg-slate-900/90 border border-slate-800 rounded-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-white uppercase">Filter Options</span>
+              <span className="text-xs font-bold text-white uppercase">
+                Filter Options
+              </span>
+
               <button
+                type="button"
                 onClick={() => {
                   setSelectedCategory('All');
                   setSelectedBrand('All');
@@ -266,127 +441,206 @@ function StoreContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1 font-semibold">Category:</label>
+                <label className="block text-slate-400 mb-1 font-semibold">
+                  Category:
+                </label>
+
                 <div className="flex flex-wrap gap-1.5">
-                  {categories.map((cat) => (
+                  {categories.map((category) => (
                     <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
+                      key={category}
+                      type="button"
+                      onClick={() =>
+                        setSelectedCategory(category)
+                      }
                       className={`px-2.5 py-1 rounded-lg transition-all ${
-                        selectedCategory === cat
+                        selectedCategory === category
                           ? 'bg-amber-500 text-slate-950 font-bold'
                           : 'bg-slate-950 text-slate-300 border border-slate-800'
                       }`}
                     >
-                      {cat}
+                      {category}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1 font-semibold">Brand:</label>
+                <label className="block text-slate-400 mb-1 font-semibold">
+                  Brand:
+                </label>
+
                 <div className="flex flex-wrap gap-1.5">
-                  {brands.map((b) => (
+                  {brands.map((brand) => (
                     <button
-                      key={b}
-                      onClick={() => setSelectedBrand(b)}
+                      key={brand}
+                      type="button"
+                      onClick={() => setSelectedBrand(brand)}
                       className={`px-2.5 py-1 rounded-lg transition-all ${
-                        selectedBrand === b
+                        selectedBrand === brand
                           ? 'bg-amber-500 text-slate-950 font-bold'
                           : 'bg-slate-950 text-slate-300 border border-slate-800'
                       }`}
                     >
-                      {b}
+                      {brand}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
+
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
+              <input
+                id="discount-only"
+                type="checkbox"
+                checked={showDiscountsOnly}
+                onChange={(e) =>
+                  setShowDiscountsOnly(e.target.checked)
+                }
+                className="accent-amber-500"
+              />
+
+              <label
+                htmlFor="discount-only"
+                className="text-xs text-slate-300 cursor-pointer"
+              >
+                Show discounted products only
+              </label>
+            </div>
           </div>
         )}
 
-        {/* Products Grid */}
+        {/* ================= PRODUCTS ================= */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-6">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onQuickView={(p) => { 
-                setDetailsProduct(p); 
-                setDetailsSelectedSize(p.sizes[0] || 'EU 42'); 
-              }}
-            />
-          ))}
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onQuickView={openProductDetails}
+              />
+            ))
+          ) : (
+            <div className="col-span-full py-16 text-center">
+              <div className="text-slate-500 text-4xl mb-3">
+                🔍
+              </div>
+
+              <h3 className="text-lg font-bold text-white">
+                No products found
+              </h3>
+
+              <p className="text-sm text-slate-400 mt-1">
+                Try changing your search or filter options.
+              </p>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Footer */}
+      {/* ================= FOOTER ================= */}
       <Footer />
 
-      {/* Modals & Overlays */}
+      {/* ================= GLOBAL MODALS ================= */}
       <CartDrawer />
       <AuthModal />
-      <SecretAdminModal 
-        isOpen={isSecretAdminModalOpen} 
-        onClose={() => setIsSecretAdminModalOpen(false)} 
-        onLoginSuccess={() => setIsAdminOpen(true)} 
+
+      <SecretAdminModal
+        isOpen={isSecretAdminModalOpen}
+        onClose={() => setIsSecretAdminModalOpen(false)}
+        onLoginSuccess={() => {
+          setIsSecretAdminModalOpen(false);
+          setIsAdminOpen(true);
+        }}
       />
+
       {isAdminOpen && <AdminDashboard />}
+
       {isOrderConfirmModalOpen && <OrderConfirmModal />}
+
       <NotificationsModal />
 
-      {/* Product Details Modal */}
+      {/* ================= PRODUCT DETAILS MODAL ================= */}
       {detailsProduct && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-sm">
-          <div 
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-sm"
+          onClick={closeProductDetails}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Product details"
+        >
+          <div
             className="relative w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-5 sm:p-6 overflow-hidden max-h-[90vh] overflow-y-auto"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
-            <button 
-              onClick={() => setDetailsProduct(null)}
+            <button
+              type="button"
+              onClick={closeProductDetails}
               className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-colors cursor-pointer z-10"
+              aria-label="Close product details"
+              title="Close"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
               <div className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                <img 
-                  src={detailsProduct.image} 
-                  alt={detailsProduct.name} 
-                  className="w-full h-full object-cover object-center" 
+                <img
+                  src={detailsProduct.image}
+                  alt={detailsProduct.name}
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">{detailsProduct.brand}</span>
-                  <h2 className="text-xl font-black text-white mt-1 leading-snug">{detailsProduct.name}</h2>
+                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+                    {detailsProduct.brand}
+                  </span>
+
+                  <h2 className="text-xl font-black text-white mt-1 leading-snug">
+                    {detailsProduct.name}
+                  </h2>
+
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-2xl font-black text-amber-400">QAR {detailsProduct.priceQAR}</span>
-                    {detailsProduct.originalPriceQAR && (
-                      <span className="text-sm text-slate-500 line-through">QAR {detailsProduct.originalPriceQAR}</span>
-                    )}
+                    <span className="text-2xl font-black text-amber-400">
+                      QAR {detailsProduct.priceQAR}
+                    </span>
+
+                    {detailsProduct.originalPriceQAR &&
+                      detailsProduct.originalPriceQAR >
+                        detailsProduct.priceQAR && (
+                        <span className="text-sm text-slate-500 line-through">
+                          QAR {detailsProduct.originalPriceQAR}
+                        </span>
+                      )}
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed">{detailsProduct.description}</p>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {detailsProduct.description}
+                </p>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-2">Select Shoe Size / সাইজ নির্বাচন করুন:</label>
+                  <label className="block text-xs font-bold text-slate-300 mb-2">
+                    Select Shoe Size / সাইজ নির্বাচন করুন:
+                  </label>
+
                   <div className="flex flex-wrap gap-1.5">
-                    {detailsProduct.sizes.map((s) => (
+                    {(detailsProduct.sizes || []).map((size) => (
                       <button
-                        key={s}
-                        onClick={() => setDetailsSelectedSize(s)}
+                        key={size}
+                        type="button"
+                        onClick={() =>
+                          setDetailsSelectedSize(size)
+                        }
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          detailsSelectedSize === s
+                          detailsSelectedSize === size
                             ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                             : 'bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700'
                         }`}
                       >
-                        {s}
+                        {size}
                       </button>
                     ))}
                   </div>
@@ -394,17 +648,13 @@ function StoreContent() {
 
                 <div className="pt-2 flex flex-col gap-2">
                   <button
-                    onClick={() => {
-                      addToCart(detailsProduct, detailsSelectedSize || detailsProduct.sizes[0]);
-                      setDetailsAdded(true);
-                      setTimeout(() => { 
-                        setDetailsAdded(false); 
-                        setDetailsProduct(null); 
-                      }, 1000);
-                    }}
-                    className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                    type="button"
+                    onClick={handleAddDetailsProduct}
+                    className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer transition-colors"
                   >
-                    {detailsAdded ? 'Added to Bag! ✓' : 'Add to Bag (ব্যাগে যোগ করুন)'}
+                    {detailsAdded
+                      ? 'Added to Bag! ✓'
+                      : 'Add to Bag (ব্যাগে যোগ করুন)'}
                   </button>
                 </div>
               </div>
