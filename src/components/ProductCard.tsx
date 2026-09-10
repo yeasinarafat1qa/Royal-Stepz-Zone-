@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
-
 import {
   Star,
   ShoppingBag,
@@ -29,22 +28,43 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const [isAdded, setIsAdded] = useState(false);
 
-  // Calculate discount safely
+  const rating = product.rating ?? 0;
+  const reviewCount = product.reviewCount ?? 0;
+  const brand = product.brand ?? 'Royal Stepz';
+
+  const isFeatured =
+    product.isFeatured ?? product.featured ?? false;
+
+  const isNewArrival =
+    product.isNewArrival ?? product.isNew ?? false;
+
+  const isBestseller = product.isBestseller ?? false;
+
+  const originalPrice = product.originalPriceQAR ?? 0;
+  const currentPrice = product.priceQAR ?? product.price ?? 0;
+
   const discountPercent =
-    product.originalPriceQAR &&
-    product.originalPriceQAR > product.priceQAR
+    originalPrice > currentPrice && currentPrice > 0
       ? Math.round(
-          ((product.originalPriceQAR - product.priceQAR) /
-            product.originalPriceQAR) *
-            100
+          ((originalPrice - currentPrice) / originalPrice) * 100
         )
       : 0;
 
-  // Add to cart
+  const isOutOfStock =
+    product.inStock === false ||
+    (typeof product.stock === 'number' && product.stock <= 0);
+
+  const productImage =
+    product.image ||
+    product.images?.[0] ||
+    'https://placehold.co/600x600?text=Royal+Stepz';
+
   const handleAddToCart = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.stopPropagation();
+
+    if (isOutOfStock) return;
 
     addToCart(product, selectedSize);
 
@@ -55,17 +75,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }, 1500);
   };
 
-  // Buy now
   const handleBuyNow = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.stopPropagation();
 
+    if (isOutOfStock) return;
+
     addToCart(product, selectedSize);
     setIsCartOpen(true);
   };
 
-  // Quick view
   const handleQuickView = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
@@ -79,247 +99,131 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       onClick={() => onQuickView?.(product)}
-      className="
-        group relative
-        bg-slate-900/80
-        border border-slate-800/80
-        hover:border-amber-500/40
-        rounded-2xl
-        overflow-hidden
-        transition-all duration-300
-        hover:shadow-xl
-        hover:shadow-amber-500/5
-        flex flex-col
-        justify-between
-        cursor-pointer
-      "
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/40 hover:shadow-2xl"
     >
-      {/* ================= PRODUCT IMAGE ================= */}
-      <div className="relative aspect-square overflow-hidden bg-slate-950">
+      {/* Product Image */}
+      <div className="relative aspect-square overflow-hidden bg-zinc-800">
+        <img
+          src={productImage}
+          alt={product.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => {
+            e.currentTarget.src =
+              'https://placehold.co/600x600?text=Royal+Stepz';
+          }}
+        />
 
-        {/* Hover View Details */}
-        <div
-          className="
-            absolute inset-0
-            bg-black/20
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            z-10
-            flex items-center justify-center
-            pointer-events-none
-          "
-        >
-          <span
-            className="
-              px-3 py-1.5
-              bg-slate-950/80
-              text-amber-400
-              text-xs font-bold
-              rounded-full
-              border border-amber-500/30
-              backdrop-blur-sm
-              flex items-center gap-1.5
-              shadow-lg
-            "
-          >
-            <Eye className="w-3.5 h-3.5" />
-            View Details
-          </span>
-        </div>
+        {/* Discount Badge */}
+        {discountPercent > 0 && (
+          <div className="absolute left-3 top-3 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
+            -{discountPercent}%
+          </div>
+        )}
 
-        {/* ================= BADGES ================= */}
-        <div className="absolute top-2.5 left-2.5 z-20 flex flex-col gap-1.5">
-
-          {product.isFeatured && (
-            <span
-              className="
-                inline-flex items-center gap-1
-                bg-amber-500
-                text-slate-950
-                font-black
-                text-[10px]
-                uppercase
-                px-2 py-0.5
-                rounded-full
-                shadow-md
-              "
-            >
-              <Sparkles className="w-3 h-3" />
+        {/* Featured / New / Bestseller */}
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-2">
+          {isFeatured && (
+            <span className="flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-black">
+              <Sparkles size={12} />
               Featured
             </span>
           )}
 
-          {product.isBestseller && (
-            <span
-              className="
-                inline-flex items-center gap-1
-                bg-gradient-to-r
-                from-red-500 to-orange-500
-                text-white
-                font-black
-                text-[10px]
-                uppercase
-                px-2 py-0.5
-                rounded-full
-                shadow-md
-              "
-            >
-              <Flame className="w-3 h-3" />
-              Bestseller
+          {isNewArrival && (
+            <span className="flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-black">
+              <Zap size={12} />
+              New
             </span>
           )}
 
-          {discountPercent > 0 && (
-            <span
-              className="
-                bg-red-500/90
-                text-white
-                font-black
-                text-[10px]
-                px-2 py-0.5
-                rounded-full
-                shadow-md
-              "
-            >
-              {discountPercent}% OFF
+          {isBestseller && (
+            <span className="flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-1 text-xs font-bold text-white">
+              <Flame size={12} />
+              Bestseller
             </span>
           )}
         </div>
 
-        {/* ================= QUICK VIEW BUTTON ================= */}
+        {/* Quick View */}
         {onQuickView && (
           <button
             type="button"
             onClick={handleQuickView}
-            className="
-              absolute top-2.5 right-2.5
-              z-30
-              p-2
-              rounded-full
-              bg-slate-900/80
-              hover:bg-amber-500
-              text-slate-300
-              hover:text-slate-950
-              backdrop-blur-md
-              transition-all
-              opacity-0
-              group-hover:opacity-100
-              shadow-md
-              cursor-pointer
-            "
-            title="View Details"
-            aria-label="View product details"
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/80 px-3 py-2 text-xs font-semibold text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 hover:bg-amber-400 hover:text-black"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Eye size={14} />
+            Quick View
           </button>
         )}
 
-        {/* Product Image */}
-        <img
-          src={product.image}
-          alt={product.name}
-          className="
-            w-full h-full
-            object-cover object-center
-            group-hover:scale-105
-            transition-transform duration-500
-          "
-          loading="lazy"
-        />
+        {/* Out of Stock Overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+            <span className="rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white">
+              Out of Stock
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* ================= PRODUCT INFORMATION ================= */}
-      <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+      {/* Product Information */}
+      <div className="flex flex-1 flex-col p-4">
+        {/* Brand */}
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-amber-400">
+          {brand}
+        </p>
 
-        {/* Product Title / Brand / Rating */}
-        <div>
-          <div className="flex items-center justify-between text-xs mb-1">
+        {/* Product Name */}
+        <h3 className="line-clamp-2 min-h-[48px] text-base font-bold text-white transition-colors group-hover:text-amber-400">
+          {product.name}
+        </h3>
 
-            <span
-              className="
-                font-mono
-                text-amber-400
-                font-semibold
-                tracking-wider
-                uppercase
-                text-[11px]
-              "
-            >
-              {product.brand}
-            </span>
-
-            <div
-              className="
-                flex items-center gap-1
-                text-slate-400
-                text-[11px]
-              "
-            >
+        {/* Rating */}
+        <div className="mt-2 flex items-center gap-2">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
               <Star
-                className="
-                  w-3 h-3
-                  text-amber-400
-                  fill-amber-400
-                "
+                key={star}
+                size={14}
+                fill={star <= Math.round(rating) ? 'currentColor' : 'none'}
+                className={
+                  star <= Math.round(rating)
+                    ? 'text-amber-400'
+                    : 'text-zinc-600'
+                }
               />
-
-              <span>{product.rating}</span>
-
-              <span className="text-slate-600">
-                ({product.reviewCount})
-              </span>
-            </div>
+            ))}
           </div>
 
-          <h3
-            className="
-              font-bold
-              text-white
-              text-sm
-              line-clamp-1
-              group-hover:text-amber-400
-              transition-colors
-            "
-          >
-            {product.name}
-          </h3>
-
-          <p
-            className="
-              text-slate-400
-              text-xs
-              line-clamp-2
-              mt-1
-              leading-relaxed
-            "
-          >
-            {product.description}
-          </p>
+          <span className="text-xs text-zinc-400">
+            {rating > 0 ? rating.toFixed(1) : 'New'}
+            {reviewCount > 0 && ` (${reviewCount})`}
+          </span>
         </div>
 
-        {/* ================= SIZE SELECTION ================= */}
-        <div>
-          <div
-            className="
-              text-[11px]
-              text-slate-400
-              mb-1.5
-              flex
-              items-center
-              justify-between
-              font-medium
-            "
-          >
-            <span>Size (EU):</span>
+        {/* Description */}
+        <p className="mt-2 line-clamp-2 text-sm leading-5 text-zinc-400">
+          {product.description}
+        </p>
 
-            <span className="text-amber-400 font-bold">
+        {/* Size Selection */}
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-semibold text-zinc-300">
+              Size
+            </span>
+
+            <span className="text-xs text-zinc-500">
               {selectedSize}
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-1">
-            {(product.sizes || []).map((size) => (
+          <div className="flex flex-wrap gap-1.5">
+            {(product.sizes?.length
+              ? product.sizes
+              : ['EU 42']
+            ).map((size) => (
               <button
                 key={size}
                 type="button"
@@ -327,20 +231,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   e.stopPropagation();
                   setSelectedSize(size);
                 }}
-                className={`
-                  text-[10px]
-                  font-bold
-                  px-2 py-1
-                  rounded-md
-                  transition-all
-                  cursor-pointer
-
-                  ${
-                    selectedSize === size
-                      ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
-                      : 'bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-700'
-                  }
-                `}
+                className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all ${
+                  selectedSize === size
+                    ? 'border-amber-400 bg-amber-400 text-black'
+                    : 'border-white/10 bg-zinc-800 text-zinc-300 hover:border-amber-400/50 hover:text-white'
+                }`}
               >
                 {size}
               </button>
@@ -348,109 +243,59 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
 
-        {/* ================= PRICE & ACTIONS ================= */}
-        <div className="pt-2 border-t border-slate-800/80">
+        {/* Price */}
+        <div className="mt-4 flex items-end gap-2">
+          <span className="text-xl font-extrabold text-white">
+            QAR {currentPrice.toFixed(2)}
+          </span>
 
-          {/* Price */}
-          <div className="flex items-baseline gap-2 mb-3">
-
-            <span className="text-lg font-black text-white">
-              QAR {product.priceQAR}
+          {originalPrice > currentPrice && (
+            <span className="pb-0.5 text-sm text-zinc-500 line-through">
+              QAR {originalPrice.toFixed(2)}
             </span>
+          )}
+        </div>
 
-            {product.originalPriceQAR &&
-              product.originalPriceQAR > product.priceQAR && (
-                <span
-                  className="
-                    text-xs
-                    text-slate-500
-                    line-through
-                    font-medium
-                  "
-                >
-                  QAR {product.originalPriceQAR}
-                </span>
-              )}
-          </div>
+        {/* Buttons */}
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={isOutOfStock}
+            className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-sm font-bold transition-all ${
+              isOutOfStock
+                ? 'cursor-not-allowed bg-zinc-700 text-zinc-500'
+                : isAdded
+                ? 'bg-green-500 text-white'
+                : 'bg-white text-black hover:bg-amber-400'
+            }`}
+          >
+            {isAdded ? (
+              <>
+                <Check size={16} />
+                Added
+              </>
+            ) : (
+              <>
+                <ShoppingBag size={16} />
+                Add to Cart
+              </>
+            )}
+          </button>
 
-          {/* Buttons */}
-          <div className="grid grid-cols-2 gap-2">
-
-            {/* Add to Cart */}
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              className={`
-                py-2
-                px-2.5
-                rounded-xl
-                text-xs
-                font-bold
-                flex
-                items-center
-                justify-center
-                gap-1.5
-                transition-all
-                cursor-pointer
-
-                ${
-                  isAdded
-                    ? 'bg-emerald-500 text-slate-950'
-                    : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
-                }
-              `}
-            >
-              {isAdded ? (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Added</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Add</span>
-                </>
-              )}
-            </button>
-
-            {/* Order Now */}
-            <button
-              type="button"
-              onClick={handleBuyNow}
-              className="
-                py-2
-                px-2.5
-                rounded-xl
-                text-xs
-                font-black
-                bg-gradient-to-r
-                from-amber-500
-                to-yellow-500
-                hover:from-amber-400
-                hover:to-yellow-400
-                text-slate-950
-                flex
-                items-center
-                justify-center
-                gap-1
-                shadow-md
-                shadow-amber-500/10
-                cursor-pointer
-                transition-transform
-                active:scale-95
-              "
-            >
-              <Zap
-                className="
-                  w-3.5 h-3.5
-                  fill-slate-950
-                "
-              />
-
-              <span>Order Now</span>
-            </button>
-
-          </div>
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            disabled={isOutOfStock}
+            className={`flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition-all ${
+              isOutOfStock
+                ? 'cursor-not-allowed border-zinc-700 text-zinc-600'
+                : 'border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black'
+            }`}
+          >
+            <Zap size={16} />
+            Buy Now
+          </button>
         </div>
       </div>
     </div>
