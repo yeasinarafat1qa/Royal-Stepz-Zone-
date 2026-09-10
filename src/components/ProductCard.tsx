@@ -3,200 +3,185 @@ import { Product } from '../types';
 import { useStore } from '../context/StoreContext';
 import { 
   Star, 
-  ShoppingCart, 
+  ShoppingBag, 
   Zap, 
   Check, 
   Eye, 
-  Truck,
-  Sparkles
+  Sparkles, 
+  Flame
 } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
+  onQuickView?: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { openFastCheckout, setSelectedProduct, setIsProductDetailModalOpen, addToCart } = useStore();
-  const [selectedSize, setSelectedSize] = useState<string>(product.sizes[0] || 'EU 42');
-  const [isHovered, setIsHovered] = useState(false);
-  const [quickAdded, setQuickAdded] = useState(false);
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onQuickView }) => {
+  const { addToCart, setIsCartOpen } = useStore();
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'EU 42');
+  const [isAdded, setIsAdded] = useState(false);
 
-  const discountPercent = product.originalPriceQAR
+  const discountPercent = product.originalPriceQAR 
     ? Math.round(((product.originalPriceQAR - product.priceQAR) / product.originalPriceQAR) * 100)
     : 0;
 
-  const handleOpenDetail = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedProduct(product);
-    setIsProductDetailModalOpen(true);
-  };
-
-  // User requested: Clicking Add to Cart opens the confirmation inter-page
-  const handleAddToCartAndConfirm = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    openFastCheckout(product, selectedSize);
-  };
-
-  const handleStandardAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart(product, selectedSize);
-    setQuickAdded(true);
-    setTimeout(() => setQuickAdded(false), 2000);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1500);
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart(product, selectedSize);
+    setIsCartOpen(true);
   };
 
   return (
     <div 
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 rounded-xl overflow-hidden shadow-lg transition-all duration-300 flex flex-col justify-between group relative hover:shadow-2xl hover:shadow-amber-500/10"
+      onClick={() => onQuickView && onQuickView(product)}
+      className="group relative bg-slate-900/80 border border-slate-800/80 hover:border-amber-500/40 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/5 flex flex-col justify-between cursor-pointer"
     >
-      {/* Top Image Container */}
-      <div className="relative bg-slate-950/70 aspect-square overflow-hidden cursor-pointer" onClick={handleOpenDetail}>
-        <img
-          src={product.image}
-          alt={product.name}
-          className={`w-full h-full object-cover object-center transition-transform duration-500 ${
-            isHovered ? 'scale-108' : 'scale-100'
-          }`}
-          loading="lazy"
-        />
+      {/* Product Image & Badges */}
+      <div className="relative aspect-square overflow-hidden bg-slate-950">
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity z-0 flex items-center justify-center pointer-events-none">
+          <span className="px-3 py-1.5 bg-slate-950/80 text-amber-400 text-xs font-bold rounded-full border border-amber-500/30 backdrop-blur-sm flex items-center gap-1.5 shadow-lg">
+            <Eye className="w-3.5 h-3.5" /> View Details
+          </span>
+        </div>
 
         {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
-          {product.badge && (
-            <span className="bg-slate-950/90 border border-amber-500/40 text-amber-400 font-bold text-[10px] px-2 py-0.5 rounded shadow backdrop-blur-sm">
-              {product.badge}
+        <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1.5">
+          {product.isFeatured && (
+            <span className="inline-flex items-center gap-1 bg-amber-500 text-slate-950 font-black text-[10px] uppercase px-2 py-0.5 rounded-full shadow-md">
+              <Sparkles className="w-3 h-3" />
+              Featured
+            </span>
+          )}
+          {product.isBestseller && (
+            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-red-500 to-orange-500 text-white font-black text-[10px] uppercase px-2 py-0.5 rounded-full shadow-md">
+              <Flame className="w-3 h-3" />
+              Bestseller
             </span>
           )}
           {discountPercent > 0 && (
-            <span className="bg-red-600 text-white font-black text-[10px] px-2 py-0.5 rounded shadow">
+            <span className="bg-red-500/90 text-white font-black text-[10px] px-2 py-0.5 rounded-full shadow-md">
               {discountPercent}% OFF
             </span>
           )}
         </div>
 
-        {/* Quick View Button on Hover */}
+        {/* View Details Eye Button */}
         <button
-          onClick={handleOpenDetail}
-          className="absolute bottom-3 right-3 p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
-          title="Quick View Details"
+          onClick={(e) => {
+            e.stopPropagation();
+            onQuickView && onQuickView(product);
+          }}
+          className="absolute top-2.5 right-2.5 z-10 p-2 rounded-full bg-slate-900/80 hover:bg-amber-500 text-slate-300 hover:text-slate-950 backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-md cursor-pointer"
+          title="View Details"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3.5 h-3.5" />
         </button>
 
-        {/* 24H Delivery Chip in Qatar */}
-        <div className="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-emerald-400 text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1">
-          <Truck className="w-3 h-3" />
-          <span>24h Qatar Express</span>
-        </div>
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
       </div>
 
-      {/* Product Information Body */}
-      <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between">
+      {/* Product Information */}
+      <div className="p-4 flex flex-col flex-1 justify-between gap-3">
         <div>
-          {/* Category & Rating */}
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="text-[11px] font-semibold text-amber-500 uppercase tracking-wider">
-              {product.category}
+          <div className="flex items-center justify-between text-xs mb-1">
+            <span className="font-mono text-amber-400 font-semibold tracking-wider uppercase text-[11px]">
+              {product.brand}
             </span>
-            <div className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="font-bold text-slate-200">{product.rating}</span>
-              <span className="text-[10px] text-slate-500">({product.reviewsCount})</span>
+            <div className="flex items-center gap-1 text-slate-400 text-[11px]">
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+              <span>{product.rating}</span>
+              <span className="text-slate-600">({product.reviewCount})</span>
             </div>
           </div>
 
-          {/* Title */}
-          <h3 
-            onClick={handleOpenDetail}
-            className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-2 cursor-pointer leading-snug"
-          >
+          <h3 className="font-bold text-white text-sm line-clamp-1 group-hover:text-amber-400 transition-colors">
             {product.name}
           </h3>
 
-          {/* Qatar QAR Price Display */}
-          <div className="mt-2.5 flex items-baseline gap-2">
-            <span className="text-lg font-black text-amber-400 tracking-tight">
+          <p className="text-slate-400 text-xs line-clamp-2 mt-1 leading-relaxed">
+            {product.description}
+          </p>
+        </div>
+
+        {/* Sizes Selection */}
+        <div>
+          <div className="text-[11px] text-slate-400 mb-1.5 flex items-center justify-between font-medium">
+            <span>Size (EU):</span>
+            <span className="text-amber-400 font-bold">{selectedSize}</span>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {product.sizes.map((size) => (
+              <button
+                key={size}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedSize(size);
+                }}
+                className={`text-[10px] font-bold px-2 py-1 rounded-md transition-all cursor-pointer ${
+                  selectedSize === size
+                    ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
+                    : 'bg-slate-950 text-slate-300 border border-slate-800 hover:border-slate-700'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pricing & Action Buttons */}
+        <div className="pt-2 border-t border-slate-800/80">
+          <div className="flex items-baseline gap-2 mb-3">
+            <span className="text-lg font-black text-white">
               QAR {product.priceQAR}
             </span>
             {product.originalPriceQAR && (
-              <span className="text-xs text-slate-500 line-through">
+              <span className="text-xs text-slate-500 line-through font-medium">
                 QAR {product.originalPriceQAR}
               </span>
             )}
           </div>
 
-          {/* Size Selector Strip */}
-          <div className="mt-3">
-            <div className="text-[11px] text-slate-400 flex items-center justify-between mb-1">
-              <span>Select Size (EU):</span>
-              <span className="font-bold text-slate-300">{selectedSize}</span>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {product.sizes.slice(0, 5).map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedSize(size);
-                  }}
-                  className={`text-[10px] px-2 py-0.5 rounded font-semibold border transition-all ${
-                    selectedSize === size
-                      ? 'bg-amber-500 text-slate-950 border-amber-500 font-bold'
-                      : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-slate-500'
-                  }`}
-                >
-                  {size.replace('EU ', '')}
-                </button>
-              ))}
-              {product.sizes.length > 5 && (
-                <button
-                  onClick={handleOpenDetail}
-                  className="text-[10px] px-1 text-amber-400 hover:underline"
-                >
-                  +{product.sizes.length - 5}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons (Amazon / Direct Confirmation) */}
-        <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-col gap-1.5">
-          {/* Main Action: Add to Cart & Open Order Inter-Page (User Request) */}
-          <button
-            onClick={handleAddToCartAndConfirm}
-            className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/10 transition-all active:scale-98"
-          >
-            <Zap className="w-3.5 h-3.5 fill-slate-950" />
-            <span>Add to Cart & Confirm (QAR {product.priceQAR})</span>
-          </button>
-
-          {/* Secondary Action: Silent Add to Bag */}
-          <div className="flex items-center gap-1.5">
+          <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={handleStandardAddToCart}
-              className="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold border border-slate-700 flex items-center justify-center gap-1 transition-colors"
+              onClick={handleAddToCart}
+              className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                isAdded
+                  ? 'bg-emerald-500 text-slate-950'
+                  : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+              }`}
             >
-              {quickAdded ? (
+              {isAdded ? (
                 <>
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span className="text-emerald-400">Added to Bag!</span>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Added</span>
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="w-3 h-3 text-slate-400" />
-                  <span>Add to Bag</span>
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Add</span>
                 </>
               )}
             </button>
 
             <button
-              onClick={handleOpenDetail}
-              className="py-1.5 px-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-semibold border border-slate-700"
+              onClick={handleBuyNow}
+              className="py-2 px-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 flex items-center justify-center gap-1 shadow-md shadow-amber-500/10 cursor-pointer transition-transform active:scale-95"
             >
-              Details
+              <Zap className="w-3.5 h-3.5 fill-slate-950" />
+              <span>Order Now</span>
             </button>
           </div>
         </div>
