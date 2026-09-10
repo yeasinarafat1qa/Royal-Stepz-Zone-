@@ -1,166 +1,285 @@
 import React from 'react';
-import { useStore } from '../context/StoreContext';
-import { 
-  Crown, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  MessageCircle, 
-  ShieldCheck, 
-  Truck, 
-  RotateCcw, 
-  ChevronUp,
-  Lock
+import {
+  MessageCircle,
+  MapPin,
+  Phone,
+  Mail,
+  Instagram,
+  Facebook,
+  Clock,
+  ArrowUp,
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { settings, setIsAdminDashboardOpen, setSelectedCategory } = useStore();
+  const whatsappNumber = '97455551234';
+  const phoneNumber = '+974 5555 1234';
+  const email = 'support@royalstepz.qa';
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleOpenWhatsApp = () => {
-    const cleanNumber = settings.whatsappNumber.replace(/[^0-9]/g, '');
-    window.open(`https://wa.me/${cleanNumber}?text=Hello%20Royal%20Stepz%20Zone%20Qatar!`, '_blank');
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
 
   return (
-    <footer className="bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
-      {/* Amazon-style Back to Top Button */}
-      <button
-        onClick={scrollToTop}
-        className="w-full py-3 bg-slate-900 hover:bg-slate-850 text-slate-200 hover:text-white font-semibold flex items-center justify-center gap-1.5 transition-colors border-b border-slate-800"
-      >
-        <ChevronUp className="w-4 h-4 text-amber-400" />
-        <span>Back to Top</span>
-      </button>
-
-      {/* Main Footer Body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          
-          {/* Col 1 & 2: Brand & Qatar Headquarters */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                <Crown className="w-5 h-5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-black text-white leading-none">
-                  ROYAL STEPZ ZONE
-                </span>
-                <span className="text-[10px] tracking-widest font-bold text-amber-400 uppercase">
-                  QATAR PREMIER FOOTWEAR
-                </span>
-              </div>
+    <footer className="mt-16 border-t border-white/10 bg-zinc-950 text-white">
+      {/* Main Footer */}
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Brand */}
+          <div>
+            <div className="text-2xl font-black tracking-tight">
+              <span className="text-amber-400">ROYAL</span>
+              <span className="ml-1 text-white">STEPZ</span>
             </div>
 
-            <p className="text-slate-300 text-xs leading-relaxed max-w-sm">
-              Royal Stepz Zone is Qatar's foremost destination for exclusive streetwear sneakers, luxury Italian calfskin loafers, and high-performance athletic footwear. Serving Doha and all municipalities with guaranteed authenticity and 24-hour fast delivery.
+            <div className="mt-1 text-[10px] font-semibold tracking-[0.3em] text-zinc-500">
+              ZONE • QATAR
+            </div>
+
+            <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-400">
+              Premium footwear for every step. Discover stylish,
+              comfortable and quality footwear for your everyday
+              journey.
             </p>
 
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center gap-2 text-slate-300">
-                <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                <span>{settings.storeAddress}</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <MessageCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>WhatsApp Hotline: {settings.whatsappNumber}</span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Mail className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                <span>Email: {settings.supportEmail}</span>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={handleOpenWhatsApp}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg flex items-center gap-2 text-xs transition-colors"
+            {/* Social Links */}
+            <div className="mt-6 flex items-center gap-3">
+              <a
+                href={`https://wa.me/${whatsappNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white transition hover:-translate-y-1 hover:bg-emerald-500"
               >
-                <MessageCircle className="w-4 h-4 fill-white" />
-                <span>Contact Qatar WhatsApp Support</span>
-              </button>
+                <MessageCircle size={18} />
+              </a>
+
+              <a
+                href="#"
+                aria-label="Instagram"
+                onClick={(e) => e.preventDefault()}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:-translate-y-1 hover:bg-amber-400 hover:text-black"
+              >
+                <Instagram size={18} />
+              </a>
+
+              <a
+                href="#"
+                aria-label="Facebook"
+                onClick={(e) => e.preventDefault()}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-zinc-300 transition hover:-translate-y-1 hover:bg-amber-400 hover:text-black"
+              >
+                <Facebook size={18} />
+              </a>
             </div>
           </div>
 
-          {/* Col 3: Footwear Categories */}
+          {/* Quick Links */}
           <div>
-            <h4 className="font-bold text-white text-sm mb-3">Footwear Collections</h4>
-            <ul className="space-y-2">
-              {['Sneakers', 'Running', 'Formal', 'Loafers', 'Slides & Sandals', 'Limited Edition'].map((cat) => (
-                <li key={cat}>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="hover:text-amber-400 transition-colors text-left"
-                  >
-                    {cat} (QAR)
-                  </button>
-                </li>
-              ))}
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Quick Links
+            </h3>
+
+            <ul className="mt-5 space-y-3 text-sm">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth',
+                    });
+                  }}
+                  className="text-zinc-400 transition hover:text-amber-400"
+                >
+                  Home
+                </button>
+              </li>
+
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const shopSection =
+                      document.getElementById('shop');
+
+                    shopSection?.scrollIntoView({
+                      behavior: 'smooth',
+                    });
+                  }}
+                  className="text-zinc-400 transition hover:text-amber-400"
+                >
+                  Shop
+                </button>
+              </li>
+
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth',
+                    });
+                  }}
+                  className="text-zinc-400 transition hover:text-amber-400"
+                >
+                  Categories
+                </button>
+              </li>
+
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.scrollTo({
+                      top: 0,
+                      behavior: 'smooth',
+                    });
+                  }}
+                  className="text-zinc-400 transition hover:text-amber-400"
+                >
+                  New Arrivals
+                </button>
+              </li>
             </ul>
           </div>
 
-          {/* Col 4: Qatar Express Delivery & Policies */}
+          {/* Customer Service */}
           <div>
-            <h4 className="font-bold text-white text-sm mb-3">Qatar Fast Service</h4>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-1.5 text-slate-300">
-                <Truck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>24H Doha Express</span>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Customer Service
+            </h3>
+
+            <ul className="mt-5 space-y-3 text-sm">
+              <li>
+                <span className="text-zinc-400">
+                  Fast Delivery Across Qatar
+                </span>
               </li>
-              <li className="flex items-center gap-1.5 text-slate-300">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                <span>Cash on Delivery (COD)</span>
+
+              <li>
+                <span className="text-zinc-400">
+                  Cash on Delivery Available
+                </span>
               </li>
-              <li className="flex items-center gap-1.5 text-slate-300">
-                <RotateCcw className="w-3.5 h-3.5 text-blue-400" />
-                <span>7-Day Free Size Exchange</span>
+
+              <li>
+                <span className="text-zinc-400">
+                  Quality Guaranteed
+                </span>
               </li>
-              <li><span>Lusail & Pearl-Qatar Delivery</span></li>
-              <li><span>Al Rayyan & Al Wakrah Delivery</span></li>
+
+              <li>
+                <span className="text-zinc-400">
+                  WhatsApp Support
+                </span>
+              </li>
             </ul>
           </div>
 
-          {/* Col 5: Security & Secret Admin Portal */}
+          {/* Contact */}
           <div>
-            <h4 className="font-bold text-white text-sm mb-3">Store Operations</h4>
-            <p className="text-slate-400 text-xs mb-3">
-              All prices are listed in Qatari Riyal (QAR). Authentic footwear with official certification.
-            </p>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Contact Us
+            </h3>
 
-            {/* Discreet Admin Login Link */}
-            <div className="pt-2 border-t border-slate-850">
-              <button
-                onClick={() => setIsAdminDashboardOpen(true)}
-                className="text-slate-600 hover:text-slate-400 flex items-center gap-1.5 text-[11px] transition-colors"
-                title="Management Gate (Ctrl+Shift+A)"
+            <div className="mt-5 space-y-4">
+              <div className="flex items-start gap-3">
+                <MapPin
+                  size={18}
+                  className="mt-0.5 shrink-0 text-amber-400"
+                />
+
+                <div>
+                  <p className="text-sm font-medium text-white">
+                    Doha, Qatar
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Delivery available across Qatar
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Phone
+                  size={18}
+                  className="shrink-0 text-amber-400"
+                />
+
+                <a
+                  href={`tel:${phoneNumber.replace(/\s/g, '')}`}
+                  className="text-sm text-zinc-400 transition hover:text-amber-400"
+                >
+                  {phoneNumber}
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Mail
+                  size={18}
+                  className="shrink-0 text-amber-400"
+                />
+
+                <a
+                  href={`mailto:${email}`}
+                  className="break-all text-sm text-zinc-400 transition hover:text-amber-400"
+                >
+                  {email}
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Clock
+                  size={18}
+                  className="shrink-0 text-amber-400"
+                />
+
+                <span className="text-sm text-zinc-400">
+                  Daily: 9:00 AM – 10:00 PM
+                </span>
+              </div>
+
+              <a
+                href={`https://wa.me/${whatsappNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-500"
               >
-                <Lock className="w-3 h-3 text-slate-600" />
-                <span>Private Portal</span>
-              </button>
+                <MessageCircle size={17} />
+                Chat on WhatsApp
+              </a>
             </div>
           </div>
-
         </div>
+      </div>
 
-        {/* Bottom copyright */}
-        <div className="mt-10 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
-          <div>
-            © {new Date().getFullYear()} Royal Stepz Zone Qatar. All Rights Reserved. Designed in Doha.
+      {/* Bottom Bar */}
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+          <div className="text-center text-xs text-zinc-500 md:text-left">
+            © 2026 Royal Stepz Zone Qatar. All rights reserved.
           </div>
-          <div className="flex items-center gap-4">
-            <span>Currency: <strong>QAR</strong></span>
-            <span>Language: <strong>English</strong></span>
-            <span className="flex items-center gap-1">
-              <span>Delivery Country: Qatar</span> 🇶🇦
-            </span>
+
+          <div className="flex items-center justify-center gap-5 text-xs text-zinc-500">
+            <span>QAR</span>
+            <span>•</span>
+            <span>Qatar</span>
+            <span>•</span>
+            <span>Online Store</span>
           </div>
+
+          <button
+            type="button"
+            onClick={scrollToTop}
+            aria-label="Back to top"
+            className="mx-auto flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-zinc-400 transition hover:border-amber-400 hover:text-amber-400 md:mx-0"
+          >
+            <ArrowUp size={14} />
+            Back to top
+          </button>
         </div>
       </div>
     </footer>
