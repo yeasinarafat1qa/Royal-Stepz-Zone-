@@ -1,257 +1,408 @@
 import React, { useState } from 'react';
-import { useStore } from '../context/StoreContext';
-import { 
-  ShoppingBag, 
-  Search, 
-  User as UserIcon, 
-  Menu, 
-  X, 
-  Phone, 
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Bell,
   LogOut,
-  Bell
+  Package,
+  MessageCircle,
+  ChevronDown,
 } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
 
 export const Header: React.FC = () => {
-  const { 
-    cart, 
-    setIsCartOpen, 
+  const {
+    cart,
+    setIsCartOpen,
     isAuthOpen,
-    setIsAuthOpen, 
-    user, 
-    logout, 
+    setIsAuthOpen,
+    user,
+    logout,
     searchQuery,
     setSearchQuery,
     selectedCategory,
     setSelectedCategory,
     setIsNotificationsOpen,
     notifications,
-    orders
+    orders,
   } = useStore();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  
-  const unreadCount = notifications.filter(n => !n.read).length;
-  const activeOrdersCount = orders.filter(o => o.status === 'Pending' || o.status === 'Confirmed' || o.status === 'Dispatched').length;
-  const notificationBadgeTotal = unreadCount > 0 ? unreadCount : (activeOrdersCount > 0 ? activeOrdersCount : 0);
+  const categories = [
+    'All',
+    'Sneakers',
+    'Casual',
+    'Running',
+    'Luxury',
+    'Slides',
+  ];
 
-  const categories = ['All', 'Sneakers', 'Casual', 'Running', 'Luxury', 'Slides'];
+  const totalItems = cart.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read
+  ).length;
+
+  const activeOrdersCount = orders.filter(
+    (order) =>
+      order.status === 'Pending' ||
+      order.status === 'Confirmed' ||
+      order.status === 'Processing' ||
+      order.status === 'Dispatched' ||
+      order.status === 'Shipped'
+  ).length;
+
+  const notificationBadgeTotal =
+    unreadCount > 0 ? unreadCount : activeOrdersCount;
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleAccountClick = () => {
+    if (user) {
+      setIsUserMenuOpen((current) => !current);
+    } else {
+      setIsAuthOpen(true);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsUserMenuOpen(false);
+  };
+
+  const whatsappNumber = '97455551234';
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
-      {/* Top Banner - Qatar Hotline */}
-      <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 text-slate-950 text-xs py-1.5 px-4 font-semibold">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-slate-950 animate-pulse" />
-            <span>🇶🇦 Express 24h Delivery Across Qatar • Free on orders over 300 QAR</span>
-          </div>
-          <a 
-            href="https://wa.me/97455551234" 
-            target="_blank" 
+    <>
+      {/* WhatsApp Announcement Bar */}
+      <div className="bg-emerald-600 px-4 py-2 text-center text-sm font-medium text-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-2">
+          <MessageCircle size={16} />
+
+          <span>Need help? WhatsApp us:</span>
+
+          <a
+            href={`https://wa.me/${whatsappNumber}`}
+            target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 hover:underline font-bold"
+            className="font-bold underline underline-offset-2 hover:text-emerald-100"
           >
-            <Phone className="w-3.5 h-3.5" />
-            <span>WhatsApp: +974 5555 1234</span>
+            +974 5555 1234
           </a>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
-          {/* Mobile menu trigger */}
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition-colors cursor-pointer"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+      {/* Main Header */}
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-zinc-950 text-white shadow-xl">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex min-h-[72px] items-center gap-3">
+            {/* Mobile Menu */}
+            <button
+              type="button"
+              aria-label="Toggle menu"
+              onClick={() =>
+                setIsMobileMenuOpen((current) => !current)
+              }
+              className="rounded-lg p-2 text-zinc-300 transition hover:bg-white/10 hover:text-white lg:hidden"
+            >
+              {isMobileMenuOpen ? (
+                <X size={23} />
+              ) : (
+                <Menu size={23} />
+              )}
+            </button>
 
-          {/* Brand Logo */}
-          <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform duration-200">
-                <span className="text-slate-950 font-black text-xl tracking-tighter">RS</span>
+            {/* Logo */}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedCategory('All');
+                setSearchQuery('');
+                window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth',
+                });
+              }}
+              className="shrink-0 text-left"
+            >
+              <div className="text-lg font-black leading-none tracking-tight sm:text-xl">
+                <span className="text-amber-400">ROYAL</span>
+                <span className="ml-1 text-white">STEPZ</span>
               </div>
-              <div>
-                <span className="font-extrabold text-base sm:text-xl tracking-wider text-white flex items-center gap-1">
-                  ROYAL <span className="text-amber-400 font-black">STEPZ</span>
-                </span>
-                <span className="text-[10px] text-amber-500/90 font-mono tracking-widest block -mt-1 uppercase">
-                  ZONE • QATAR
-                </span>
-              </div>
-            </a>
-          </div>
 
-          {/* Desktop Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search sneakers, Jordans, Yeezy, Panda..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-700/80 rounded-full text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              <div className="mt-1 text-[9px] font-semibold tracking-[0.28em] text-zinc-400">
+                ZONE • QATAR
+              </div>
+            </button>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden items-center gap-1 lg:flex">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => handleCategoryChange(category)}
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                    selectedCategory === category
+                      ? 'bg-amber-400 text-black'
+                      : 'text-zinc-300 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </nav>
+
+            {/* Search */}
+            <div className="relative ml-auto hidden max-w-md flex-1 md:block">
+              <Search
+                size={18}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
               />
+
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search shoes, sneakers, sandals..."
+                aria-label="Search products"
+                className="w-full rounded-xl border border-white/10 bg-zinc-900 py-2.5 pl-10 pr-4 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              />
+
               {searchQuery && (
                 <button
+                  type="button"
+                  aria-label="Clear search"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                 >
-                  Clear
+                  <X size={16} />
                 </button>
               )}
             </div>
-          </div>
 
-          {/* Desktop Categories */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-850'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </nav>
-
-          {/* Right Action Icons */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Orders & Notifications Bell */}
+            {/* Notifications */}
             <button
+              type="button"
+              aria-label="Notifications"
               onClick={() => setIsNotificationsOpen(true)}
-              className="relative p-2 sm:p-2.5 text-slate-300 hover:text-amber-400 transition-colors rounded-full hover:bg-slate-850 cursor-pointer"
-              title="My Orders & Notifications"
+              className="relative rounded-xl p-2.5 text-zinc-300 transition hover:bg-white/10 hover:text-white"
             >
-              <Bell className="w-5 h-5" />
+              <Bell size={21} />
+
               {notificationBadgeTotal > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center animate-pulse shadow">
-                  {notificationBadgeTotal}
+                <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  {notificationBadgeTotal > 99
+                    ? '99+'
+                    : notificationBadgeTotal}
                 </span>
               )}
             </button>
 
-            {/* User Account Action (Customer Only) */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              {user ? (
-                <div className="flex items-center gap-1.5">
-                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium">
-                    <UserIcon className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="truncate max-w-[90px]">{user.name}</span>
+            {/* Account */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={handleAccountClick}
+                className="hidden items-center gap-2 rounded-xl p-2 text-zinc-300 transition hover:bg-white/10 hover:text-white sm:flex"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-black">
+                  <User size={17} />
+                </div>
+
+                <div className="hidden max-w-[110px] text-left xl:block">
+                  <div className="truncate text-xs text-zinc-400">
+                    {user ? 'Welcome' : 'Hello, sign in'}
                   </div>
+
+                  <div className="truncate text-sm font-semibold text-white">
+                    {user?.name || 'Account'}
+                  </div>
+                </div>
+
+                <ChevronDown size={15} />
+              </button>
+
+              {isUserMenuOpen && user && (
+                <div className="absolute right-0 top-12 w-64 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-2xl">
+                  <div className="border-b border-white/10 px-4 py-4">
+                    <p className="font-bold text-white">
+                      {user.name}
+                    </p>
+
+                    {user.email && (
+                      <p className="mt-1 truncate text-xs text-zinc-400">
+                        {user.email}
+                      </p>
+                    )}
+
+                    {user.phone && (
+                      <p className="mt-1 text-xs text-zinc-400">
+                        {user.phone}
+                      </p>
+                    )}
+
+                    {user.isAdmin && (
+                      <span className="mt-2 inline-block rounded-full bg-amber-400 px-2 py-1 text-[10px] font-bold text-black">
+                        ADMIN
+                      </span>
+                    )}
+                  </div>
+
                   <button
-                    onClick={logout}
-                    title="Sign Out / Log Out"
-                    className="p-2 text-slate-400 hover:text-red-400 transition-colors rounded-full hover:bg-slate-800/80 cursor-pointer"
+                    type="button"
+                    onClick={() => {
+                      setIsUserMenuOpen(false);
+                      setIsNotificationsOpen(true);
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-white/10 hover:text-white"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <Package size={17} />
+                    My Orders
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 border-t border-white/10 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10"
+                  >
+                    <LogOut size={17} />
+                    Logout
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => setIsAuthOpen(!isAuthOpen)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 hover:border-amber-500 text-slate-200 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-sm"
-                  title="Customer Sign In"
-                >
-                  <UserIcon className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline font-semibold">Sign In</span>
-                </button>
               )}
             </div>
 
-            {/* Shopping Cart Trigger */}
+            {/* Cart */}
             <button
+              type="button"
+              aria-label="Open shopping cart"
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold px-3.5 py-2 rounded-full transition-all shadow-md shadow-amber-500/20 cursor-pointer active:scale-95"
+              className="relative rounded-xl bg-amber-400 p-2.5 text-black transition hover:bg-amber-300"
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span className="text-xs hidden sm:inline">Bag</span>
+              <ShoppingCart size={21} />
+
               {totalItems > 0 && (
-                <span className="bg-slate-950 text-amber-400 text-xs font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                  {totalItems}
+                <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold text-white ring-2 ring-zinc-950">
+                  {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
             </button>
           </div>
-        </div>
 
-        {/* Mobile Search Bar */}
-        <div className="md:hidden pb-3">
-          <div className="relative w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search shoes, sneakers..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500"
-            />
-          </div>
-        </div>
-      </div>
+          {/* Mobile Search */}
+          <div className="pb-3 md:hidden">
+            <div className="relative">
+              <Search
+                size={18}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+              />
 
-      {/* Mobile Menu Drawer */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-950 border-b border-slate-800 px-4 py-4 space-y-3">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Categories
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setSelectedCategory(cat);
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
-                  selectedCategory === cat
-                    ? 'bg-amber-500 text-slate-950'
-                    : 'bg-slate-900 text-slate-300 border border-slate-800'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder="Search products..."
+                aria-label="Search products"
+                className="w-full rounded-xl border border-white/10 bg-zinc-900 py-2.5 pl-10 pr-10 text-sm text-white outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              />
 
-          <div className="pt-2 border-t border-slate-800">
-            {user ? (
-              <div className="flex items-center justify-between text-xs text-slate-300 px-1 pt-1">
-                <span>Signed in: <strong>{user.name}</strong></span>
+              {searchQuery && (
                 <button
-                  onClick={logout}
-                  className="text-red-400 hover:underline font-bold"
+                  type="button"
+                  aria-label="Clear search"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                 >
-                  Logout
+                  <X size={16} />
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setIsAuthOpen(true);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer w-full text-left font-semibold"
-              >
-                <UserIcon className="w-4 h-4 text-amber-400" />
-                <span>Customer Sign In</span>
-              </button>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      )}
-    </header>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="border-t border-white/10 bg-zinc-950 lg:hidden">
+            <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() =>
+                      handleCategoryChange(category)
+                    }
+                    className={`rounded-xl border px-4 py-3 text-sm font-semibold transition ${
+                      selectedCategory === category
+                        ? 'border-amber-400 bg-amber-400 text-black'
+                        : 'border-white/10 bg-zinc-900 text-zinc-300 hover:border-amber-400/50 hover:text-white'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              {/* Mobile Account */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+
+                  if (user) {
+                    setIsUserMenuOpen(true);
+                  } else {
+                    setIsAuthOpen(true);
+                  }
+                }}
+                className="mt-3 flex w-full items-center gap-3 rounded-xl border border-white/10 bg-zinc-900 px-4 py-3 text-left text-sm font-semibold text-white"
+              >
+                <User size={18} />
+                {user ? `Account: ${user.name}` : 'Sign in / Register'}
+              </button>
+
+              {/* Mobile Notifications */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsNotificationsOpen(true);
+                }}
+                className="mt-2 flex w-full items-center justify-between rounded-xl border border-white/10 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white"
+              >
+                <span className="flex items-center gap-3">
+                  <Bell size={18} />
+                  Notifications
+                </span>
+
+                {notificationBadgeTotal > 0 && (
+                  <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-bold">
+                    {notificationBadgeTotal}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 };
