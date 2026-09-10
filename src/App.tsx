@@ -9,7 +9,6 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { SecretAdminModal } from './components/SecretAdminModal';
 import { OrderConfirmModal } from './components/OrderConfirmModal';
 import { NotificationsModal } from './components/NotificationsModal';
-import { Product } from './types';
 import { 
   Sparkles, 
   ShieldCheck, 
@@ -17,11 +16,7 @@ import {
   RotateCcw, 
   Headphones,
   SlidersHorizontal,
-  ChevronDown,
-  X,
-  ShoppingBag,
-  Star,
-  Check
+  ChevronDown
 } from 'lucide-react';
 
 export function App() {
@@ -35,13 +30,8 @@ export function App() {
     isAdminOpen,
     setIsAdminOpen,
     isOrderConfirmModalOpen,
-    addToCart,
     user,
   } = useStore();
-
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [selectedQuickSize, setSelectedQuickSize] = useState<string>('');
-  const [quickAdded, setQuickAdded] = useState(false);
 
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating' | 'newest'>('featured');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1500]);
@@ -49,7 +39,7 @@ export function App() {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isSecretAdminModalOpen, setIsSecretAdminModalOpen] = useState(false);
 
-  // Secret Keyboard Shortcut: Ctrl + F12 (or Cmd + F12)
+  // Secret Keyboard Shortcut: Ctrl + F12
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'F12' || e.code === 'F12')) {
@@ -68,13 +58,6 @@ export function App() {
     };
   }, [user, setIsAdminOpen]);
 
-  // Set default size when quickview opens
-  useEffect(() => {
-    if (quickViewProduct && quickViewProduct.sizes && quickViewProduct.sizes.length > 0) {
-      setSelectedQuickSize(quickViewProduct.sizes[0]);
-    }
-  }, [quickViewProduct]);
-
   // Brands list
   const brands = useMemo(() => {
     const set = new Set<string>();
@@ -82,10 +65,9 @@ export function App() {
     return ['All', ...Array.from(set)];
   }, [products]);
 
-  // Categories list
   const categories = ['All', 'Sneakers', 'Casual', 'Running', 'Luxury', 'Slides'];
 
-  // Filtered & Sorted Products
+  // Filtered Products
   const filteredProducts = useMemo(() => {
     return products
       .filter((product) => {
@@ -113,12 +95,11 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
-      {/* Sticky Header */}
+      {/* Header */}
       <Header />
 
       {/* Hero Banner */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-b border-slate-800/80 pt-8 pb-12 sm:pt-14 sm:pb-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
@@ -323,82 +304,10 @@ export function App() {
             <ProductCard
               key={product.id}
               product={product}
-              onQuickView={setQuickViewProduct}
             />
           ))}
         </div>
       </main>
-
-      {/* Built-in Self-Contained Quick View Modal (No missing file error!) */}
-      {quickViewProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl p-4 sm:p-6">
-            <button
-              onClick={() => setQuickViewProduct(null)}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-              <div className="aspect-square rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
-                <img
-                  src={quickViewProduct.image}
-                  alt={quickViewProduct.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <span className="text-xs font-mono text-amber-400 uppercase">{quickViewProduct.brand}</span>
-                  <h3 className="text-lg font-bold text-white">{quickViewProduct.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xl font-black text-amber-400">QAR {quickViewProduct.priceQAR}</span>
-                    {quickViewProduct.originalPriceQAR && (
-                      <span className="text-xs text-slate-500 line-through">QAR {quickViewProduct.originalPriceQAR}</span>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Select Shoe Size (EU):</label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {quickViewProduct.sizes.map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => setSelectedQuickSize(s)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                          selectedQuickSize === s
-                            ? 'bg-amber-500 text-slate-950 shadow'
-                            : 'bg-slate-950 border border-slate-800 text-slate-300 hover:border-slate-700'
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    addToCart(quickViewProduct, selectedQuickSize || quickViewProduct.sizes[0]);
-                    setQuickAdded(true);
-                    setTimeout(() => {
-                      setQuickAdded(false);
-                      setQuickViewProduct(null);
-                    }, 1200);
-                  }}
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg cursor-pointer"
-                >
-                  {quickAdded ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-                  <span>{quickAdded ? 'Added to Bag!' : 'Add to Bag'}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer */}
       <Footer />
