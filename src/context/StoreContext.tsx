@@ -192,47 +192,50 @@ const initialDefaultProducts: Product[] = [
       'Premium everyday sneakers designed for comfort and modern street style.',
     inStock: true,
     stock: 25,
-    featured: true,
-    isFeatured: true,
-    isNew: true,
-    isNewArrival: true,
-    isBestseller: true,
-    rating: 4.8,
-    reviewCount: 124,
-  },
+    // Load initial data safely
+  useEffect(() => {
+    try {
+      const cachedProd = localStorage.getItem('royal_products');
+      if (cachedProd) setProducts(JSON.parse(cachedProd));
+      const cachedOrders = localStorage.getItem('royal_orders');
+      if (cachedOrders) setOrders(JSON.parse(cachedOrders));
+      const cachedSettings = localStorage.getItem('royal_settings');
+      if (cachedSettings) setSettings(JSON.parse(cachedSettings));
+    } catch (e) {}
 
-  {
-    id: 'royal-runner-white',
-    name: 'Royal Runner White',
-    category: 'Running',
-    brand: 'Royal Stepz',
-    priceQAR: 279,
-    originalPriceQAR: 329,
-    image:
-      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80',
-    ],
-    sizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44'],
-    colors: ['White'],
-    description:
-      'Lightweight running shoes with a responsive sole for daily training.',
-    inStock: true,
-    stock: 18,
-    featured: true,
-    isFeatured: true,
-    isNew: true,
-    isNewArrival: true,
-    rating: 4.7,
-    reviewCount: 86,
-  },
+    if (!db) {
+      setProducts(INITIAL_PRODUCTS);
+      return;
+    }
 
-  {
-    id: 'royal-casual-brown',
-    name: 'Royal Casual Brown',
-    category: 'Casual',
-    brand: 'Royal Stepz',
-    priceQAR: 199,
+    try {
+      const qProducts = collection(db, 'products');
+      const unsubscribeProducts = onSnapshot(
+        qProducts,
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const items: Product[] = [];
+            snapshot.forEach((doc) => {
+              items.push(doc.data() as Product);
+            });
+            setProducts(items);
+            try { localStorage.setItem('royal_products', JSON.stringify(items)); } catch(e){}
+          } else {
+            setProducts(INITIAL_PRODUCTS);
+          }
+        },
+        () => {
+          setProducts(INITIAL_PRODUCTS);
+        }
+      );
+
+      return () => {
+        unsubscribeProducts();
+      };
+    } catch (e) {
+      setProducts(INITIAL_PRODUCTS);
+    }
+  }, []);
     originalPriceQAR: 239,
     image:
       'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80',
