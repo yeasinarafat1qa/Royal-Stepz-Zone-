@@ -7,7 +7,6 @@ import {
   Menu, 
   X, 
   Phone, 
-  ShieldAlert, 
   LogOut,
   Bell
 } from 'lucide-react';
@@ -20,7 +19,6 @@ export const Header: React.FC = () => {
     setIsAuthOpen, 
     user, 
     logout, 
-    setIsAdminOpen,
     searchQuery,
     setSearchQuery,
     selectedCategory,
@@ -67,7 +65,7 @@ export const Header: React.FC = () => {
           {/* Mobile menu trigger */}
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition-colors"
+            className="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/80 transition-colors cursor-pointer"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -117,7 +115,7 @@ export const Header: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   selectedCategory === cat
                     ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-bold'
                     : 'text-slate-300 hover:text-white hover:bg-slate-850'
@@ -144,27 +142,18 @@ export const Header: React.FC = () => {
               )}
             </button>
 
-            {/* DIRECT ADMIN & SIGN IN ACTIONS */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* Direct 1-Click Admin Button */}
-              <button
-                onClick={() => setIsAdminOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md shadow-amber-500/20 cursor-pointer"
-                title="Open Store Admin Dashboard"
-              >
-                <ShieldAlert className="w-3.5 h-3.5" />
-                <span>Admin</span>
-              </button>
-
+            {/* User Account Action (Customer Only) */}
+            <div className="flex items-center gap-1 sm:gap-2">
               {user ? (
-                <div className="flex items-center gap-1">
-                  <span className="hidden sm:inline text-xs text-slate-300 font-medium px-2 py-1 rounded bg-slate-800 border border-slate-700 truncate max-w-[80px]">
-                    {user.name}
-                  </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-medium">
+                    <UserIcon className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="truncate max-w-[90px]">{user.name}</span>
+                  </div>
                   <button
                     onClick={logout}
                     title="Sign Out / Log Out"
-                    className="p-1.5 text-slate-400 hover:text-red-400 rounded-full hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="p-2 text-slate-400 hover:text-red-400 transition-colors rounded-full hover:bg-slate-800/80 cursor-pointer"
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
@@ -172,11 +161,11 @@ export const Header: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsAuthOpen(!isAuthOpen)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 hover:border-amber-500 text-slate-200 hover:text-white text-xs font-medium transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700 hover:border-amber-500 text-slate-200 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-sm"
                   title="Customer Sign In"
                 >
                   <UserIcon className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Sign In</span>
+                  <span className="hidden sm:inline font-semibold">Sign In</span>
                 </button>
               )}
             </div>
@@ -237,19 +226,7 @@ export const Header: React.FC = () => {
             ))}
           </div>
 
-          <div className="pt-2 border-t border-slate-800 space-y-2">
-            {/* Mobile Direct Admin Portal Button */}
-            <button
-              onClick={() => {
-                setIsAdminOpen(true);
-                setIsMobileMenuOpen(false);
-              }}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-950 bg-amber-500 hover:bg-amber-400 font-bold rounded-lg transition-colors cursor-pointer w-full text-left shadow"
-            >
-              <ShieldAlert className="w-4 h-4" />
-              <span>Admin Dashboard (নতুন জুতো যোগ / এডিট)</span>
-            </button>
-
+          <div className="pt-2 border-t border-slate-800">
             {user ? (
               <div className="flex items-center justify-between text-xs text-slate-300 px-1 pt-1">
                 <span>Signed in: <strong>{user.name}</strong></span>
