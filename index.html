@@ -18,7 +18,7 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- Amazon Authentic Top Navigation Bar -->
+    <!-- Top Navigation Bar -->
     <header class="amzn-header flex items-center justify-between px-3 py-2 sticky top-0 z-50 shadow-md">
         <!-- Logo -->
         <div class="flex items-center space-x-1 cursor-pointer px-2 py-1 hover:border hover:border-white rounded" onclick="showPage('home')">
@@ -38,7 +38,7 @@
         <!-- Search Bar -->
         <div class="flex flex-1 max-w-3xl mx-3">
             <input type="text" id="searchInput" placeholder="Search Royal Stepz Zone..." class="w-full p-2 text-black text-sm rounded-l outline-none">
-            <button onclick="searchProducts()" class="amzn-search-btn text-black px-4 rounded-r font-bold text-base flex items-center justify-center">
+            <button onclick="searchProducts()" class="amzn-search-btn text-black px-4 rounded-r font-bold text-base flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
@@ -65,10 +65,10 @@
 
     <!-- Sub Header Nav -->
     <nav class="amzn-subnav px-3 py-2 flex space-x-6 text-sm overflow-x-auto items-center">
-        <button onclick="showPage('home')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap flex items-center"><i class="fa-solid fa-bars mr-1.5"></i> All Footwear</button>
-        <button onclick="showPage('my-orders')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap">My Dashboard & Orders</button>
-        <button onclick="showPage('delivery-rates')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap">Delivery Rates</button>
-        <button onclick="showPage('returns-policy')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap">Returns Policy</button>
+        <button onclick="showPage('home')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap flex items-center cursor-pointer"><i class="fa-solid fa-bars mr-1.5"></i> All Footwear</button>
+        <button onclick="showPage('my-orders')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap cursor-pointer">My Dashboard & Orders</button>
+        <button onclick="showPage('delivery-rates')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap cursor-pointer">Delivery Rates</button>
+        <button onclick="showPage('returns-policy')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap cursor-pointer">Returns Policy</button>
         <span class="text-gray-400 text-xs hidden sm:inline">| Fast Delivery across Doha, Al Wakrah, Lusail, Rayyan</span>
     </nav>
 
@@ -93,7 +93,7 @@
 
         <!-- PRODUCT DETAILS PAGE -->
         <div id="page-details" class="hidden bg-white p-6 rounded shadow max-w-5xl mx-auto">
-            <button onclick="showPage('home')" class="mb-4 text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded font-bold"><i class="fa-solid fa-arrow-left"></i> Back to Results</button>
+            <button onclick="showPage('home')" class="mb-4 text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded font-bold cursor-pointer"><i class="fa-solid fa-arrow-left"></i> Back to Results</button>
             <div id="productDetailsContent" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
         </div>
 
@@ -105,7 +105,7 @@
                 <span>Subtotal:</span>
                 <span id="cartTotalPrice" class="text-amber-600">QAR 0.00</span>
             </div>
-            <button onclick="showPage('checkout')" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold shadow-sm text-sm">Proceed to Checkout</button>
+            <button onclick="showPage('checkout')" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold shadow-sm text-sm cursor-pointer">Proceed to Checkout</button>
         </div>
 
         <!-- CHECKOUT PAGE -->
@@ -128,7 +128,7 @@
                     <label class="block font-bold mb-1">Special Notes (Optional)</label>
                     <input type="text" id="chkNotes" class="w-full border p-2 rounded">
                 </div>
-                <button type="submit" class="w-full bg-[#28a745] hover:bg-[#218838] text-white py-2.5 rounded font-bold">Confirm QAR & Place Order</button>
+                <button type="submit" class="w-full bg-[#28a745] hover:bg-[#218838] text-white py-2.5 rounded font-bold cursor-pointer">Confirm QAR & Place Order</button>
             </form>
         </div>
 
@@ -138,7 +138,7 @@
             <h2 class="text-2xl font-bold text-gray-800">Order Confirmed Successfully!</h2>
             <p class="text-gray-600 text-xs">Your order has been recorded and forwarded directly to WhatsApp. Thank you for shopping with Royal Stepz Zone.</p>
             <div id="successDetails" class="bg-gray-50 p-3 rounded text-left text-xs space-y-1"></div>
-            <button onclick="showPage('home')" class="bg-[#007185] text-white px-5 py-2 rounded font-bold text-xs">Continue Shopping</button>
+            <button onclick="showPage('home')" class="bg-[#007185] text-white px-5 py-2 rounded font-bold text-xs cursor-pointer">Continue Shopping</button>
         </div>
 
         <!-- MY ORDERS & NOTIFICATIONS PAGE -->
@@ -158,12 +158,12 @@
             <h2 class="text-xl font-bold border-b pb-2 text-amber-700"><i class="fa-solid fa-truck-fast"></i> Qatar Delivery Rates & Zones</h2>
             <p class="text-xs text-gray-600">We provide express footwear delivery across all major municipalities and zones in Qatar:</p>
             <ul class="list-disc pl-5 space-y-2 text-xs text-gray-700">
-                <li><b>Doha Municipality (Downtown, West Bay, Al Sadd, Msheireb):</b> Free Delivery on orders above QAR 200, otherwise QAR 15. Delivery within 24 Hours.</li>
+                <li><b>Doha Municipality:</b> Free Delivery on orders above QAR 200, otherwise QAR 15. Delivery within 24 Hours.</li>
                 <li><b>Al Wakrah & Al Wukair:</b> QAR 20 standard delivery charge. Delivery within 24-48 Hours.</li>
                 <li><b>Lusail & The Pearl Qatar:</b> QAR 15 delivery charge. Express delivery available.</li>
                 <li><b>Al Rayyan & Umm Salal:</b> QAR 20 delivery charge. Delivery within 48 Hours.</li>
             </ul>
-            <button onclick="showPage('home')" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold mt-2">Back to Home</button>
+            <button onclick="showPage('home')" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold mt-2 cursor-pointer">Back to Home</button>
         </div>
 
         <!-- RETURNS & REPLACEMENTS INFO PAGE -->
@@ -175,18 +175,18 @@
                 <li><b>Condition:</b> Footwear must be unworn, in original condition, and with the box/tags intact.</li>
                 <li><b>How to Initiate:</b> Simply contact our support via WhatsApp or visit your "My Orders" section to manage items.</li>
             </ul>
-            <button onclick="showPage('home')" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold mt-2">Back to Home</button>
+            <button onclick="showPage('home')" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold mt-2 cursor-pointer">Back to Home</button>
         </div>
 
         <!-- HIDDEN ADMIN LOGIN MODAL (Ctrl + F12) -->
         <div id="page-admin-login" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
             <div class="bg-white p-6 rounded shadow w-full max-w-sm space-y-3 relative">
-                <button onclick="closeAdminLogin()" class="absolute top-2 right-2 text-gray-500 font-bold">X</button>
+                <button onclick="closeAdminLogin()" class="absolute top-2 right-2 text-gray-500 font-bold cursor-pointer">X</button>
                 <h2 class="text-lg font-bold text-center text-red-600">Secure Admin Gateway</h2>
                 <p class="text-[11px] text-center text-gray-500">Authorized Access Only (Ctrl+F12)</p>
                 <input type="email" id="adminEmail" placeholder="Admin Email" class="w-full border p-2 rounded text-sm">
                 <input type="password" id="adminPass" placeholder="Admin Password" class="w-full border p-2 rounded text-sm">
-                <button onclick="verifyAdminLogin()" class="w-full bg-red-600 text-white py-2 rounded font-bold text-sm">Login Panel</button>
+                <button onclick="verifyAdminLogin()" class="w-full bg-red-600 text-white py-2 rounded font-bold text-sm cursor-pointer">Login Panel</button>
             </div>
         </div>
 
@@ -194,25 +194,25 @@
         <div id="page-admin-dashboard" class="hidden bg-white p-6 rounded shadow max-w-6xl mx-auto space-y-6 text-sm">
             <div class="flex justify-between items-center border-b pb-3">
                 <h2 class="text-xl font-bold text-red-600"><i class="fa-solid fa-user-shield"></i> Master Admin Control Panel</h2>
-                <button onclick="logoutAdmin()" class="bg-gray-800 text-white px-3 py-1 rounded text-xs">Exit Admin</button>
+                <button onclick="logoutAdmin()" class="bg-gray-800 text-white px-3 py-1 rounded text-xs cursor-pointer">Exit Admin</button>
             </div>
 
             <div class="bg-gray-50 p-3 rounded space-y-2 border">
                 <h3 class="font-bold">WhatsApp Number Setup</h3>
                 <div class="flex gap-2 max-w-md">
                     <input type="text" id="adminWhatsAppNum" placeholder="+974XXXXXXXX" class="border p-1.5 rounded text-xs w-full">
-                    <button onclick="saveWhatsAppNumber()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold">Save</button>
+                    <button onclick="saveWhatsAppNumber()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Save</button>
                 </div>
             </div>
 
             <div class="bg-gray-50 p-3 rounded space-y-3 border">
-                <h3 class="font-bold">Add New Footwear Product (Local Upload)</h3>
+                <h3 class="font-bold">Add New Footwear Product</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <input type="text" id="newProdName" placeholder="Product Name" class="border p-1.5 rounded text-xs">
                     <input type="number" id="newProdPrice" placeholder="Price (QAR)" class="border p-1.5 rounded text-xs">
                     <input type="file" id="newProdImgFile" accept="image/*" class="border p-1.5 rounded text-xs bg-white">
                 </div>
-                <button onclick="addNewProduct()" class="bg-green-600 text-white px-4 py-1.5 rounded font-bold text-xs">Publish Product</button>
+                <button onclick="addNewProduct()" class="bg-green-600 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer">Publish Product</button>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -236,8 +236,8 @@
             <h3 class="text-lg font-bold">Added to Cart Successfully!</h3>
             <p id="modalPopupItemName" class="text-xs text-gray-600"></p>
             <div class="flex space-x-2">
-                <button onclick="closeCartPopup()" class="flex-1 bg-gray-200 hover:bg-gray-300 py-2 rounded text-xs font-bold">Continue Shopping</button>
-                <button onclick="closeCartPopup(); showPage('cart');" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] py-2 rounded text-xs font-bold">Go to Cart</button>
+                <button onclick="closeCartPopup()" class="flex-1 bg-gray-200 hover:bg-gray-300 py-2 rounded text-xs font-bold cursor-pointer">Continue Shopping</button>
+                <button onclick="closeCartPopup(); showPage('cart');" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] py-2 rounded text-xs font-bold cursor-pointer">Go to Cart</button>
             </div>
         </div>
     </div>
@@ -245,12 +245,12 @@
     <!-- USER AUTH MODAL -->
     <div id="authModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
         <div class="bg-white p-6 rounded shadow max-w-sm w-full space-y-3 relative text-sm">
-            <button onclick="closeAuthModal()" class="absolute top-2 right-2 text-gray-500 font-bold">X</button>
+            <button onclick="closeAuthModal()" class="absolute top-2 right-2 text-gray-500 font-bold cursor-pointer">X</button>
             <h3 id="authTitle" class="text-lg font-bold text-center">Customer Sign In</h3>
             <input type="text" id="authName" placeholder="Full Name" class="w-full border p-2 rounded hidden">
             <input type="email" id="authEmail" placeholder="Email Address" class="w-full border p-2 rounded">
             <input type="password" id="authPassword" placeholder="Password" class="w-full border p-2 rounded">
-            <button onclick="handleUserAuth()" id="authBtn" class="w-full bg-[#ffd814] font-bold py-2 rounded text-xs shadow-sm">Sign In</button>
+            <button onclick="handleUserAuth()" id="authBtn" class="w-full bg-[#ffd814] font-bold py-2 rounded text-xs shadow-sm cursor-pointer">Sign In</button>
             <p class="text-[11px] text-center cursor-pointer text-blue-600" onclick="toggleAuthMode()">New customer? Create account</p>
         </div>
     </div>
@@ -304,8 +304,23 @@
         </div>
     </footer>
 
-    <!-- Script Section -->
+    <!-- Script Section (Full Bug-Free Engine) -->
     <script>
+        function safeGetPrice(item) {
+            if (!item) return 250;
+            if (typeof item.price === 'number' && !isNaN(item.price)) return item.price;
+            if (typeof item.priceQAR === 'number' && !isNaN(item.priceQAR)) return item.priceQAR;
+            if (typeof item.price === 'string') {
+                let p = parseFloat(item.price);
+                if (!isNaN(p)) return p;
+            }
+            if (typeof item.priceQAR === 'string') {
+                let p = parseFloat(item.priceQAR);
+                if (!isNaN(p)) return p;
+            }
+            return 250;
+        }
+
         const DEFAULT_PRODUCTS = [
             { id: 1, name: 'Royal Classic Leather Sneaker', price: 290, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80', desc: 'Premium handcrafted leather sneaker for ultimate comfort and royal style across Doha streets.' },
             { id: 2, name: 'Doha Urban Street Runner', price: 350, image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80', desc: 'Lightweight modern design optimized for running, fitness, and casual daily wear in Qatar.' },
@@ -315,7 +330,9 @@
         function getStored(key, def) {
             try {
                 const val = localStorage.getItem(key);
-                return val ? JSON.parse(val) : def;
+                if (!val) return def;
+                const parsed = JSON.parse(val);
+                return Array.isArray(parsed) && parsed.length ? parsed : def;
             } catch(e) {
                 return def;
             }
@@ -329,7 +346,13 @@
             }
         }
 
-        let products = getStored('rsz_products', DEFAULT_PRODUCTS);
+        let products = getStored('rsz_products', null) || getStored('royal_products', null) || DEFAULT_PRODUCTS;
+        // Normalize products price
+        products = products.map(p => ({
+            ...p,
+            price: safeGetPrice(p)
+        }));
+
         let cart = getStored('rsz_cart', []);
         let orders = getStored('rsz_orders', []);
         let notifications = getStored('rsz_notifications', []);
@@ -368,17 +391,18 @@
                 return;
             }
             displayList.forEach(p => {
+                const itemPrice = safeGetPrice(p);
                 grid.innerHTML += `
                     <div class="bg-white p-3 rounded shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
                         <div>
-                            <div onclick="showProductDetails(${p.id})" class="h-44 bg-cover bg-center rounded mb-2 cursor-pointer" style="background-image: url('${p.image}')"></div>
-                            <h3 onclick="showProductDetails(${p.id})" class="font-bold text-gray-900 text-sm line-clamp-2 cursor-pointer hover:text-amber-600">${p.name}</h3>
-                            <p class="text-amber-700 font-bold text-base mt-1">QAR <span class="text-lg">${p.price}</span></p>
+                            <div onclick="showProductDetails('${p.id}')" class="h-44 bg-cover bg-center rounded mb-2 cursor-pointer" style="background-image: url('${p.image}')"></div>
+                            <h3 onclick="showProductDetails('${p.id}')" class="font-bold text-gray-900 text-sm line-clamp-2 cursor-pointer hover:text-amber-600">${p.name}</h3>
+                            <p class="text-amber-700 font-bold text-base mt-1">QAR <span class="text-lg font-black">${itemPrice}</span></p>
                             <p class="text-[11px] text-green-700 font-semibold">In Stock - Qatar Delivery</p>
                         </div>
                         <div class="mt-3 flex gap-2">
-                            <button onclick="showProductDetails(${p.id})" class="flex-1 bg-gray-100 hover:bg-gray-200 text-black py-1.5 rounded font-bold text-xs border">Details</button>
-                            <button onclick="addToCart(${p.id})" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-1.5 rounded font-bold text-xs shadow-sm">Add to Cart</button>
+                            <button onclick="showProductDetails('${p.id}')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-black py-1.5 rounded font-bold text-xs border cursor-pointer">Details</button>
+                            <button onclick="addToCart('${p.id}')" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-1.5 rounded font-bold text-xs shadow-sm cursor-pointer">Add to Cart</button>
                         </div>
                     </div>
                 `;
@@ -387,9 +411,10 @@
         }
 
         function showProductDetails(id) {
-            let p = products.find(prod => prod.id === id);
+            let p = products.find(prod => String(prod.id) === String(id));
             if(!p) return;
 
+            const itemPrice = safeGetPrice(p);
             let container = document.getElementById('productDetailsContent');
             if(!container) return;
             container.innerHTML = `
@@ -398,16 +423,16 @@
                 </div>
                 <div class="space-y-4">
                     <h2 class="text-2xl font-bold text-gray-900">${p.name}</h2>
-                    <p class="text-2xl font-bold text-amber-700">QAR ${p.price}</p>
+                    <p class="text-2xl font-bold text-amber-700">QAR ${itemPrice}</p>
                     <p class="text-xs text-green-700 font-bold">✔ In Stock (Fast delivery across Doha, Al Wakrah, Lusail)</p>
                     <hr>
                     <div>
                         <h4 class="font-bold text-sm text-gray-800 mb-1">About this item:</h4>
-                        <p class="text-xs text-gray-600 leading-relaxed">${p.desc || 'High quality durable footwear designed for premium comfort and long-lasting style.'}</p>
+                        <p class="text-xs text-gray-600 leading-relaxed">${p.desc || p.description || 'High quality durable footwear designed for premium comfort and long-lasting style.'}</p>
                     </div>
                     <div class="pt-4 flex gap-3">
-                        <button onclick="addToCart(${p.id})" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold text-xs shadow">Add to Cart</button>
-                        <button onclick="addToCart(${p.id}); showPage('cart');" class="flex-1 bg-[#ffa41c] hover:bg-[#fa8900] text-black py-2.5 rounded font-bold text-xs shadow">Buy Now</button>
+                        <button onclick="addToCart('${p.id}')" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Add to Cart</button>
+                        <button onclick="addToCart('${p.id}'); showPage('cart');" class="flex-1 bg-[#ffa41c] hover:bg-[#fa8900] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Buy Now</button>
                     </div>
                 </div>
             `;
@@ -424,13 +449,14 @@
         }
 
         function addToCart(id) {
-            let p = products.find(prod => prod.id === id);
+            let p = products.find(prod => String(prod.id) === String(id));
             if(!p) return;
-            let existing = cart.find(item => item.id === id);
+            const itemPrice = safeGetPrice(p);
+            let existing = cart.find(item => String(item.id) === String(id));
             if(existing) { 
                 existing.qty += 1; 
             } else { 
-                cart.push({...p, qty: 1}); 
+                cart.push({...p, price: itemPrice, qty: 1}); 
             }
             setStored('rsz_cart', cart);
             updateCartCount();
@@ -463,17 +489,18 @@
                 return;
             }
             cart.forEach((item, index) => {
-                total += item.price * item.qty;
+                const pPrice = safeGetPrice(item);
+                total += pPrice * item.qty;
                 list.innerHTML += `
                     <div class="py-2.5 flex justify-between items-center text-xs">
                         <div class="flex items-center space-x-2">
                             <img src="${item.image}" class="w-10 h-10 object-cover rounded border">
                             <div>
                                 <h4 class="font-bold text-gray-900">${item.name}</h4>
-                                <p class="text-gray-500">QAR ${item.price} x ${item.qty}</p>
+                                <p class="text-gray-500">QAR ${pPrice} x ${item.qty}</p>
                             </div>
                         </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-600 font-bold hover:underline">Delete</button>
+                        <button onclick="removeFromCart(${index})" class="text-red-600 font-bold hover:underline cursor-pointer">Delete</button>
                     </div>
                 `;
             });
@@ -496,7 +523,7 @@
             let address = document.getElementById('chkAddress').value;
             let notes = document.getElementById('chkNotes').value;
 
-            let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            let total = cart.reduce((acc, item) => acc + (safeGetPrice(item) * item.qty), 0);
             let orderId = 'RSZ-' + Math.floor(100000 + Math.random() * 900000);
 
             let order = {
@@ -521,7 +548,7 @@
 
             let waNum = whatsappNumber.replace(/[^0-9]/g, '');
             let msg = `*New Order Confirmed - Royal Stepz Zone*\n\nOrder ID: ${orderId}\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\nNotes: ${notes}\n\n*Items:*`;
-            order.items.forEach(i => { msg += `\n- ${i.name} (Qty: ${i.qty}) - QAR ${i.price * i.qty}`; });
+            order.items.forEach(i => { msg += `\n- ${i.name} (Qty: ${i.qty}) - QAR ${safeGetPrice(i) * i.qty}`; });
             msg += `\n\n*Total Amount: QAR ${total}*`;
 
             window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -601,15 +628,16 @@
             if(pList) {
                 pList.innerHTML = '';
                 products.forEach(p => {
+                    const price = safeGetPrice(p);
                     pList.innerHTML += `
                         <div class="flex justify-between items-center bg-white p-2 border rounded text-xs">
                             <div class="flex items-center space-x-2">
                                 <img src="${p.image}" class="w-8 h-8 object-cover rounded">
-                                <span><b>${p.name}</b> - QAR ${p.price}</span>
+                                <span><b>${p.name}</b> - QAR ${price}</span>
                             </div>
                             <div class="space-x-1">
-                                <button onclick="adminEditProduct(${p.id})" class="bg-blue-600 text-white px-2 py-0.5 rounded">Edit</button>
-                                <button onclick="adminDeleteProduct(${p.id})" class="bg-red-600 text-white px-2 py-0.5 rounded">Del</button>
+                                <button onclick="adminEditProduct('${p.id}')" class="bg-blue-600 text-white px-2 py-0.5 rounded cursor-pointer">Edit</button>
+                                <button onclick="adminDeleteProduct('${p.id}')" class="bg-red-600 text-white px-2 py-0.5 rounded cursor-pointer">Del</button>
                             </div>
                         </div>
                     `;
@@ -645,14 +673,14 @@
             let price = parseFloat(document.getElementById('newProdPrice').value);
             let fileInput = document.getElementById('newProdImgFile');
 
-            if(!name || !price || !fileInput.files.length) {
+            if(!name || isNaN(price) || !fileInput.files.length) {
                 alert('Please enter Name, Price, and choose an Image.');
                 return;
             }
 
             let reader = new FileReader();
             reader.onload = function(e) {
-                let newId = products.length ? products[products.length - 1].id + 1 : 1;
+                let newId = 'prod-' + Date.now();
                 products.push({ id: newId, name, price, image: e.target.result, desc: 'Premium Qatar collection.' });
                 setStored('rsz_products', products);
                 alert('Product added successfully!');
@@ -665,14 +693,18 @@
         }
 
         function adminEditProduct(id) {
-            let prod = products.find(p => p.id === id);
+            let prod = products.find(p => String(p.id) === String(id));
             if(!prod) return;
 
+            let currentPrice = safeGetPrice(prod);
             let newName = prompt("Edit Shoe Name:", prod.name);
-            let newPrice = prompt("Edit Price (QAR):", prod.price);
+            let newPrice = prompt("Edit Price (QAR):", currentPrice);
 
             if(newName) prod.name = newName;
-            if(newPrice) prod.price = parseFloat(newPrice);
+            if(newPrice && !isNaN(parseFloat(newPrice))) {
+                prod.price = parseFloat(newPrice);
+                prod.priceQAR = parseFloat(newPrice);
+            }
 
             setStored('rsz_products', products);
             alert('Updated!');
@@ -681,7 +713,7 @@
 
         function adminDeleteProduct(id) {
             if(confirm("Delete this shoe from catalog?")) {
-                products = products.filter(p => p.id !== id);
+                products = products.filter(p => String(p.id) !== String(id));
                 setStored('rsz_products', products);
                 renderAdminDashboard();
             }
