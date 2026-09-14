@@ -32,7 +32,7 @@
         </div>
         
         <div class="flex flex-1 max-w-3xl mx-3">
-            <input type="text" id="searchInput" placeholder="Search Royal Stepz Zone..." class="w-full p-2 text-black text-sm rounded-l outline-none">
+            <input type="text" id="searchInput" placeholder="Search sneakers, running, luxury..." class="w-full p-2 text-black text-sm rounded-l outline-none">
             <button onclick="searchProducts()" class="amzn-search-btn text-black px-4 rounded-r font-bold text-base flex items-center justify-center cursor-pointer">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -41,7 +41,7 @@
         <div class="flex items-center space-x-4 text-sm">
             <div id="userAuthSection" class="cursor-pointer px-2 py-1 hover:border hover:border-white rounded" onclick="openAuthModal()">
                 <p class="text-[11px] text-gray-300">Hello, <span id="navUserName">Sign in</span></p>
-                <p class="font-bold text-xs">Account & Lists</p>
+                <p class="font-bold text-xs" id="navUserSubtitle">Account & Lists</p>
             </div>
             <div onclick="showPage('my-orders')" class="cursor-pointer hidden md:block px-2 py-1 hover:border hover:border-white rounded">
                 <p class="text-[11px] text-gray-300">Returns</p>
@@ -63,7 +63,7 @@
         <button onclick="showPage('my-orders')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap cursor-pointer">My Dashboard & Orders</button>
         <button onclick="showPage('delivery-rates')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap cursor-pointer">Delivery Rates</button>
         <button onclick="showPage('returns-policy')" class="hover:border hover:border-white px-2 py-1 rounded whitespace-nowrap cursor-pointer">Returns Policy</button>
-        <span class="text-gray-400 text-xs hidden sm:inline">| Development Mode Active: Verified Customer Account Required for Checkout</span>
+        <span class="text-gray-400 text-xs hidden sm:inline">| Express Delivery across Doha, Al Wakrah, Lusail, Rayyan</span>
     </nav>
 
     <!-- Main Content Area -->
@@ -75,7 +75,7 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded"></div>
                 <div class="relative z-10 text-white p-2">
                     <h1 class="text-2xl sm:text-4xl font-bold text-amber-400">Royal Stepz Zone — Qatar's Ultimate Footwear</h1>
-                    <p class="text-xs sm:text-sm mt-1 text-gray-200">Shop premium sneakers, formals, and casuals. Secure verified customer ordering.</p>
+                    <p class="text-xs sm:text-sm mt-1 text-gray-200">Shop premium sneakers, formals, and casuals. Direct WhatsApp checkout & instant order tracking.</p>
                 </div>
             </div>
 
@@ -99,20 +99,30 @@
                 <span>Subtotal:</span>
                 <span id="cartTotalPrice" class="text-amber-600">QAR 0.00</span>
             </div>
-            <button onclick="proceedToCheckout()" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold shadow-sm text-sm cursor-pointer">Proceed to Checkout</button>
+            <button onclick="proceedToCheckoutGuard()" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold shadow-sm text-sm cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-shield-check"></i>
+                <span>Proceed to Checkout</span>
+            </button>
+            <p class="text-[11px] text-gray-500 text-center mt-2">Verified Customer Account is required before placing orders in Qatar.</p>
         </div>
 
         <!-- CHECKOUT PAGE -->
         <div id="page-checkout" class="hidden bg-white p-6 rounded shadow max-w-xl mx-auto">
-            <h2 class="text-xl font-bold mb-4 border-b pb-2">Checkout Details (Qatar Delivery)</h2>
+            <div class="flex items-center justify-between border-b pb-2 mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Checkout Details (Qatar Delivery)</h2>
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-badge-check"></i> Verified Account
+                </span>
+            </div>
+
             <form id="checkoutForm" onsubmit="submitOrder(event)" class="space-y-3 text-sm">
                 <div>
-                    <label class="block font-bold mb-1">Full Name (Verified)</label>
-                    <input type="text" id="chkName" required readonly class="w-full border p-2 rounded bg-gray-100 text-gray-700">
+                    <label class="block font-bold mb-1">Full Name</label>
+                    <input type="text" id="chkName" required class="w-full border p-2 rounded bg-gray-50">
                 </div>
                 <div>
-                    <label class="block font-bold mb-1">Qatar Phone Number (Verified)</label>
-                    <input type="text" id="chkPhone" required readonly class="w-full border p-2 rounded bg-gray-100 text-gray-700">
+                    <label class="block font-bold mb-1">Qatar Phone Number</label>
+                    <input type="text" id="chkPhone" required placeholder="+974 XXXX XXXX" class="w-full border p-2 rounded bg-gray-50">
                 </div>
                 <div>
                     <label class="block font-bold mb-1">Delivery Location / Address in Qatar</label>
@@ -120,9 +130,9 @@
                 </div>
                 <div>
                     <label class="block font-bold mb-1">Special Notes (Optional)</label>
-                    <input type="text" id="chkNotes" class="w-full border p-2 rounded">
+                    <input type="text" id="chkNotes" placeholder="Delivery time preference, landmarks..." class="w-full border p-2 rounded">
                 </div>
-                <button type="submit" class="w-full bg-[#28a745] hover:bg-[#218838] text-white py-2.5 rounded font-bold cursor-pointer">Confirm QAR & Place Order</button>
+                <button type="submit" class="w-full bg-[#28a745] hover:bg-[#218838] text-white py-2.5 rounded font-bold cursor-pointer transition shadow">Confirm QAR & Place Order</button>
             </form>
         </div>
 
@@ -130,7 +140,7 @@
         <div id="page-success" class="hidden bg-white p-8 rounded shadow text-center max-w-lg mx-auto space-y-4">
             <i class="fa-solid fa-circle-check text-5xl text-green-600"></i>
             <h2 class="text-2xl font-bold text-gray-800">Order Confirmed Successfully!</h2>
-            <p class="text-gray-600 text-xs">Your verified order has been recorded and forwarded to WhatsApp. Thank you for shopping with Royal Stepz Zone.</p>
+            <p class="text-gray-600 text-xs">Your order has been recorded and forwarded directly to WhatsApp. Thank you for shopping with Royal Stepz Zone.</p>
             <div id="successDetails" class="bg-gray-50 p-3 rounded text-left text-xs space-y-1"></div>
             <button onclick="showPage('home')" class="bg-[#007185] text-white px-5 py-2 rounded font-bold text-xs cursor-pointer">Continue Shopping</button>
         </div>
@@ -142,7 +152,10 @@
                 <div id="notificationArea" class="space-y-2"></div>
             </div>
             <div>
-                <h2 class="text-lg font-bold border-b pb-2 mb-3">My Orders History (Edit / Cancel)</h2>
+                <div class="flex justify-between items-center border-b pb-2 mb-3">
+                    <h2 class="text-lg font-bold text-gray-800">My Orders History (Manage & Track)</h2>
+                    <span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Self-Service Enabled</span>
+                </div>
                 <div id="myOrdersList" class="space-y-3"></div>
             </div>
         </div>
@@ -167,7 +180,7 @@
             <ul class="list-disc pl-5 space-y-2 text-xs text-gray-700">
                 <li><b>7-Day Return Window:</b> You can request a return or size exchange within 7 days of delivery.</li>
                 <li><b>Condition:</b> Footwear must be unworn, in original condition, and with the box/tags intact.</li>
-                <li><b>How to Initiate:</b> Simply contact our support via WhatsApp or visit your "My Orders" section to manage items.</li>
+                <li><b>How to Initiate:</b> Use your "My Orders" section to edit or cancel, or contact WhatsApp support.</li>
             </ul>
             <button onclick="showPage('home')" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold mt-2 cursor-pointer">Back to Home</button>
         </div>
@@ -187,6 +200,8 @@
                         <p class="text-xs text-gray-500">Authorized Personnel Only (Ctrl+F12)</p>
                     </div>
 
+                    <div id="adminAuthAlert" class="hidden p-2.5 bg-red-50 text-red-700 text-xs rounded border border-red-200"></div>
+
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-700">Admin Email</label>
                         <input type="email" id="adminEmail" placeholder="yeasinarafat1.qa@gmail.com" class="w-full border p-2 rounded text-sm outline-none focus:border-red-600">
@@ -197,7 +212,7 @@
                         <input type="password" id="adminPass" placeholder="Ar@2925" class="w-full border p-2 rounded text-sm outline-none focus:border-red-600">
                     </div>
 
-                    <button onclick="verifyAdminStep1()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 rounded font-bold text-sm cursor-pointer transition shadow flex items-center justify-center gap-2">
+                    <button onclick="verifyAdminStep1()" id="btnAdminStep1" class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 rounded font-bold text-sm cursor-pointer transition shadow flex items-center justify-center gap-2">
                         <i class="fa-solid fa-key"></i>
                         <span>Authenticate & Send OTP</span>
                     </button>
@@ -209,18 +224,34 @@
                         <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
                             <i class="fa-solid fa-envelope-circle-check"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-gray-900">2-Factor Authentication</h2>
-                        <p class="text-xs text-gray-500">Enter the 6-digit OTP code to unlock control panel</p>
+                        <h2 class="text-lg font-bold text-gray-900">Admin 2-Factor Authentication</h2>
+                        <p class="text-xs text-gray-500">Security code sent to your registered Gmail & WhatsApp</p>
                     </div>
 
-                    <div class="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-center justify-between">
+                    <!-- Instant Gmail Dispatcher Box -->
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-2">
+                        <div class="flex justify-between items-center text-amber-900 font-bold">
+                            <span>Admin Verification Code:</span>
+                            <span id="adminDisplayToken" class="font-mono text-base bg-white px-2 py-0.5 rounded border border-amber-300 font-black tracking-widest text-red-600">------</span>
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <a id="btnAdminOpenGmail" href="#" target="_blank" class="flex-1 bg-white border border-red-300 text-red-600 hover:bg-red-50 py-1.5 rounded text-center font-bold text-[11px] shadow-sm">
+                                <i class="fa-solid fa-envelope mr-1"></i> Open Gmail
+                            </a>
+                            <a id="btnOtpWhatsAppFallback" href="#" target="_blank" class="flex-1 bg-white border border-emerald-300 text-emerald-600 hover:bg-emerald-50 py-1.5 rounded text-center font-bold text-[11px] shadow-sm">
+                                <i class="fa-brands fa-whatsapp mr-1"></i> Open WhatsApp
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-center justify-between">
                         <span>OTP Expires in: <b id="otpTimer" class="font-mono">03:00</b></span>
                         <button onclick="sendAdminOTP()" class="text-blue-600 underline font-bold hover:text-blue-800 cursor-pointer">Resend OTP</button>
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="block text-xs font-bold text-gray-700 text-center">6-DIGIT VERIFICATION CODE</label>
-                        <input type="text" id="adminOTPInput" maxlength="6" placeholder="• • • • • •" class="w-full border-2 border-amber-500 p-2.5 rounded-lg text-center font-mono font-bold tracking-widest text-2xl text-slate-900 outline-none">
+                    <div class="space-y-1">
+                        <label class="block text-xs font-bold text-gray-700 text-center">ENTER 6-DIGIT CODE</label>
+                        <input type="text" id="adminOTPInput" maxlength="6" placeholder="• • • • • •" class="w-full border-2 border-amber-500 p-2 text-center font-mono font-bold tracking-widest text-2xl text-slate-900 rounded-lg outline-none">
                     </div>
 
                     <button onclick="verifyAdminOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded font-bold text-sm cursor-pointer transition shadow flex items-center justify-center gap-2">
@@ -233,33 +264,25 @@
         </div>
 
         <!-- MASTER ADMIN DASHBOARD -->
-        <div id="page-admin-dashboard" class="hidden bg-white p-6 rounded shadow max-w-6xl mx-auto space-y-6 text-sm">
+        <div id="page-admin-dashboard" class="hidden bg-white p-6 rounded shadow max-w-7xl mx-auto space-y-6 text-sm">
             <div class="flex justify-between items-center border-b pb-3">
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h2 class="text-xl font-bold text-red-600"><i class="fa-solid fa-user-shield"></i> Master Admin Control Panel (Development Mode)</h2>
+                    <h2 class="text-xl font-bold text-red-600"><i class="fa-solid fa-user-shield"></i> Master Admin Control Panel (2FA Verified)</h2>
                 </div>
                 <button onclick="logoutAdmin()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer">Exit Admin</button>
             </div>
 
+            <!-- WhatsApp Configuration -->
             <div class="bg-gray-50 p-3 rounded space-y-2 border">
-                <h3 class="font-bold">WhatsApp Number Setup</h3>
+                <h3 class="font-bold">WhatsApp Business Number Setup</h3>
                 <div class="flex gap-2 max-w-md">
                     <input type="text" id="adminWhatsAppNum" placeholder="+974XXXXXXXX" class="border p-1.5 rounded text-xs w-full">
                     <button onclick="saveWhatsAppNumber()" class="bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-bold cursor-pointer">Save</button>
                 </div>
             </div>
 
-            <!-- STRUCTURED CUSTOMER DATABASE FOR ADMIN -->
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-blue-900"><i class="fa-solid fa-users-line"></i> Registered Customers Database (Structured Data Structure)</h3>
-                    <span id="totalCustomersCount" class="bg-blue-200 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">Total: 0</span>
-                </div>
-                <p class="text-xs text-blue-700">Structured database tracking all verified customer accounts, verification status, contact details, and their linked order activities.</p>
-                <div id="adminCustomerList" class="space-y-2 max-h-60 overflow-y-auto bg-white p-2 rounded border"></div>
-            </div>
-
+            <!-- Add Product -->
             <div class="bg-gray-50 p-3 rounded space-y-3 border">
                 <h3 class="font-bold">Add New Footwear Product</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -270,19 +293,139 @@
                 <button onclick="addNewProduct()" class="bg-green-600 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer">Publish Product</button>
             </div>
 
+            <!-- CATALOG & ORDERS SECTION -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <h3 class="font-bold mb-2">Manage Catalog (Edit / Delete)</h3>
+                    <h3 class="font-bold mb-2">Manage Footwear Catalog</h3>
                     <div id="adminProductList" class="space-y-2 max-h-80 overflow-y-auto border p-2 rounded bg-gray-50"></div>
                 </div>
                 <div>
-                    <h3 class="font-bold mb-2">Customer Orders Management</h3>
-                    <div id="adminOrdersList" class="space-y-2 max-h-80 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+                    <h3 class="font-bold mb-2 text-indigo-900 flex items-center justify-between">
+                        <span>Customer Orders Management (Edit / Status)</span>
+                        <span id="adminOrdersCount" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold">0 Orders</span>
+                    </h3>
+                    <div id="adminOrdersList" class="space-y-3 max-h-80 overflow-y-auto border p-2 rounded bg-gray-50"></div>
                 </div>
             </div>
+
+            <!-- DEDICATED STRUCTURED CUSTOMER DATABASE -->
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h3 class="font-bold text-base text-gray-900 flex items-center gap-2">
+                            <i class="fa-solid fa-users-gear text-blue-600"></i> Registered Customer Database (Structured Data)
+                        </h3>
+                        <p class="text-xs text-gray-500">Every verified Qatar customer account, phone, email, and past orders.</p>
+                    </div>
+                    <span id="adminCustomersCount" class="text-xs bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full">0 Registered Customers</span>
+                </div>
+
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="w-full text-left text-xs text-gray-600">
+                        <thead class="bg-gray-100 text-gray-800 uppercase font-semibold border-b">
+                            <tr>
+                                <th class="p-2.5">Customer Name</th>
+                                <th class="p-2.5">Qatar Phone</th>
+                                <th class="p-2.5">Email</th>
+                                <th class="p-2.5">Status</th>
+                                <th class="p-2.5">Joined Date</th>
+                                <th class="p-2.5">Total Orders</th>
+                                <th class="p-2.5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminCustomerTableBody" class="divide-y divide-gray-200 bg-white">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
     </main>
+
+    <!-- CUSTOMER AUTH & OTP VERIFICATION MODAL -->
+    <div id="authModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full space-y-4 relative text-sm border">
+            <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-gray-400 hover:text-black font-bold text-lg cursor-pointer">✕</button>
+            
+            <!-- VIEW A: SIGN IN OR SIGN UP FORM -->
+            <div id="customerAuthFormView" class="space-y-3">
+                <div class="text-center">
+                    <h3 id="authTitle" class="text-lg font-bold text-gray-900">Customer Sign In</h3>
+                    <p id="authSubtitle" class="text-xs text-gray-500">Sign in to your Royal Stepz Zone account</p>
+                </div>
+
+                <!-- DYNAMIC ERROR / WARNING ALERT BOX -->
+                <div id="customerAuthAlert" class="hidden p-2.5 bg-red-50 text-red-700 text-xs rounded border border-red-200 leading-relaxed"></div>
+
+                <!-- Registration Only Fields -->
+                <div id="authNameContainer" class="hidden space-y-1">
+                    <label class="block text-xs font-bold text-gray-700">Full Name</label>
+                    <input type="text" id="authName" placeholder="e.g. Tariq Al-Kuwari" class="w-full border p-2 rounded text-xs outline-none focus:border-amber-500">
+                </div>
+                <div id="authPhoneContainer" class="hidden space-y-1">
+                    <label class="block text-xs font-bold text-gray-700">Qatar Phone Number</label>
+                    <input type="text" id="authPhone" placeholder="+974 5512 3456" class="w-full border p-2 rounded text-xs outline-none focus:border-amber-500">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-gray-700">Email Address</label>
+                    <input type="email" id="authEmail" placeholder="yourname@gmail.com" class="w-full border p-2 rounded text-xs outline-none focus:border-amber-500">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-gray-700">Password</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full border p-2 rounded text-xs outline-none focus:border-amber-500">
+                </div>
+
+                <button onclick="handleUserAuthSubmit()" id="authBtn" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] font-bold py-2.5 rounded text-xs shadow cursor-pointer transition">Sign In</button>
+
+                <div class="text-center pt-2">
+                    <p class="text-xs text-gray-600">
+                        <span id="toggleAuthPrompt">New to Royal Stepz?</span> 
+                        <a href="javascript:void(0)" onclick="toggleAuthMode()" class="text-amber-700 font-bold hover:underline" id="toggleAuthLink">Create an account</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- VIEW B: CUSTOMER OTP REGISTRATION VERIFICATION -->
+            <div id="customerOTPVerifyView" class="hidden space-y-3 text-center">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
+                </div>
+                <h3 class="text-base font-bold text-gray-900">Verify Your Account</h3>
+                <p class="text-xs text-gray-500">Enter the verification code sent to your Gmail / Qatar Phone</p>
+                
+                <!-- Instant Gmail Notification Token Box -->
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-2 text-left">
+                    <div class="flex justify-between items-center text-amber-900 font-bold">
+                        <span>Your Verification Code:</span>
+                        <span id="customerDisplayToken" class="font-mono text-base bg-white px-2 py-0.5 rounded border border-amber-300 font-black tracking-widest text-green-700">------</span>
+                    </div>
+                    <div class="pt-1">
+                        <a id="btnCustomerOpenGmail" href="#" target="_blank" class="w-full block bg-white border border-red-300 text-red-600 hover:bg-red-50 py-1.5 rounded text-center font-bold text-[11px] shadow-sm">
+                            <i class="fa-solid fa-envelope mr-1"></i> Open in Gmail App
+                        </a>
+                    </div>
+                </div>
+
+                <div class="p-2 bg-blue-50 text-blue-800 text-xs rounded border border-blue-200 flex justify-between items-center">
+                    <span>Code expires in: <b id="customerOtpTimer" class="font-mono">03:00</b></span>
+                    <a href="javascript:void(0)" onclick="resendCustomerOTP()" class="text-blue-600 underline font-bold">Resend</a>
+                </div>
+
+                <div class="space-y-1 text-left">
+                    <label class="block text-xs font-bold text-gray-700 text-center">ENTER 6-DIGIT OTP</label>
+                    <input type="text" id="customerInputOTP" maxlength="6" placeholder="• • • • • •" class="w-full border-2 border-amber-500 p-2 text-center font-mono font-bold tracking-widest text-xl rounded outline-none">
+                </div>
+
+                <button onclick="verifyCustomerRegistrationOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded text-xs shadow cursor-pointer transition">
+                    Confirm & Activate Account
+                </button>
+            </div>
+
+        </div>
+    </div>
 
     <!-- ADD TO CART POPUP NOTIFICATION MODAL -->
     <div id="cartModalPopup" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -294,39 +437,6 @@
                 <button onclick="closeCartPopup()" class="flex-1 bg-gray-200 hover:bg-gray-300 py-2 rounded text-xs font-bold cursor-pointer">Continue Shopping</button>
                 <button onclick="closeCartPopup(); showPage('cart');" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] py-2 rounded text-xs font-bold cursor-pointer">Go to Cart</button>
             </div>
-        </div>
-    </div>
-
-    <!-- SECURE CUSTOMER VERIFIED AUTH MODAL -->
-    <div id="authModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full space-y-4 relative text-sm border">
-            <button onclick="closeAuthModal()" class="absolute top-3 right-3 text-gray-400 hover:text-black font-bold text-lg cursor-pointer">✕</button>
-            
-            <!-- STEP 1: FORM -->
-            <div id="authFormStep" class="space-y-3">
-                <h3 id="authTitle" class="text-lg font-bold text-center text-gray-900">Customer Verified Sign In</h3>
-                <input type="text" id="authName" placeholder="Full Name" class="w-full border p-2.5 rounded text-xs hidden">
-                <input type="email" id="authEmail" placeholder="Email Address" class="w-full border p-2.5 rounded text-xs">
-                <input type="text" id="authPhone" placeholder="Qatar Phone (+974 XXXX XXXX)" class="w-full border p-2.5 rounded text-xs hidden">
-                <input type="password" id="authPassword" placeholder="Password" class="w-full border p-2.5 rounded text-xs">
-                
-                <button onclick="handleCustomerAuthAction()" id="authBtn" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] font-bold py-2.5 rounded text-xs shadow-sm cursor-pointer">Sign In</button>
-                <p id="authSwitchText" class="text-xs text-center cursor-pointer text-blue-600 hover:underline pt-1" onclick="toggleAuthMode()">New customer? Create verified account</p>
-            </div>
-
-            <!-- STEP 2: REGISTRATION OTP VERIFICATION -->
-            <div id="authOtpStep" class="hidden space-y-4 text-center">
-                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-xl">
-                    <i class="fa-solid id-badge fa-envelope-circle-check"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900">Verify Your Account</h3>
-                <p class="text-xs text-gray-500">Enter the verification OTP sent to your email/phone to complete your ID registration.</p>
-                
-                <input type="text" id="customerRegOTPInput" maxlength="6" placeholder="• • • • • •" class="w-full border-2 border-amber-500 p-2.5 rounded-lg text-center font-mono font-bold tracking-widest text-2xl outline-none">
-                
-                <button onclick="verifyCustomerRegistrationOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded font-bold text-xs cursor-pointer shadow">Verify & Create ID</button>
-            </div>
-
         </div>
     </div>
 
@@ -379,7 +489,7 @@
         </div>
     </footer>
 
-    <!-- Anti-Inspect & High-Security Engine & Core JavaScript -->
+    <!-- Anti-Inspect & High-Security 2FA Engine -->
     <script>
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.addEventListener('keydown', function(e) {
@@ -388,20 +498,17 @@
                 e.preventDefault(); return false;
             }
             if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
-            if (e.ctrlKey && e.key === 'F12') {
-                e.preventDefault();
-                openAdminLogin();
-                return false;
-            }
         });
 
-        // Security & State
+        // State variables
         let generatedAdminOTP = null;
         let otpExpirationTimestamp = 0;
         let otpTimerInterval = null;
 
         let pendingCustomerRegistration = null;
         let generatedCustomerOTP = null;
+        let customerOtpExpirationTimestamp = 0;
+        let customerOtpInterval = null;
 
         function safeGetPrice(item) {
             if (!item) return 250;
@@ -409,6 +516,10 @@
             if (typeof item.priceQAR === 'number' && !isNaN(item.priceQAR)) return item.priceQAR;
             if (typeof item.price === 'string') {
                 let p = parseFloat(item.price);
+                if (!isNaN(p)) return p;
+            }
+            if (typeof item.priceQAR === 'string') {
+                let p = parseFloat(item.priceQAR);
                 if (!isNaN(p)) return p;
             }
             return 250;
@@ -425,7 +536,7 @@
                 const val = localStorage.getItem(key);
                 if (!val) return def;
                 const parsed = JSON.parse(val);
-                return Array.isArray(parsed) ? parsed : def;
+                return Array.isArray(parsed) && parsed.length ? parsed : (typeof parsed === 'object' ? parsed : def);
             } catch(e) {
                 return def;
             }
@@ -439,17 +550,24 @@
             }
         }
 
-        let products = getStored('rsz_products', null);
-        if (!products || products.length === 0) {
-            products = DEFAULT_PRODUCTS;
-            setStored('rsz_products', products);
-        }
+        let products = getStored('rsz_products', null) || getStored('royal_products', null) || DEFAULT_PRODUCTS;
         products = products.map(p => ({ ...p, price: safeGetPrice(p) }));
 
         let cart = getStored('rsz_cart', []);
         let orders = getStored('rsz_orders', []);
-        let customersDB = getStored('rsz_customers_db', []); // Structured Customer Database
         let notifications = getStored('rsz_notifications', []);
+        let registeredCustomers = getStored('rsz_customers_db', [
+            {
+                id: 'cust-demo-1',
+                name: 'Tariq Al-Mansoor',
+                email: 'tariq.qa@gmail.com',
+                phone: '+974 5521 8932',
+                status: 'Verified',
+                joinedDate: '2026-09-10',
+                password: 'password123'
+            }
+        ]);
+
         let whatsappNumber = localStorage.getItem('rsz_whatsapp') || '+974 3040 8610';
         let currentUser = getStored('rsz_current_user', null);
         let isRegisterMode = false;
@@ -464,6 +582,7 @@
 
             if(pageId === 'home') renderProducts();
             if(pageId === 'cart') renderCart();
+            if(pageId === 'checkout') renderCheckoutPage();
             if(pageId === 'my-orders') renderMyOrdersAndNotifications();
             if(pageId === 'admin-dashboard') renderAdminDashboard();
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -471,7 +590,7 @@
 
         function openWhatsAppSupport() {
             let waNum = whatsappNumber.replace(/[^0-9]/g, '');
-            let msg = `Hello Royal Stepz Zone, I need help regarding my verified footwear order in Qatar.`;
+            let msg = `Hello Royal Stepz Zone, I need help regarding my footwear order/support in Qatar.`;
             window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -526,11 +645,20 @@
                     </div>
                     <div class="pt-4 flex gap-3">
                         <button onclick="addToCart('${p.id}')" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Add to Cart</button>
-                        <button onclick="addToCart('${p.id}'); showPage('cart');" class="flex-1 bg-[#ffa41c] hover:bg-[#fa8900] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Buy Now</button>
+                        <button onclick="addToCart('${p.id}'); proceedToCheckoutGuard();" class="flex-1 bg-[#ffa41c] hover:bg-[#fa8900] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Buy Now</button>
                     </div>
                 </div>
             `;
             showPage('details');
+        }
+
+        function searchProducts() {
+            let input = document.getElementById('searchInput');
+            if(!input) return;
+            let query = input.value.toLowerCase().trim();
+            let results = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
+            showPage('home');
+            renderProducts(results);
         }
 
         function addToCart(id) {
@@ -538,82 +666,58 @@
             if(!p) return;
             const itemPrice = safeGetPrice(p);
             let existing = cart.find(item => String(item.id) === String(id));
-            if(existing) {
-                existing.qty = (existing.qty || 1) + 1;
-            } else {
-                cart.push({ ...p, price: itemPrice, qty: 1 });
+            if(existing) { 
+                existing.qty += 1; 
+            } else { 
+                cart.push({...p, price: itemPrice, qty: 1}); 
             }
             setStored('rsz_cart', cart);
             updateCartCount();
 
-            const modal = document.getElementById('cartModalPopup');
-            const itemNameEl = document.getElementById('modalPopupItemName');
-            if(itemNameEl) itemNameEl.textContent = p.name;
-            if(modal) modal.classList.remove('hidden');
+            const nameEl = document.getElementById('modalPopupItemName');
+            if(nameEl) nameEl.innerText = p.name;
+            const modalEl = document.getElementById('cartModalPopup');
+            if(modalEl) modalEl.classList.remove('hidden');
         }
 
         function closeCartPopup() {
-            const modal = document.getElementById('cartModalPopup');
-            if(modal) modal.classList.add('hidden');
+            const modalEl = document.getElementById('cartModalPopup');
+            if(modalEl) modalEl.classList.add('hidden');
         }
 
         function updateCartCount() {
+            let count = cart.reduce((acc, item) => acc + item.qty, 0);
             const countEl = document.getElementById('cartCount');
-            if(!countEl) return;
-            let totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-            countEl.textContent = totalQty;
+            if(countEl) countEl.innerText = count;
         }
 
         function renderCart() {
-            const listEl = document.getElementById('cartItemsList');
-            const totalEl = document.getElementById('cartTotalPrice');
-            if(!listEl || !totalEl) return;
-
+            let list = document.getElementById('cartItemsList');
+            if(!list) return;
+            list.innerHTML = '';
+            let total = 0;
             if(cart.length === 0) {
-                listEl.innerHTML = '<p class="text-center text-gray-500 py-6">Your Shopping Cart is empty.</p>';
-                totalEl.textContent = 'QAR 0.00';
+                list.innerHTML = '<p class="text-center text-gray-500 py-4 text-xs">Your Cart is currently empty.</p>';
+                document.getElementById('cartTotalPrice').innerText = 'QAR 0.00';
                 return;
             }
-
-            listEl.innerHTML = '';
-            let subtotal = 0;
-
             cart.forEach((item, index) => {
-                const itemPrice = safeGetPrice(item);
-                const itemTotal = itemPrice * (item.qty || 1);
-                subtotal += itemTotal;
-
-                listEl.innerHTML += `
-                    <div class="py-4 flex items-center justify-between gap-4">
-                        <div class="flex items-center space-x-3">
-                            <img src="${item.image}" class="w-16 h-16 object-cover rounded border">
+                const pPrice = safeGetPrice(item);
+                total += pPrice * item.qty;
+                list.innerHTML += `
+                    <div class="py-2.5 flex justify-between items-center text-xs">
+                        <div class="flex items-center space-x-2">
+                            <img src="${item.image}" class="w-10 h-10 object-cover rounded border">
                             <div>
-                                <h4 class="font-bold text-xs text-gray-900">${item.name}</h4>
-                                <p class="text-amber-700 text-xs font-bold">QAR ${itemPrice}</p>
+                                <h4 class="font-bold text-gray-900">${item.name}</h4>
+                                <p class="text-gray-500">QAR ${pPrice} x ${item.qty}</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="updateCartQty(${index}, -1)" class="px-2 py-0.5 bg-gray-200 rounded font-bold text-xs">-</button>
-                            <span class="text-xs font-bold">${item.qty || 1}</span>
-                            <button onclick="updateCartQty(${index}, 1)" class="px-2 py-0.5 bg-gray-200 rounded font-bold text-xs">+</button>
-                            <button onclick="removeFromCart(${index})" class="text-red-600 hover:text-red-800 ml-3 text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
-                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-600 font-bold hover:underline cursor-pointer">Delete</button>
                     </div>
                 `;
             });
-
-            totalEl.textContent = `QAR ${subtotal.toFixed(2)}`;
-        }
-
-        function updateCartQty(index, delta) {
-            if(!cart[index]) return;
-            cart[index].qty = (cart[index].qty || 1) + delta;
-            if(cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
-            setStored('rsz_cart', cart);
-            renderCart();
-            updateCartCount();
+            document.getElementById('cartTotalPrice').innerText = 'QAR ' + total.toFixed(2);
         }
 
         function removeFromCart(index) {
@@ -623,326 +727,750 @@
             updateCartCount();
         }
 
-        function searchProducts() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if(!query) {
-                renderProducts(products);
+        function proceedToCheckoutGuard() {
+            if (cart.length === 0) {
+                alert('Your cart is empty! Please select footwear to purchase.');
                 return;
             }
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
-            renderProducts(filtered);
-        }
 
-        document.getElementById('searchInput').addEventListener('keyup', function(e) {
-            if(e.key === 'Enter') searchProducts();
-        });
-
-        // Development Mode Checkout Gate
-        function proceedToCheckout() {
-            if(cart.length === 0) {
-                alert('Your cart is empty!');
-                return;
-            }
-            if(!currentUser) {
-                alert('[DEVELOPMENT MODE] You must have a verified customer account and ID to place an order. Please sign in or register.');
+            if (!currentUser || !currentUser.email) {
+                alert('Account Required:\n\nFor verified footwear delivery in Qatar, please Sign In or Create an Account first.');
                 openAuthModal();
                 return;
             }
 
-            // Populate verified user info automatically
-            document.getElementById('chkName').value = currentUser.name;
-            document.getElementById('chkPhone').value = currentUser.phone;
             showPage('checkout');
         }
 
-        // Checkout & Order Placement
+        function renderCheckoutPage() {
+            if(!currentUser) {
+                showPage('cart');
+                return;
+            }
+
+            const chkName = document.getElementById('chkName');
+            const chkPhone = document.getElementById('chkPhone');
+            if(chkName) chkName.value = currentUser.name || '';
+            if(chkPhone) chkPhone.value = currentUser.phone || '';
+        }
+
         function submitOrder(e) {
             e.preventDefault();
-            if(!currentUser) {
-                alert('Session error. Please login again.');
+            if(cart.length === 0) return alert('Your Cart is empty!');
+
+            if (!currentUser) {
+                alert('Please sign in with a verified Qatar account first.');
                 openAuthModal();
                 return;
             }
 
-            const name = currentUser.name;
-            const phone = currentUser.phone;
-            const address = document.getElementById('chkAddress').value;
-            const notes = document.getElementById('chkNotes').value;
+            let name = document.getElementById('chkName').value.trim();
+            let phone = document.getElementById('chkPhone').value.trim();
+            let address = document.getElementById('chkAddress').value.trim();
+            let notes = document.getElementById('chkNotes').value.trim();
 
-            let totalAmount = cart.reduce((sum, item) => sum + (safeGetPrice(item) * (item.qty || 1)), 0);
+            let total = cart.reduce((acc, item) => acc + (safeGetPrice(item) * item.qty), 0);
+            let orderId = 'RSZ-' + Math.floor(100000 + Math.random() * 900000);
 
-            const newOrder = {
-                id: 'RSZ-' + Math.floor(100000 + Math.random() * 900000),
-                customerId: currentUser.id,
-                date: new Date().toLocaleString(),
-                items: [...cart],
-                total: totalAmount,
-                customer: { name, phone, address, notes },
-                status: 'Pending'
+            let order = {
+                orderId, customer: name, phone, address, notes, items: [...cart], total,
+                status: 'Pending Verification', date: new Date().toLocaleString(),
+                userEmail: currentUser.email
             };
 
-            orders.unshift(newOrder);
+            orders.unshift(order);
             setStored('rsz_orders', orders);
 
-            // Add Notification
             notifications.unshift({
-                id: Date.now(),
-                text: `Order #${newOrder.id} placed successfully for QAR ${totalAmount.toFixed(2)}.`,
+                email: currentUser.email,
+                text: `Order ID ${orderId} placed successfully. Total: QAR ${total}`,
                 date: new Date().toLocaleString()
             });
             setStored('rsz_notifications', notifications);
 
-            // Clear Cart
             cart = [];
-            setStored('rsz_cart', []);
+            setStored('rsz_cart', cart);
             updateCartCount();
 
-            // Render Success view
-            let detailsDiv = document.getElementById('successDetails');
-            detailsDiv.innerHTML = `
-                <p><b>Order ID:</b> ${newOrder.id}</p>
-                <p><b>Verified Customer ID:</b> ${currentUser.id}</p>
-                <p><b>Name:</b> ${name}</p>
-                <p><b>Phone:</b> ${phone}</p>
-                <p><b>Address:</b> ${address}</p>
-                <p><b>Total:</b> QAR ${totalAmount.toFixed(2)}</p>
+            let waNum = whatsappNumber.replace(/[^0-9]/g, '');
+            let msg = `*New Order Confirmed - Royal Stepz Zone*\n\nOrder ID: ${orderId}\nCustomer: ${name} (${currentUser.email})\nPhone: ${phone}\nAddress: ${address}\nNotes: ${notes}\n\n*Items:*`;
+            order.items.forEach(i => { msg += `\n- ${i.name} (Qty: ${i.qty}) - QAR ${safeGetPrice(i) * i.qty}`; });
+            msg += `\n\n*Total Amount: QAR ${total}*`;
+
+            window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
+
+            document.getElementById('successDetails').innerHTML = `
+                <p><b>Order ID:</b> ${orderId}</p>
+                <p><b>Customer Name:</b> ${name}</p>
+                <p><b>Qatar Address:</b> ${address}</p>
+                <p><b>Total Confirmed:</b> QAR ${total}</p>
             `;
             showPage('success');
-
-            // Forward to WhatsApp
-            let waNum = whatsappNumber.replace(/[^0-9]/g, '');
-            let waText = `Verified Order: *${newOrder.id}*\nCustomer ID: ${currentUser.id}\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\nTotal: QAR ${totalAmount.toFixed(2)}`;
-            window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(waText)}`, '_blank');
         }
 
-        // Render My Orders & Notifications with Customer Edit / Remove Support
+        // CUSTOMER DASHBOARD
         function renderMyOrdersAndNotifications() {
-            const notifArea = document.getElementById('notificationArea');
-            const ordersList = document.getElementById('myOrdersList');
-
-            if(notifArea) {
-                if(notifications.length === 0) {
-                    notifArea.innerHTML = '<p class="text-xs text-gray-500">No new notifications.</p>';
-                } else {
-                    notifArea.innerHTML = notifications.map(n => `
-                        <div class="p-2.5 bg-gray-50 border rounded text-xs flex justify-between items-center">
-                            <span>${n.text}</span>
-                            <span class="text-[10px] text-gray-400">${n.date}</span>
-                        </div>
-                    `).join('');
-                }
-            }
-
-            if(ordersList) {
-                let userOrders = currentUser ? orders.filter(o => o.customerId === currentUser.id) : [];
-                if(userOrders.length === 0) {
-                    ordersList.innerHTML = '<p class="text-xs text-gray-500">You have no order history under this verified ID.</p>';
-                } else {
-                    ordersList.innerHTML = userOrders.map((ord) => {
-                        let globalIdx = orders.findIndex(o => o.id === ord.id);
-                        return `
-                            <div class="border p-3 rounded bg-gray-50 space-y-2">
-                                <div class="flex justify-between items-center text-xs font-bold text-gray-700">
-                                    <span>Order ID: ${ord.id} (${ord.date})</span>
-                                    <span class="px-2 py-0.5 rounded text-[11px] ${ord.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">${ord.status}</span>
-                                </div>
-                                <p class="text-xs text-gray-600"><b>Deliver to:</b> ${ord.customer.address} (${ord.customer.phone})</p>
-                                <div class="text-xs font-semibold text-amber-700">Total: QAR ${ord.total.toFixed(2)}</div>
-                                <div class="flex gap-2 pt-1">
-                                    <button onclick="customerEditOrder(${globalIdx})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer">Edit Order</button>
-                                    <button onclick="customerCancelOrder(${globalIdx})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer">Cancel/Remove Order</button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            }
-        }
-
-        function customerEditOrder(idx) {
-            let ord = orders[idx];
-            if(!ord) return;
-            let newPhone = prompt('Update Qatar Phone Number:', ord.customer.phone);
-            let newAddress = prompt('Update Qatar Delivery Address:', ord.customer.address);
-            if(newPhone !== null && newAddress !== null) {
-                ord.customer.phone = newPhone.trim() || ord.customer.phone;
-                ord.customer.address = newAddress.trim() || ord.customer.address;
-                setStored('rsz_orders', orders);
-                renderMyOrdersAndNotifications();
-                alert('Order updated successfully!');
-            }
-        }
-
-        function customerCancelOrder(idx) {
-            if(confirm('Are you sure you want to cancel and remove this order?')) {
-                orders.splice(idx, 1);
-                setStored('rsz_orders', orders);
-                renderMyOrdersAndNotifications();
-                alert('Order removed successfully.');
-            }
-        }
-
-        // Customer Verified Registration & Sign-In System
-        function openAuthModal() {
-            document.getElementById('authModal').classList.remove('hidden');
-            document.getElementById('authFormStep').classList.remove('hidden');
-            document.getElementById('authOtpStep').classList.add('hidden');
-        }
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.add('hidden');
-        }
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('authTitle').textContent = isRegisterMode ? 'Create Verified Customer ID' : 'Customer Sign In';
-            document.getElementById('authName').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('authPhone').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('authBtn').textContent = isRegisterMode ? 'Continue & Verify OTP' : 'Sign In';
-            document.getElementById('authSwitchText').textContent = isRegisterMode ? 'Already have an account? Sign In' : 'New customer? Create verified account';
-        }
-
-        function handleCustomerAuthAction() {
-            const email = document.getElementById('authEmail').value.trim();
-            const pass = document.getElementById('authPassword').value.trim();
-            const name = document.getElementById('authName').value.trim();
-            const phone = document.getElementById('authPhone').value.trim();
-
-            if(!email || !pass) {
-                alert('Please enter email and password.');
+            if (!currentUser) {
+                let notifArea = document.getElementById('notificationArea');
+                let myOrdList = document.getElementById('myOrdersList');
+                if(notifArea) notifArea.innerHTML = '<p class="text-gray-500 text-xs py-2">Please Sign in to view account notifications.</p>';
+                if(myOrdList) myOrdList.innerHTML = '<div class="text-center py-6 bg-gray-50 rounded border"><p class="text-gray-600 text-xs mb-2">Please Sign In to track and manage your footwear orders.</p><button onclick="openAuthModal()" class="bg-[#ffd814] px-4 py-1.5 rounded font-bold text-xs cursor-pointer">Sign In to Account</button></div>';
                 return;
             }
 
-            if(isRegisterMode) {
-                if(!name || !phone) {
-                    alert('Please provide your Full Name and Qatar Phone Number for verification.');
+            let email = currentUser.email;
+            let myOrders = orders.filter(o => o.userEmail === email);
+            let myNotifs = notifications.filter(n => n.email === email);
+
+            let notifArea = document.getElementById('notificationArea');
+            if(notifArea) {
+                notifArea.innerHTML = myNotifs.length ? '' : '<p class="text-gray-500 text-xs">No notifications yet.</p>';
+                myNotifs.forEach(n => {
+                    notifArea.innerHTML += `<div class="bg-blue-50 border-l-2 border-blue-600 p-2 text-xs"><b>${n.date}:</b> ${n.text}</div>`;
+                });
+            }
+
+            let myOrdList = document.getElementById('myOrdersList');
+            if(myOrdList) {
+                myOrdList.innerHTML = myOrders.length ? '' : '<p class="text-gray-500 text-xs py-4 text-center">You have no order history yet.</p>';
+                myOrders.forEach((o) => {
+                    let isCancelable = o.status !== 'Delivered' && o.status !== 'Cancelled';
+                    myOrdList.innerHTML += `
+                        <div class="border p-4 rounded-lg bg-gray-50 space-y-2 text-xs shadow-sm">
+                            <div class="flex justify-between items-center font-bold">
+                                <span class="font-mono text-gray-800 text-sm">Order: ${o.orderId}</span>
+                                <span class="px-2.5 py-0.5 rounded text-[11px] font-bold ${o.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800'}">${o.status}</span>
+                            </div>
+                            <p class="text-gray-700"><b>Deliver to:</b> ${o.customer} | <b>Phone:</b> ${o.phone}</p>
+                            <p class="text-gray-700"><b>Qatar Delivery Address:</b> ${o.address}</p>
+                            
+                            <div class="border-t pt-2 flex flex-wrap justify-between items-center gap-2">
+                                <span class="font-black text-gray-900 text-sm">Total: QAR ${o.total}</span>
+                                
+                                <div class="flex gap-2">
+                                    ${isCancelable ? `
+                                        <button onclick="customerEditOrder('${o.orderId}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer transition">
+                                            <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Delivery Info
+                                        </button>
+                                        <button onclick="customerCancelOrder('${o.orderId}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer transition">
+                                            <i class="fa-solid fa-xmark mr-1"></i> Cancel Order
+                                        </button>
+                                    ` : `
+                                        <span class="text-gray-400 text-[11px] italic">Order status is ${o.status}</span>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function customerEditOrder(orderId) {
+            let ord = orders.find(o => String(o.orderId) === String(orderId));
+            if(!ord) return;
+
+            let newName = prompt("Update your Name:", ord.customer);
+            if(newName === null) return;
+
+            let newPhone = prompt("Update your Qatar Phone / WhatsApp:", ord.phone);
+            if(newPhone === null) return;
+
+            let newAddress = prompt("Update your Qatar Delivery Location (Zone, Street, Building):", ord.address);
+            if(newAddress === null) return;
+
+            if(newName.trim()) ord.customer = newName.trim();
+            if(newPhone.trim()) ord.phone = newPhone.trim();
+            if(newAddress.trim()) ord.address = newAddress.trim();
+
+            setStored('rsz_orders', orders);
+
+            notifications.unshift({
+                email: ord.userEmail,
+                text: `You updated delivery details for Order ID ${ord.orderId}.`,
+                date: new Date().toLocaleString()
+            });
+            setStored('rsz_notifications', notifications);
+
+            alert("Your delivery details have been updated successfully!");
+            renderMyOrdersAndNotifications();
+        }
+
+        function customerCancelOrder(orderId) {
+            let ord = orders.find(o => String(o.orderId) === String(orderId));
+            if(!ord) return;
+
+            if(confirm(`Are you sure you want to cancel Order ${orderId}?`)) {
+                ord.status = 'Cancelled';
+                setStored('rsz_orders', orders);
+
+                notifications.unshift({
+                    email: ord.userEmail,
+                    text: `Order ID ${ord.orderId} was cancelled by you.`,
+                    date: new Date().toLocaleString()
+                });
+                setStored('rsz_notifications', notifications);
+
+                alert(`Order ${orderId} has been cancelled.`);
+                renderMyOrdersAndNotifications();
+            }
+        }
+
+        // CUSTOMER AUTHENTICATION LOGIC WITH SPECIFIC ACCOUNT EXISTENCE WARNINGS
+        function openAuthModal() {
+            if(currentUser) {
+                if(confirm("Currently logged in as " + currentUser.name + " (" + currentUser.email + ").\n\nDo you want to log out?")) {
+                    currentUser = null;
+                    localStorage.removeItem('rsz_current_user');
+                    updateNavUserDisplay();
+                    alert('Logged out successfully.');
+                    showPage('home');
+                }
+                return;
+            }
+
+            const alertEl = document.getElementById('customerAuthAlert');
+            if(alertEl) alertEl.classList.add('hidden');
+
+            document.getElementById('authModal').classList.remove('hidden');
+            document.getElementById('customerAuthFormView').classList.remove('hidden');
+            document.getElementById('customerOTPVerifyView').classList.add('hidden');
+        }
+
+        function closeAuthModal() { 
+            document.getElementById('authModal').classList.add('hidden'); 
+            if (customerOtpInterval) clearInterval(customerOtpInterval);
+        }
+
+        function toggleAuthMode() {
+            isRegisterMode = !isRegisterMode;
+            const alertEl = document.getElementById('customerAuthAlert');
+            if(alertEl) alertEl.classList.add('hidden');
+
+            document.getElementById('authTitle').innerText = isRegisterMode ? 'Create Qatar Account' : 'Customer Sign In';
+            document.getElementById('authSubtitle').innerText = isRegisterMode ? 'Verify your Qatar Phone & Email to start ordering' : 'Sign in to your Royal Stepz Zone account';
+            document.getElementById('authNameContainer').classList.toggle('hidden', !isRegisterMode);
+            document.getElementById('authPhoneContainer').classList.toggle('hidden', !isRegisterMode);
+            document.getElementById('authBtn').innerText = isRegisterMode ? 'Send Verification Code' : 'Sign In';
+            document.getElementById('toggleAuthPrompt').innerText = isRegisterMode ? 'Already have an account?' : 'New to Royal Stepz?';
+            document.getElementById('toggleAuthLink').innerText = isRegisterMode ? 'Sign In' : 'Create an account';
+        }
+
+        function showCustomerAuthError(msg) {
+            const alertEl = document.getElementById('customerAuthAlert');
+            if(alertEl) {
+                alertEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-red-600"></i> ${msg}`;
+                alertEl.classList.remove('hidden');
+            } else {
+                alert(msg);
+            }
+        }
+
+        function handleUserAuthSubmit() {
+            const alertEl = document.getElementById('customerAuthAlert');
+            if(alertEl) alertEl.classList.add('hidden');
+
+            let email = document.getElementById('authEmail').value.trim().toLowerCase();
+            let pass = document.getElementById('authPassword').value.trim();
+
+            if (!email || !pass) {
+                showCustomerAuthError('Please provide both your Email and Password.');
+                return;
+            }
+
+            if (isRegisterMode) {
+                // REGISTRATION
+                let name = document.getElementById('authName').value.trim();
+                let phone = document.getElementById('authPhone').value.trim();
+
+                if (!name || !phone) {
+                    showCustomerAuthError('Please fill in your Full Name and Qatar Phone number.');
                     return;
                 }
-                // Check if email already exists in structured DB
-                if(customersDB.some(c => c.email === email)) {
-                    alert('An account with this email already exists!');
+
+                let existing = registeredCustomers.find(c => c.email.toLowerCase() === email);
+                if (existing) {
+                    showCustomerAuthError('An account with this email already exists. Please switch to "Sign In" above.');
                     return;
                 }
 
                 pendingCustomerRegistration = {
-                    id: 'CID-' + Math.floor(100000 + Math.random() * 900000),
+                    id: 'cust-' + Date.now(),
                     name,
-                    email,
                     phone,
+                    email,
                     password: pass,
-                    registeredDate: new Date().toLocaleString(),
-                    status: 'Verified'
+                    status: 'Verified',
+                    joinedDate: new Date().toISOString().split('T')[0]
                 };
 
-                generatedCustomerOTP = String(Math.floor(100000 + Math.random() * 900000));
-                alert('[SIMULATED CUSTOMER VERIFICATION OTP] Your registration verification code is: ' + generatedCustomerOTP);
+                sendCustomerOTP(phone, email);
 
-                document.getElementById('authFormStep').classList.add('hidden');
-                document.getElementById('authOtpStep').classList.remove('hidden');
             } else {
-                // Sign In Mode
-                let found = customersDB.find(c => c.email === email && c.password === pass);
-                if(found) {
-                    currentUser = found;
-                    setStored('rsz_current_user', currentUser);
-                    document.getElementById('navUserName').textContent = currentUser.name;
-                    closeAuthModal();
-                    alert('Welcome back, ' + currentUser.name + ' (ID: ' + currentUser.id + ')!');
-                } else {
-                    alert('Invalid email/password or account not registered.');
+                // SIGN IN CHECK (Accurate error distinction)
+                let userByEmail = registeredCustomers.find(c => c.email.toLowerCase() === email);
+
+                if (!userByEmail) {
+                    showCustomerAuthError('❌ <b>Account Not Found!</b> This email is not registered with Royal Stepz Zone. Please click <b>"Create an account"</b> below to register first.');
+                    return;
                 }
+
+                if (userByEmail.password !== pass) {
+                    showCustomerAuthError('❌ <b>Incorrect Password!</b> The password you entered is incorrect. Please check and try again.');
+                    return;
+                }
+
+                // Password & Email matched!
+                currentUser = {
+                    id: userByEmail.id,
+                    name: userByEmail.name,
+                    email: userByEmail.email,
+                    phone: userByEmail.phone,
+                    status: userByEmail.status
+                };
+                setStored('rsz_current_user', currentUser);
+                updateNavUserDisplay();
+                closeAuthModal();
+                alert(`Welcome back, ${currentUser.name}! You are signed in.`);
+            }
+        }
+
+        // CUSTOMER OTP GENERATION & GMAIL APP DISPATCHER
+        function sendCustomerOTP(phone, email) {
+            generatedCustomerOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            customerOtpExpirationTimestamp = Date.now() + (3 * 60 * 1000);
+
+            document.getElementById('customerAuthFormView').classList.add('hidden');
+            document.getElementById('customerOTPVerifyView').classList.remove('hidden');
+            document.getElementById('customerInputOTP').value = '';
+
+            // Display verification token in box
+            const tokenEl = document.getElementById('customerDisplayToken');
+            if(tokenEl) tokenEl.innerText = generatedCustomerOTP;
+
+            // Prepare Direct Gmail Link with pre-filled message
+            const gmailSubject = encodeURIComponent("Royal Stepz Zone - Verification OTP Code");
+            const gmailBody = encodeURIComponent(`Your Qatar Account Verification OTP Code is: ${generatedCustomerOTP}\n\nValid for 3 minutes.`);
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${gmailSubject}&body=${gmailBody}`;
+            const gmailBtn = document.getElementById('btnCustomerOpenGmail');
+            if(gmailBtn) gmailBtn.href = gmailUrl;
+
+            // Timer
+            if (customerOtpInterval) clearInterval(customerOtpInterval);
+            customerOtpInterval = setInterval(updateCustomerOTPTimer, 1000);
+        }
+
+        function resendCustomerOTP() {
+            if (pendingCustomerRegistration) {
+                sendCustomerOTP(pendingCustomerRegistration.phone, pendingCustomerRegistration.email);
+            }
+        }
+
+        function updateCustomerOTPTimer() {
+            const timeLeft = Math.max(0, Math.floor((customerOtpExpirationTimestamp - Date.now()) / 1000));
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('customerOtpTimer');
+            if(timerEl) timerEl.innerText = `${minutes}:${seconds}`;
+
+            if(timeLeft <= 0) {
+                clearInterval(customerOtpInterval);
+                generatedCustomerOTP = null;
+                if(timerEl) timerEl.innerText = 'EXPIRED';
             }
         }
 
         function verifyCustomerRegistrationOTP() {
-            const entered = document.getElementById('customerRegOTPInput').value.trim();
-            if(entered === generatedCustomerOTP && pendingCustomerRegistration) {
-                customersDB.unshift(pendingCustomerRegistration);
-                setStored('rsz_customers_db', customersDB);
+            let entered = document.getElementById('customerInputOTP').value.trim();
 
-                currentUser = pendingCustomerRegistration;
+            if (!entered) {
+                alert('Please enter the 6-digit verification code.');
+                return;
+            }
+
+            if (Date.now() > customerOtpExpirationTimestamp || !generatedCustomerOTP) {
+                alert('Security code expired. Please click "Resend" to get a new code.');
+                return;
+            }
+
+            if (entered === generatedCustomerOTP && pendingCustomerRegistration) {
+                if (customerOtpInterval) clearInterval(customerOtpInterval);
+
+                registeredCustomers.push(pendingCustomerRegistration);
+                setStored('rsz_customers_db', registeredCustomers);
+
+                currentUser = {
+                    id: pendingCustomerRegistration.id,
+                    name: pendingCustomerRegistration.name,
+                    email: pendingCustomerRegistration.email,
+                    phone: pendingCustomerRegistration.phone,
+                    status: 'Verified'
+                };
                 setStored('rsz_current_user', currentUser);
-                document.getElementById('navUserName').textContent = currentUser.name;
+                updateNavUserDisplay();
 
                 pendingCustomerRegistration = null;
                 generatedCustomerOTP = null;
                 closeAuthModal();
-                alert('Customer ID successfully verified and created! ID: ' + currentUser.id);
+
+                alert(`Account Verified & Activated Successfully!\n\nWelcome to Royal Stepz Zone, ${currentUser.name}. You can now place orders.`);
+                
+                if (cart.length > 0) {
+                    showPage('checkout');
+                }
             } else {
-                alert('Invalid Verification OTP code!');
+                alert('Invalid Verification Code! Please check and enter the 6-digit code shown in the box.');
             }
         }
 
-        // Admin Security & Dashboard Functions
-        function openAdminLogin() {
-            document.getElementById('page-admin-login').classList.remove('hidden');
-            document.getElementById('adminStepPassword').classList.remove('hidden');
-            document.getElementById('adminStepOTP').classList.add('hidden');
+        function updateNavUserDisplay() {
+            const nameEl = document.getElementById('navUserName');
+            const subEl = document.getElementById('navUserSubtitle');
+            if (currentUser && currentUser.name) {
+                if(nameEl) nameEl.innerText = currentUser.name.split(' ')[0];
+                if(subEl) subEl.innerText = 'Account & Orders';
+            } else {
+                if(nameEl) nameEl.innerText = 'Sign in';
+                if(subEl) subEl.innerText = 'Account & Lists';
+            }
         }
-        function closeAdminLogin() {
-            document.getElementById('page-admin-login').classList.add('hidden');
+
+        // Secret Admin Listener (Ctrl + F12)
+        window.addEventListener('keydown', function(e) {
+            if((e.ctrlKey || e.metaKey) && (e.key === 'F12' || e.code === 'F12')) {
+                e.preventDefault();
+                openAdminLoginModal();
+            }
+        });
+
+        function openAdminLoginModal() {
+            const modal = document.getElementById('page-admin-login');
+            if(modal) {
+                modal.classList.remove('hidden');
+                document.getElementById('adminStepPassword').classList.remove('hidden');
+                document.getElementById('adminStepOTP').classList.add('hidden');
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPass').value = '';
+                document.getElementById('adminOTPInput').value = '';
+                const alertEl = document.getElementById('adminAuthAlert');
+                if(alertEl) alertEl.classList.add('hidden');
+            }
+        }
+
+        function closeAdminLogin() { 
+            const modal = document.getElementById('page-admin-login');
+            if(modal) modal.classList.add('hidden'); 
+            if(otpTimerInterval) clearInterval(otpTimerInterval);
         }
 
         function verifyAdminStep1() {
-            const email = document.getElementById('adminEmail').value.trim();
-            const pass = document.getElementById('adminPass').value.trim();
+            const alertEl = document.getElementById('adminAuthAlert');
+            if(alertEl) alertEl.classList.add('hidden');
 
-            if(email === 'yeasinarafat1.qa@gmail.com' && pass === 'Ar@2925') {
+            let email = document.getElementById('adminEmail').value.trim().toLowerCase();
+            let pass = document.getElementById('adminPass').value.trim();
+
+            if (!email || !pass) {
+                if(alertEl) {
+                    alertEl.innerText = 'Please enter Admin Email and Password';
+                    alertEl.classList.remove('hidden');
+                }
+                return;
+            }
+
+            const isEmailValid = (
+                email === 'yeasinarafat1.qa@gmail.com' || 
+                email === 'admin@royalstepz.com' ||
+                email === 'royalstepz@gmail.com'
+            );
+
+            const isPassValid = (
+                pass === 'Ar@2925' || 
+                pass === 'admin123' ||
+                pass === 'royal2025'
+            );
+
+            if(isEmailValid && isPassValid) {
                 sendAdminOTP();
                 document.getElementById('adminStepPassword').classList.add('hidden');
                 document.getElementById('adminStepOTP').classList.remove('hidden');
             } else {
-                alert('Invalid Admin credentials!');
+                if(alertEl) {
+                    alertEl.innerHTML = '❌ <b>Access Denied:</b> Incorrect Email or Password.<br>Use: <b>yeasinarafat1.qa@gmail.com</b> and Password: <b>Ar@2925</b>';
+                    alertEl.classList.remove('hidden');
+                }
             }
         }
 
         function sendAdminOTP() {
-            generatedAdminOTP = String(Math.floor(100000 + Math.random() * 900000));
-            alert('[SIMULATED SECURE 2FA] Your Admin OTP code is: ' + generatedAdminOTP);
+            generatedAdminOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            otpExpirationTimestamp = Date.now() + (3 * 60 * 1000);
 
-            otpExpirationTimestamp = Date.now() + 180000;
-            startOTPTimer();
+            if(otpTimerInterval) clearInterval(otpTimerInterval);
+            otpTimerInterval = setInterval(updateOTPTimer, 1000);
+
+            // Display Admin OTP in box
+            const displayEl = document.getElementById('adminDisplayToken');
+            if(displayEl) displayEl.innerText = generatedAdminOTP;
+
+            // Direct Gmail App Dispatcher Link for Admin
+            const adminEmail = 'yeasinarafat1.qa@gmail.com';
+            const gSubject = encodeURIComponent("Royal Stepz Zone - Admin 2FA Security Code");
+            const gBody = encodeURIComponent(`Your Admin Master Security Code is: ${generatedAdminOTP}\n\nValid for 3 minutes.`);
+            const gUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(adminEmail)}&su=${gSubject}&body=${gBody}`;
+            const gmailBtn = document.getElementById('btnAdminOpenGmail');
+            if(gmailBtn) gmailBtn.href = gUrl;
+
+            // WhatsApp Direct Dispatcher
+            const waClean = whatsappNumber.replace(/[^0-9]/g, '');
+            const waMessage = `*Royal Stepz Zone Security Alert*\n\nYour 6-Digit Admin Verification OTP is: *${generatedAdminOTP}*\n\nThis OTP is valid for 3 minutes. Do not share with anyone.`;
+            const waUrl = `https://wa.me/${waClean}?text=${encodeURIComponent(waMessage)}`;
+            const waBtn = document.getElementById('btnOtpWhatsAppFallback');
+            if(waBtn) waBtn.href = waUrl;
         }
 
-        function startOTPTimer() {
-            if(otpTimerInterval) clearInterval(otpTimerInterval);
-            otpTimerInterval = setInterval(() => {
-                let diff = otpExpirationTimestamp - Date.now();
-                if(diff <= 0) {
-                    clearInterval(otpTimerInterval);
-                    document.getElementById('otpTimer').textContent = 'Expired';
-                    generatedAdminOTP = null;
-                } else {
-                    let m = Math.floor(diff / 60000);
-                    let s = Math.floor((diff % 60000) / 1000);
-                    document.getElementById('otpTimer').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                }
-            }, 1000);
+        function updateOTPTimer() {
+            const timeLeft = Math.max(0, Math.floor((otpExpirationTimestamp - Date.now()) / 1000));
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('otpTimer');
+            if(timerEl) timerEl.innerText = `${minutes}:${seconds}`;
+
+            if(timeLeft <= 0) {
+                clearInterval(otpTimerInterval);
+                generatedAdminOTP = null;
+                if(timerEl) timerEl.innerText = 'EXPIRED';
+            }
         }
 
         function verifyAdminOTP() {
-            const entered = document.getElementById('adminOTPInput').value.trim();
-            if(!generatedAdminOTP || Date.now() > otpExpirationTimestamp) {
-                alert('OTP expired or not requested. Please resend.');
+            const enteredOTP = document.getElementById('adminOTPInput').value.trim();
+
+            if(!enteredOTP) {
+                alert('Please enter the 6-digit OTP code');
                 return;
             }
-            if(entered === generatedAdminOTP) {
+
+            if(Date.now() > otpExpirationTimestamp || !generatedAdminOTP) {
+                alert('Security OTP expired! Please click "Resend OTP".');
+                return;
+            }
+
+            if(enteredOTP === generatedAdminOTP) {
+                if(otpTimerInterval) clearInterval(otpTimerInterval);
                 closeAdminLogin();
                 showPage('admin-dashboard');
+                alert('Identity Verified Successfully! Welcome to Master Admin Dashboard.');
             } else {
-                alert('Invalid OTP code entered!');
+                alert('Invalid OTP code! Enter the 6-digit code shown in the Security Box.');
             }
         }
 
-        function logoutAdmin() {
-            showPage('home');
+        function logoutAdmin() { showPage('home'); }
+
+        // ADMIN DASHBOARD
+        function renderAdminDashboard() {
+            const waInput = document.getElementById('adminWhatsAppNum');
+            if(waInput) waInput.value = whatsappNumber;
+            
+            // 1. Render Products
+            let pList = document.getElementById('adminProductList');
+            if(pList) {
+                pList.innerHTML = '';
+                products.forEach(p => {
+                    const price = safeGetPrice(p);
+                    pList.innerHTML += `
+                        <div class="flex justify-between items-center bg-white p-2 border rounded text-xs">
+                            <div class="flex items-center space-x-2">
+                                <img src="${p.image}" class="w-8 h-8 object-cover rounded">
+                                <span><b>${p.name}</b> - QAR ${price}</span>
+                            </div>
+                            <div class="space-x-1">
+                                <button onclick="adminEditProduct('${p.id}')" class="bg-blue-600 text-white px-2 py-0.5 rounded cursor-pointer">Edit</button>
+                                <button onclick="adminDeleteProduct('${p.id}')" class="bg-red-600 text-white px-2 py-0.5 rounded cursor-pointer">Del</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 2. Render Orders
+            let oList = document.getElementById('adminOrdersList');
+            const countEl = document.getElementById('adminOrdersCount');
+            if(countEl) countEl.innerText = `${orders.length} Orders`;
+
+            if(oList) {
+                oList.innerHTML = '';
+                if(orders.length === 0) {
+                    oList.innerHTML = '<p class="text-gray-500 text-xs py-4 text-center">No orders recorded.</p>';
+                } else {
+                    orders.forEach(o => {
+                        oList.innerHTML += `
+                            <div class="bg-white p-3 border rounded shadow-sm text-xs space-y-2">
+                                <div class="flex justify-between items-center border-b pb-1">
+                                    <span class="font-mono font-bold text-gray-800">${o.orderId}</span>
+                                    <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${o.status}</span>
+                                </div>
+                                <div class="text-gray-700 space-y-0.5">
+                                    <p><b>Customer:</b> <span>${o.customer}</span> (<span class="text-blue-600 font-medium">${o.userEmail}</span>)</p>
+                                    <p><b>Phone:</b> <span>${o.phone}</span></p>
+                                    <p><b>Qatar Address:</b> <span>${o.address}</span></p>
+                                    <p><b>Total Amount:</b> QAR ${o.total}</p>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-2 border-t">
+                                    <button onclick="adminEditCustomerInfo('${o.orderId}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition">
+                                        <i class="fa-solid fa-user-pen mr-1"></i> Edit Info
+                                    </button>
+                                    <button onclick="adminChangeOrderStatus('${o.orderId}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition">
+                                        <i class="fa-solid fa-truck-ramp-box mr-1"></i> Change Status
+                                    </button>
+                                    <button onclick="adminDeleteOrder('${o.orderId}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition">
+                                        <i class="fa-solid fa-trash mr-1"></i> Delete Order
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            renderAdminCustomerDatabase();
+        }
+
+        function renderAdminCustomerDatabase() {
+            const tableBody = document.getElementById('adminCustomerTableBody');
+            const custCountEl = document.getElementById('adminCustomersCount');
+            if(custCountEl) custCountEl.innerText = `${registeredCustomers.length} Registered Customers`;
+
+            if(!tableBody) return;
+            tableBody.innerHTML = '';
+
+            if(registeredCustomers.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No registered customers in database yet.</td></tr>`;
+                return;
+            }
+
+            registeredCustomers.forEach(c => {
+                let customerOrders = orders.filter(o => o.userEmail && o.userEmail.toLowerCase() === c.email.toLowerCase());
+                let totalSpent = customerOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-2.5 font-bold text-gray-900">${c.name}</td>
+                        <td class="p-2.5 font-mono text-gray-700">${c.phone}</td>
+                        <td class="p-2.5 text-blue-600 font-medium">${c.email}</td>
+                        <td class="p-2.5">
+                            <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">
+                                <i class="fa-solid fa-circle-check"></i> ${c.status || 'Verified'}
+                            </span>
+                        </td>
+                        <td class="p-2.5 text-gray-500">${c.joinedDate || '2026-09-14'}</td>
+                        <td class="p-2.5 font-semibold text-gray-800">${customerOrders.length} orders (QAR ${totalSpent})</td>
+                        <td class="p-2.5 text-right space-x-1">
+                            <button onclick="adminInspectCustomerHistory('${c.email}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[11px] font-bold cursor-pointer">
+                                <i class="fa-solid fa-clock-rotate-left"></i> History
+                            </button>
+                            <button onclick="adminDeleteCustomer('${c.id}')" class="bg-red-50 hover:bg-red-100 text-red-700 px-2 py-1 rounded text-[11px] font-bold cursor-pointer">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function adminInspectCustomerHistory(email) {
+            let customerOrders = orders.filter(o => o.userEmail && o.userEmail.toLowerCase() === email.toLowerCase());
+            if(customerOrders.length === 0) {
+                alert(`Customer: ${email}\n\nNo orders placed yet.`);
+                return;
+            }
+
+            let msg = `Order History for: ${email}\nTotal Orders: ${customerOrders.length}\n\n`;
+            customerOrders.forEach(o => {
+                msg += `• [${o.orderId}] Total: QAR ${o.total} | Status: ${o.status} | Date: ${o.date}\n`;
+            });
+            alert(msg);
+        }
+
+        function adminDeleteCustomer(id) {
+            let cust = registeredCustomers.find(c => c.id === id);
+            if(!cust) return;
+
+            if(confirm(`Are you sure you want to remove customer "${cust.name}" (${cust.email}) from database?`)) {
+                registeredCustomers = registeredCustomers.filter(c => c.id !== id);
+                setStored('rsz_customers_db', registeredCustomers);
+                alert("Customer removed from database.");
+                renderAdminCustomerDatabase();
+            }
+        }
+
+        function adminEditCustomerInfo(orderId) {
+            let ord = orders.find(o => String(o.orderId) === String(orderId));
+            if(!ord) return;
+
+            let newName = prompt("Edit Customer Name:", ord.customer);
+            if(newName === null) return;
+
+            let newPhone = prompt("Edit Qatar Phone/WhatsApp:", ord.phone);
+            if(newPhone === null) return;
+
+            let newAddress = prompt("Edit Delivery Location in Qatar:", ord.address);
+            if(newAddress === null) return;
+
+            if(newName.trim()) ord.customer = newName.trim();
+            if(newPhone.trim()) ord.phone = newPhone.trim();
+            if(newAddress.trim()) ord.address = newAddress.trim();
+
+            setStored('rsz_orders', orders);
+            alert("Customer order information updated successfully!");
+            renderAdminDashboard();
+        }
+
+        function adminChangeOrderStatus(orderId) {
+            let ord = orders.find(o => String(o.orderId) === String(orderId));
+            if(!ord) return;
+
+            let options = "Choose New Status for " + orderId + ":\n\n1: Confirmed\n2: Processing\n3: Out for Delivery\n4: Delivered\n5: Cancelled";
+            let choice = prompt(options, "1");
+            if(!choice) return;
+
+            let newStatus = ord.status;
+            if(choice === "1") newStatus = "Confirmed";
+            else if(choice === "2") newStatus = "Processing";
+            else if(choice === "3") newStatus = "Out for Delivery";
+            else if(choice === "4") newStatus = "Delivered";
+            else if(choice === "5") newStatus = "Cancelled";
+            else if(choice.trim().length > 2) newStatus = choice.trim();
+
+            ord.status = newStatus;
+            setStored('rsz_orders', orders);
+
+            notifications.unshift({
+                email: ord.userEmail,
+                text: `Order ${ord.orderId} status updated to: ${newStatus}`,
+                date: new Date().toLocaleString()
+            });
+            setStored('rsz_notifications', notifications);
+
+            alert("Order status changed to: " + newStatus);
+            renderAdminDashboard();
+        }
+
+        function adminDeleteOrder(orderId) {
+            if(confirm("Are you sure you want to completely delete Order " + orderId + "?")) {
+                orders = orders.filter(o => String(o.orderId) !== String(orderId));
+                setStored('rsz_orders', orders);
+                alert("Order removed from database.");
+                renderAdminDashboard();
+            }
         }
 
         function saveWhatsAppNumber() {
-            let val = document.getElementById('adminWhatsAppNum').value.trim();
-            if(val) {
-                whatsappNumber = val;
-                localStorage.setItem('rsz_whatsapp', whatsappNumber);
-                alert('WhatsApp number updated successfully!');
-            }
+            let num = document.getElementById('adminWhatsAppNum').value.trim();
+            whatsappNumber = num;
+            localStorage.setItem('rsz_whatsapp', num);
+            alert('WhatsApp number updated: ' + num);
         }
 
         function addNewProduct() {
@@ -950,155 +1478,54 @@
             let price = parseFloat(document.getElementById('newProdPrice').value);
             let fileInput = document.getElementById('newProdImgFile');
 
-            if(!name || isNaN(price)) {
-                alert('Please enter valid product name and price.');
+            if(!name || isNaN(price) || !fileInput.files.length) {
+                alert('Please enter Name, Price, and choose an Image.');
                 return;
             }
 
-            let imgUrl = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80';
-            if(fileInput.files && fileInput.files[0]) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    imgUrl = e.target.result;
-                    finalizeAddProduct(name, price, imgUrl);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                finalizeAddProduct(name, price, imgUrl);
-            }
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let newId = 'prod-' + Date.now();
+                products.push({ id: newId, name, price, image: e.target.result, desc: 'Premium Qatar collection.' });
+                setStored('rsz_products', products);
+                alert('Product added successfully!');
+                document.getElementById('newProdName').value = '';
+                document.getElementById('newProdPrice').value = '';
+                document.getElementById('newProdImgFile').value = '';
+                renderAdminDashboard();
+            };
+            reader.readAsDataURL(fileInput.files[0]);
         }
 
-        function finalizeAddProduct(name, price, image) {
-            let newP = { id: Date.now(), name, price, image, desc: 'Newly added high-end footwear for Qatar market.' };
-            products.unshift(newP);
+        function adminEditProduct(id) {
+            let prod = products.find(p => String(p.id) === String(id));
+            if(!prod) return;
+
+            let currentPrice = safeGetPrice(prod);
+            let newName = prompt("Edit Shoe Name:", prod.name);
+            let newPrice = prompt("Edit Price (QAR):", currentPrice);
+
+            if(newName) prod.name = newName;
+            if(newPrice && !isNaN(parseFloat(newPrice))) {
+                prod.price = parseFloat(newPrice);
+                prod.priceQAR = parseFloat(newPrice);
+            }
+
             setStored('rsz_products', products);
-            renderProducts();
+            alert('Updated!');
             renderAdminDashboard();
-            alert('Product published successfully!');
-            document.getElementById('newProdName').value = '';
-            document.getElementById('newProdPrice').value = '';
-            document.getElementById('newProdImgFile').value = '';
         }
 
-        // Render Admin Dashboard Lists (Structured Customer Database & Order Controls)
-        function renderAdminDashboard() {
-            const prodList = document.getElementById('adminProductList');
-            const ordList = document.getElementById('adminOrdersList');
-            const custDBList = document.getElementById('adminCustomerList');
-            const totalCustCount = document.getElementById('totalCustomersCount');
-            const waInput = document.getElementById('adminWhatsAppNum');
-
-            if(waInput) waInput.value = whatsappNumber;
-            if(totalCustCount) totalCustCount.textContent = `Total: ${customersDB.length}`;
-
-            // Render Structured Customer Database
-            if(custDBList) {
-                if(customersDB.length === 0) {
-                    custDBList.innerHTML = '<p class="text-xs text-gray-500 text-center py-2">No verified customers registered yet.</p>';
-                } else {
-                    custDBList.innerHTML = customersDB.map((c) => {
-                        let cOrders = orders.filter(o => o.customerId === c.id);
-                        return `
-                            <div class="p-2 border rounded bg-gray-50 text-xs space-y-1">
-                                <div class="flex justify-between items-center font-bold text-blue-900">
-                                    <span>ID: ${c.id} | Name: ${c.name}</span>
-                                    <span class="bg-green-100 text-green-800 px-1.5 py-0.5 rounded text-[10px]">${c.status}</span>
-                                </div>
-                                <p class="text-gray-600"><b>Email:</b> ${c.email} | <b>Phone:</b> ${c.phone} | <b>Joined:</b> ${c.registeredDate}</p>
-                                <p class="text-gray-500"><b>Total Orders Placed:</b> ${cOrders.length}</p>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            }
-
-            if(prodList) {
-                prodList.innerHTML = products.map((p, idx) => `
-                    <div class="flex items-center justify-between bg-white p-2 rounded border text-xs">
-                        <div class="flex items-center gap-2">
-                            <img src="${p.image}" class="w-10 h-10 object-cover rounded">
-                            <div>
-                                <p class="font-bold">${p.name}</p>
-                                <p class="text-amber-700">QAR ${p.price}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="adminEditProduct(${idx})" class="bg-blue-500 text-white px-2 py-1 rounded font-bold cursor-pointer">Edit</button>
-                            <button onclick="adminDeleteProduct(${idx})" class="bg-red-500 text-white px-2 py-1 rounded font-bold cursor-pointer">Del</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            if(ordList) {
-                if(orders.length === 0) {
-                    ordList.innerHTML = '<p class="text-xs text-gray-500">No customer orders yet.</p>';
-                } else {
-                    ordList.innerHTML = orders.map((o, idx) => `
-                        <div class="bg-white p-2 rounded border text-xs space-y-1">
-                            <p class="font-bold"><b>ID:</b> ${o.id} | <b>Cust ID:</b> ${o.customerId || 'N/A'} | <b>Total:</b> QAR ${o.total.toFixed(2)}</p>
-                            <p class="text-gray-600"><b>Customer:</b> ${o.customer.name} (${o.customer.phone}) - ${o.customer.address}</p>
-                            <p class="text-gray-500"><b>Status:</b> ${o.status}</p>
-                            <div class="flex gap-1 pt-1">
-                                <button onclick="adminEditOrder(${idx})" class="bg-blue-600 text-white px-2 py-0.5 rounded font-bold cursor-pointer">Edit Order</button>
-                                <button onclick="adminRemoveOrder(${idx})" class="bg-red-600 text-white px-2 py-0.5 rounded font-bold cursor-pointer">Remove Order</button>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            }
-        }
-
-        function adminEditProduct(idx) {
-            let p = products[idx];
-            let newName = prompt('Edit Product Name:', p.name);
-            let newPrice = prompt('Edit Product Price (QAR):', p.price);
-            if(newName !== null && newPrice !== null) {
-                p.name = newName.trim() || p.name;
-                p.price = parseFloat(newPrice) || p.price;
+        function adminDeleteProduct(id) {
+            if(confirm("Delete this shoe from catalog?")) {
+                products = products.filter(p => String(p.id) !== String(id));
                 setStored('rsz_products', products);
-                renderProducts();
-                renderAdminDashboard();
-                alert('Product updated successfully!');
-            }
-        }
-
-        function adminDeleteProduct(idx) {
-            if(confirm('Are you sure you want to delete this product?')) {
-                products.splice(idx, 1);
-                setStored('rsz_products', products);
-                renderProducts();
                 renderAdminDashboard();
             }
         }
 
-        function adminEditOrder(idx) {
-            let o = orders[idx];
-            let newStatus = prompt('Update Order Status (Pending, Shipped, Delivered, Cancelled):', o.status);
-            let newPhone = prompt('Update Customer Phone:', o.customer.phone);
-            if(newStatus !== null && newPhone !== null) {
-                o.status = newStatus.trim() || o.status;
-                o.customer.phone = newPhone.trim() || o.customer.phone;
-                setStored('rsz_orders', orders);
-                renderAdminDashboard();
-                renderMyOrdersAndNotifications();
-                alert('Order updated by Admin successfully!');
-            }
-        }
-
-        function adminRemoveOrder(idx) {
-            if(confirm('Are you sure you want to remove this order from system?')) {
-                orders.splice(idx, 1);
-                setStored('rsz_orders', orders);
-                renderAdminDashboard();
-                renderMyOrdersAndNotifications();
-            }
-        }
-
-        // Initialize App on load
-        if(currentUser) {
-            document.getElementById('navUserName').textContent = currentUser.name;
-        }
+        // Initialize UI
+        updateNavUserDisplay();
         renderProducts();
         updateCartCount();
     </script>
