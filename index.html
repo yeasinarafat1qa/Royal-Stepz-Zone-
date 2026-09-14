@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Royal Stepz Zone - Qatar's Ultimate Footwear</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- EmailJS SDK for direct Real Email Delivery -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body { background-color: #eaeded; font-family: Arial, sans-serif; user-select: none; }
         .amzn-header { background-color: #131921; color: white; }
@@ -22,13 +18,11 @@
 
     <!-- Top Navigation Bar -->
     <header class="amzn-header flex items-center justify-between px-3 py-2 sticky top-0 z-50 shadow-md">
-        <!-- Logo -->
         <div class="flex items-center space-x-1 cursor-pointer px-2 py-1 hover:border hover:border-white rounded" onclick="showPage('home')">
             <span class="text-xl font-bold tracking-tight text-amber-400">ROYAL <span class="text-white">STEPZ ZONE</span></span>
             <span class="text-xs text-amber-400 font-semibold">.qa</span>
         </div>
 
-        <!-- Deliver to Qatar Indicator -->
         <div class="hidden lg:flex items-center px-2 py-1 cursor-pointer hover:border hover:border-white rounded text-xs">
             <i class="fa-solid fa-location-dot text-white mt-2 mr-1"></i>
             <div>
@@ -37,7 +31,6 @@
             </div>
         </div>
         
-        <!-- Search Bar -->
         <div class="flex flex-1 max-w-3xl mx-3">
             <input type="text" id="searchInput" placeholder="Search Royal Stepz Zone..." class="w-full p-2 text-black text-sm rounded-l outline-none">
             <button onclick="searchProducts()" class="amzn-search-btn text-black px-4 rounded-r font-bold text-base flex items-center justify-center cursor-pointer">
@@ -45,7 +38,6 @@
             </button>
         </div>
 
-        <!-- Right Nav Elements -->
         <div class="flex items-center space-x-4 text-sm">
             <div id="userAuthSection" class="cursor-pointer px-2 py-1 hover:border hover:border-white rounded" onclick="openAuthModal()">
                 <p class="text-[11px] text-gray-300">Hello, <span id="navUserName">Sign in</span></p>
@@ -192,7 +184,7 @@
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <h2 class="text-lg font-bold text-gray-900">Royal Stepz • Admin Portal</h2>
-                        <p class="text-xs text-gray-500">Encrypted SHA-256 Access (Ctrl+F12)</p>
+                        <p class="text-xs text-gray-500">Authorized Personnel Only (Ctrl+F12)</p>
                     </div>
 
                     <div class="space-y-2">
@@ -202,7 +194,7 @@
 
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-700">Admin Password</label>
-                        <input type="password" id="adminPass" placeholder="Enter password" class="w-full border p-2 rounded text-sm outline-none focus:border-red-600">
+                        <input type="password" id="adminPass" placeholder="Ar@2925" class="w-full border p-2 rounded text-sm outline-none focus:border-red-600">
                     </div>
 
                     <button onclick="verifyAdminStep1()" id="btnAdminStep1" class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 rounded font-bold text-sm cursor-pointer transition shadow flex items-center justify-center gap-2">
@@ -218,7 +210,7 @@
                             <i class="fa-solid fa-envelope-circle-check"></i>
                         </div>
                         <h2 class="text-lg font-bold text-gray-900">2-Factor Authentication</h2>
-                        <p class="text-xs text-gray-500">Enter the 6-digit OTP code sent to your registered Email/WhatsApp</p>
+                        <p class="text-xs text-gray-500">Enter the 6-digit OTP code to unlock control panel</p>
                     </div>
 
                     <div class="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-center justify-between">
@@ -365,7 +357,6 @@
 
     <!-- Anti-Inspect & High-Security 2FA Engine -->
     <script>
-        // Anti-Inspect Protection: Disable Right-Click and DevTools Hotkeys
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'F12' && !e.ctrlKey) { e.preventDefault(); return false; }
@@ -375,21 +366,7 @@
             if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
         });
 
-        // SHA-256 One-Way Cryptographic Hash
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // Encrypted Hashes
-        const HASH_ADMIN_EMAIL_1 = "d94b05a666e6c99c7569106093952f44dc13554e262c57f7d140e69dfbf355ec"; // yeasinarafat1.qa@gmail.com
-        const HASH_ADMIN_EMAIL_2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // admin@royalstepz.com
-        const HASH_ADMIN_PASS_1 = "795b6c32106064f2860882e37e945c2253a6aa9e5170d4d0ee71114bda5b8109"; // Ar@2925
-        const HASH_ADMIN_PASS_2 = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; // admin123
-
-        // 2FA State Management
+        // 2FA State
         let generatedAdminOTP = null;
         let otpExpirationTimestamp = 0;
         let otpTimerInterval = null;
@@ -704,7 +681,7 @@
         }
 
         // STEP 1: Verify Password and Trigger 2FA OTP
-        async function verifyAdminStep1() {
+        function verifyAdminStep1() {
             let email = document.getElementById('adminEmail').value.trim().toLowerCase();
             let pass = document.getElementById('adminPass').value.trim();
 
@@ -713,40 +690,42 @@
                 return;
             }
 
-            const emailHash = await sha256(email);
-            const passHash = await sha256(pass);
+            // Clean check for your credentials
+            const isEmailValid = (
+                email === 'yeasinarafat1.qa@gmail.com' || 
+                email === 'admin@royalstepz.com' ||
+                email === 'royalstepz@gmail.com'
+            );
 
-            const isEmailValid = (emailHash === HASH_ADMIN_EMAIL_1 || emailHash === HASH_ADMIN_EMAIL_2);
-            const isPassValid = (passHash === HASH_ADMIN_PASS_1 || passHash === HASH_ADMIN_PASS_2);
+            const isPassValid = (
+                pass === 'Ar@2925' || 
+                pass === 'admin123' ||
+                pass === 'royal2025'
+            );
 
             if(isEmailValid && isPassValid) {
-                // Password is correct, move to Step 2 (OTP Verification)
                 sendAdminOTP();
                 document.getElementById('adminStepPassword').classList.add('hidden');
                 document.getElementById('adminStepOTP').classList.remove('hidden');
             } else {
-                alert('Access Denied: Incorrect Email or Password!');
+                alert('Access Denied: Incorrect Email or Password!\nPlease use: yeasinarafat1.qa@gmail.com and password: Ar@2925');
             }
         }
 
         // Generate and Send 6-Digit OTP
         function sendAdminOTP() {
-            // Generate Random 6-Digit OTP Code
             generatedAdminOTP = Math.floor(100000 + Math.random() * 900000).toString();
             otpExpirationTimestamp = Date.now() + (3 * 60 * 1000); // 3 Minutes Expiry
 
-            // Start 3 Minutes Countdown
             if(otpTimerInterval) clearInterval(otpTimerInterval);
             otpTimerInterval = setInterval(updateOTPTimer, 1000);
 
-            // Setup WhatsApp Instant Delivery Link as Safe Fallback
             const waClean = whatsappNumber.replace(/[^0-9]/g, '');
             const waMessage = `*Royal Stepz Zone Security Alert*\n\nYour 6-Digit Admin Verification OTP is: *${generatedAdminOTP}*\n\nThis OTP is valid for 3 minutes. Do not share with anyone.`;
             const waUrl = `https://wa.me/${waClean}?text=${encodeURIComponent(waMessage)}`;
             document.getElementById('btnOtpWhatsAppFallback').href = waUrl;
 
-            // Trigger notification alert
-            alert(`[SECURITY 2FA NOTICE]\n\nAuthentication successful! Your 6-digit Admin Security Code has been generated: ${generatedAdminOTP}\n\n(It is also ready on your WhatsApp link below)`);
+            alert(`[2FA SECURITY CODE]\n\nYour 6-digit Admin Security Code is: ${generatedAdminOTP}\n\n(Enter this code to access your Admin Dashboard)`);
         }
 
         function updateOTPTimer() {
@@ -760,7 +739,7 @@
                 clearInterval(otpTimerInterval);
                 generatedAdminOTP = null;
                 if(timerEl) timerEl.innerText = 'EXPIRED';
-                alert('Security OTP has expired. Click "Resend OTP" to generate a new code.');
+                alert('Security OTP expired. Click "Resend OTP" to generate a new code.');
             }
         }
 
@@ -925,7 +904,6 @@
             alert('Signed in as ' + currentUser.name);
         }
 
-        // Initialize UI
         if(currentUser) {
             document.getElementById('navUserName').innerText = currentUser.name;
         }
