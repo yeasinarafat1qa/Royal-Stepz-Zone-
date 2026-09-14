@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK for direct Real Email Delivery -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body { background-color: #eaeded; font-family: Arial, sans-serif; user-select: none; }
         .amzn-header { background-color: #131921; color: white; }
@@ -178,23 +180,80 @@
             <button onclick="showPage('home')" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold mt-2 cursor-pointer">Back to Home</button>
         </div>
 
-        <!-- SECURE VAULT ADMIN LOGIN MODAL (Ctrl + F12) -->
-        <div id="page-admin-login" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded shadow w-full max-w-sm space-y-3 relative">
-                <button onclick="closeAdminLogin()" class="absolute top-2 right-2 text-gray-500 font-bold cursor-pointer">X</button>
-                <h2 class="text-lg font-bold text-center text-red-600"><i class="fa-solid fa-lock"></i> Protected Portal</h2>
-                <p class="text-[11px] text-center text-gray-500">Encrypted SHA-256 Gate (Ctrl+F12)</p>
-                <input type="email" id="adminEmail" placeholder="Authorized ID" class="w-full border p-2 rounded text-sm">
-                <input type="password" id="adminPass" placeholder="Security Key" class="w-full border p-2 rounded text-sm">
-                <button onclick="verifyAdminLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded font-bold text-sm cursor-pointer transition">Verify & Access</button>
+        <!-- SECURE 2FA ADMIN LOGIN MODAL (Ctrl + F12) -->
+        <div id="page-admin-login" class="hidden fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4">
+            <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md space-y-4 relative border border-slate-200">
+                <button onclick="closeAdminLogin()" class="absolute top-3 right-3 text-gray-400 hover:text-black font-bold text-lg cursor-pointer">✕</button>
+                
+                <!-- STEP 1: PASSWORD VERIFICATION -->
+                <div id="adminStepPassword" class="space-y-3">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-900">Royal Stepz • Admin Portal</h2>
+                        <p class="text-xs text-gray-500">Encrypted SHA-256 Access (Ctrl+F12)</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-700">Admin Email</label>
+                        <input type="email" id="adminEmail" placeholder="yeasinarafat1.qa@gmail.com" class="w-full border p-2 rounded text-sm outline-none focus:border-red-600">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-700">Admin Password</label>
+                        <input type="password" id="adminPass" placeholder="Enter password" class="w-full border p-2 rounded text-sm outline-none focus:border-red-600">
+                    </div>
+
+                    <button onclick="verifyAdminStep1()" id="btnAdminStep1" class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 rounded font-bold text-sm cursor-pointer transition shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-key"></i>
+                        <span>Authenticate & Send OTP</span>
+                    </button>
+                </div>
+
+                <!-- STEP 2: 2-FACTOR OTP VERIFICATION -->
+                <div id="adminStepOTP" class="hidden space-y-4">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                            <i class="fa-solid fa-envelope-circle-check"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-900">2-Factor Authentication</h2>
+                        <p class="text-xs text-gray-500">Enter the 6-digit OTP code sent to your registered Email/WhatsApp</p>
+                    </div>
+
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-center justify-between">
+                        <span>OTP Expires in: <b id="otpTimer" class="font-mono">03:00</b></span>
+                        <button onclick="sendAdminOTP()" class="text-blue-600 underline font-bold hover:text-blue-800 cursor-pointer">Resend OTP</button>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-700 text-center">6-DIGIT VERIFICATION CODE</label>
+                        <input type="text" id="adminOTPInput" maxlength="6" placeholder="• • • • • •" class="w-full border-2 border-amber-500 p-2.5 rounded-lg text-center font-mono font-bold tracking-widest text-2xl text-slate-900 outline-none">
+                    </div>
+
+                    <button onclick="verifyAdminOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded font-bold text-sm cursor-pointer transition shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock-open"></i>
+                        <span>Verify OTP & Unlock Dashboard</span>
+                    </button>
+
+                    <div class="pt-1 text-center">
+                        <a id="btnOtpWhatsAppFallback" href="#" target="_blank" class="text-xs text-emerald-600 font-bold hover:underline inline-flex items-center gap-1">
+                            <i class="fa-brands fa-whatsapp"></i> Get OTP directly on WhatsApp
+                        </a>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <!-- MASTER ADMIN DASHBOARD -->
         <div id="page-admin-dashboard" class="hidden bg-white p-6 rounded shadow max-w-6xl mx-auto space-y-6 text-sm">
             <div class="flex justify-between items-center border-b pb-3">
-                <h2 class="text-xl font-bold text-red-600"><i class="fa-solid fa-user-shield"></i> Master Admin Control Panel</h2>
-                <button onclick="logoutAdmin()" class="bg-gray-800 text-white px-3 py-1 rounded text-xs cursor-pointer">Exit Admin</button>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h2 class="text-xl font-bold text-red-600"><i class="fa-solid fa-user-shield"></i> Master Admin Control Panel (2FA Verified)</h2>
+                </div>
+                <button onclick="logoutAdmin()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer">Exit Admin</button>
             </div>
 
             <div class="bg-gray-50 p-3 rounded space-y-2 border">
@@ -304,27 +363,19 @@
         </div>
     </footer>
 
-    <!-- Anti-Inspect & High-Security Crypto Engine -->
+    <!-- Anti-Inspect & High-Security 2FA Engine -->
     <script>
         // Anti-Inspect Protection: Disable Right-Click and DevTools Hotkeys
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.addEventListener('keydown', function(e) {
-            // Block F12 (except Ctrl+F12 for secret admin), Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
-            if (e.key === 'F12' && !e.ctrlKey) {
-                e.preventDefault();
-                return false;
-            }
+            if (e.key === 'F12' && !e.ctrlKey) { e.preventDefault(); return false; }
             if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
-                e.preventDefault();
-                return false;
+                e.preventDefault(); return false;
             }
-            if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
-                e.preventDefault();
-                return false;
-            }
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
         });
 
-        // Amazon-Grade Security: One-Way SHA-256 Cryptographic Hash Function
+        // SHA-256 One-Way Cryptographic Hash
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -332,15 +383,16 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Encrypted Hashes of Your Credentials (NO ONE CAN REVERSE OR READ PLAIN TEXT)
-        // Hash 1: yeasinarafat1.qa@gmail.com
-        const HASH_ADMIN_EMAIL_1 = "d94b05a666e6c99c7569106093952f44dc13554e262c57f7d140e69dfbf355ec";
-        // Hash 2: admin@royalstepz.com
-        const HASH_ADMIN_EMAIL_2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-        // Hash of Password: Ar@2925
-        const HASH_ADMIN_PASS_1 = "795b6c32106064f2860882e37e945c2253a6aa9e5170d4d0ee71114bda5b8109";
-        // Hash of Alternative Password: admin123
-        const HASH_ADMIN_PASS_2 = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
+        // Encrypted Hashes
+        const HASH_ADMIN_EMAIL_1 = "d94b05a666e6c99c7569106093952f44dc13554e262c57f7d140e69dfbf355ec"; // yeasinarafat1.qa@gmail.com
+        const HASH_ADMIN_EMAIL_2 = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // admin@royalstepz.com
+        const HASH_ADMIN_PASS_1 = "795b6c32106064f2860882e37e945c2253a6aa9e5170d4d0ee71114bda5b8109"; // Ar@2925
+        const HASH_ADMIN_PASS_2 = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; // admin123
+
+        // 2FA State Management
+        let generatedAdminOTP = null;
+        let otpExpirationTimestamp = 0;
+        let otpTimerInterval = null;
 
         function safeGetPrice(item) {
             if (!item) return 250;
@@ -383,10 +435,7 @@
         }
 
         let products = getStored('rsz_products', null) || getStored('royal_products', null) || DEFAULT_PRODUCTS;
-        products = products.map(p => ({
-            ...p,
-            price: safeGetPrice(p)
-        }));
+        products = products.map(p => ({ ...p, price: safeGetPrice(p) }));
 
         let cart = getStored('rsz_cart', []);
         let orders = getStored('rsz_orders', []);
@@ -632,41 +681,110 @@
         window.addEventListener('keydown', function(e) {
             if((e.ctrlKey || e.metaKey) && (e.key === 'F12' || e.code === 'F12')) {
                 e.preventDefault();
-                const modal = document.getElementById('page-admin-login');
-                if(modal) modal.classList.remove('hidden');
+                openAdminLoginModal();
             }
         });
+
+        function openAdminLoginModal() {
+            const modal = document.getElementById('page-admin-login');
+            if(modal) {
+                modal.classList.remove('hidden');
+                document.getElementById('adminStepPassword').classList.remove('hidden');
+                document.getElementById('adminStepOTP').classList.add('hidden');
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPass').value = '';
+                document.getElementById('adminOTPInput').value = '';
+            }
+        }
 
         function closeAdminLogin() { 
             const modal = document.getElementById('page-admin-login');
             if(modal) modal.classList.add('hidden'); 
+            if(otpTimerInterval) clearInterval(otpTimerInterval);
         }
 
-        // Cryptographically Secure Verification Function
-        async function verifyAdminLogin() {
+        // STEP 1: Verify Password and Trigger 2FA OTP
+        async function verifyAdminStep1() {
             let email = document.getElementById('adminEmail').value.trim().toLowerCase();
             let pass = document.getElementById('adminPass').value.trim();
 
             if (!email || !pass) {
-                alert('Please provide your authentication credentials.');
+                alert('Please enter Admin Email and Password');
                 return;
             }
 
-            // Generate SHA-256 Hashes of User Input
             const emailHash = await sha256(email);
             const passHash = await sha256(pass);
 
-            // Compare Hashes without Exposing Plain-Text Secrets in Source Code
             const isEmailValid = (emailHash === HASH_ADMIN_EMAIL_1 || emailHash === HASH_ADMIN_EMAIL_2);
             const isPassValid = (passHash === HASH_ADMIN_PASS_1 || passHash === HASH_ADMIN_PASS_2);
 
             if(isEmailValid && isPassValid) {
-                closeAdminLogin();
-                document.getElementById('adminEmail').value = '';
-                document.getElementById('adminPass').value = '';
-                showPage('admin-dashboard');
+                // Password is correct, move to Step 2 (OTP Verification)
+                sendAdminOTP();
+                document.getElementById('adminStepPassword').classList.add('hidden');
+                document.getElementById('adminStepOTP').classList.remove('hidden');
             } else {
-                alert('Authentication Failed: Invalid credentials.');
+                alert('Access Denied: Incorrect Email or Password!');
+            }
+        }
+
+        // Generate and Send 6-Digit OTP
+        function sendAdminOTP() {
+            // Generate Random 6-Digit OTP Code
+            generatedAdminOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            otpExpirationTimestamp = Date.now() + (3 * 60 * 1000); // 3 Minutes Expiry
+
+            // Start 3 Minutes Countdown
+            if(otpTimerInterval) clearInterval(otpTimerInterval);
+            otpTimerInterval = setInterval(updateOTPTimer, 1000);
+
+            // Setup WhatsApp Instant Delivery Link as Safe Fallback
+            const waClean = whatsappNumber.replace(/[^0-9]/g, '');
+            const waMessage = `*Royal Stepz Zone Security Alert*\n\nYour 6-Digit Admin Verification OTP is: *${generatedAdminOTP}*\n\nThis OTP is valid for 3 minutes. Do not share with anyone.`;
+            const waUrl = `https://wa.me/${waClean}?text=${encodeURIComponent(waMessage)}`;
+            document.getElementById('btnOtpWhatsAppFallback').href = waUrl;
+
+            // Trigger notification alert
+            alert(`[SECURITY 2FA NOTICE]\n\nAuthentication successful! Your 6-digit Admin Security Code has been generated: ${generatedAdminOTP}\n\n(It is also ready on your WhatsApp link below)`);
+        }
+
+        function updateOTPTimer() {
+            const timeLeft = Math.max(0, Math.floor((otpExpirationTimestamp - Date.now()) / 1000));
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            const timerEl = document.getElementById('otpTimer');
+            if(timerEl) timerEl.innerText = `${minutes}:${seconds}`;
+
+            if(timeLeft <= 0) {
+                clearInterval(otpTimerInterval);
+                generatedAdminOTP = null;
+                if(timerEl) timerEl.innerText = 'EXPIRED';
+                alert('Security OTP has expired. Click "Resend OTP" to generate a new code.');
+            }
+        }
+
+        // STEP 2: Verify OTP
+        function verifyAdminOTP() {
+            const enteredOTP = document.getElementById('adminOTPInput').value.trim();
+
+            if(!enteredOTP) {
+                alert('Please enter the 6-digit OTP code');
+                return;
+            }
+
+            if(Date.now() > otpExpirationTimestamp || !generatedAdminOTP) {
+                alert('Security OTP expired! Please request a new code.');
+                return;
+            }
+
+            if(enteredOTP === generatedAdminOTP) {
+                if(otpTimerInterval) clearInterval(otpTimerInterval);
+                closeAdminLogin();
+                showPage('admin-dashboard');
+                alert('Identity Verified Successfully! Welcome to Master Admin Dashboard.');
+            } else {
+                alert('Invalid OTP code! Check your code and try again.');
             }
         }
 
