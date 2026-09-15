@@ -7,7 +7,8 @@ import {
   Truck, 
   MessageCircle, 
   Crown,
-  ShieldAlert
+  ShieldAlert,
+  LogOut
 } from 'lucide-react';
 
 export const SubNavbar: React.FC = () => {
@@ -16,6 +17,7 @@ export const SubNavbar: React.FC = () => {
     setSelectedCategory, 
     settings,
     user,
+    logout,
     setIsAdminDashboardOpen,
     setIsAuthModalOpen,
     setIsNotificationsOpen,
@@ -111,6 +113,18 @@ export const SubNavbar: React.FC = () => {
             >
               <Crown className="w-3.5 h-3.5" />
               <span>Admin Panel</span>
+            </button>
+          )}
+
+          {/* Quick Logout for logged in customer/admin */}
+          {user && (
+            <button
+              onClick={logout}
+              title={`Logged in as ${user.name}. Click to Log Out`}
+              className="flex items-center gap-1 px-2 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-md font-semibold transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Log Out</span>
             </button>
           )}
         </div>
