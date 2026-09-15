@@ -1,249 +1,152 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
-import { getDeviceId } from '../utils/device';
 import { 
+  ShoppingBag, 
   Search, 
-  ShoppingCart, 
-  MapPin, 
+  Crown, 
   User as UserIcon, 
   Bell, 
-  Crown, 
-  ChevronDown, 
-  X, 
-  ShieldCheck, 
-  LogOut, 
   PackageCheck,
-  CheckCircle2,
-  Menu
+  ChevronDown,
+  LogOut,
+  Sparkles,
+  Layers,
+  PhoneCall
 } from 'lucide-react';
 
-interface HeaderProps {
-  onToggleSidebar?: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
-  const {
-    user,
-    cart,
-    notifications,
-    searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    setIsCartOpen,
-    setIsAuthModalOpen,
+export const Header: React.FC = () => {
+  const { 
+    searchQuery, 
+    setSearchQuery, 
+    cart, 
+    setIsCartOpen, 
+    user, 
+    setIsAuthModalOpen, 
     setIsAdminDashboardOpen,
     setIsNotificationsOpen,
-    logout,
+    notifications,
     settings,
+    logout,
+    orders,
+    setSelectedCategory
   } = useStore();
 
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [showLocationTooltip, setShowLocationTooltip] = useState(false);
-
-  const currentDeviceId = getDeviceId();
-
-  // User-specific unread notifications badge
-  const unreadNotificationsCount = useMemo(() => {
-    return notifications.filter(n => {
-      if (n.read) return false;
-      if (user?.isAdmin) return true;
-      if (n.type === 'system' || n.type === 'deal') return true;
-      if (user?.email && n.recipientEmail && n.recipientEmail.toLowerCase() === user.email.toLowerCase()) return true;
-      if (n.deviceId && n.deviceId === currentDeviceId) return true;
-      return false;
-    }).length;
-  }, [notifications, user, currentDeviceId]);
-
-  const cartTotalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const cartTotalPriceQAR = cart.reduce(
-    (acc, item) => acc + item.product.priceQAR * item.quantity,
-    0
-  );
-
-  const categories = [
-    'All Categories',
-    'Sneakers',
-    'Running',
-    'Formal',
-    'Loafers',
-    'Slides & Sandals',
-    'Limited Edition',
-  ];
+  const totalCartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const unreadNotifications = notifications.filter(n => !n.read).length;
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Search is handled reactively by searchQuery
-    const catalogSection = document.getElementById('catalog-section');
-    if (catalogSection) {
-      catalogSection.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0f172a] text-white shadow-xl border-b border-slate-800">
-      {/* Top Banner for Qatar Delivery */}
-      <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 text-slate-950 font-semibold text-xs py-1.5 px-4 text-center flex items-center justify-center gap-2 tracking-wide">
-        <span className="inline-flex items-center gap-1 font-bold">
-          ROYAL STEPZ ZONE QATAR
-        </span>
-        <span className="hidden md:inline">•</span>
-        <span className="hidden md:inline">
-          Fast 24H Delivery in Doha, Lusail & Al Rayyan | Cash on Delivery Available
-        </span>
-        <span className="hidden sm:inline">•</span>
-        <span className="bg-slate-950 text-amber-400 px-2 py-0.5 rounded text-[11px] font-bold">
-          Free Delivery
-        </span>
+    <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-850 shadow-lg">
+      {/* Top micro announcement bar */}
+      <div className="bg-slate-900 border-b border-slate-800 text-[11px] py-1 px-4 text-slate-300 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1 text-amber-400 font-semibold">
+            <Sparkles className="w-3 h-3" /> Premier Footwear Qatar
+          </span>
+          <span className="hidden sm:inline text-slate-400">• Direct WhatsApp Checkout in QAR</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <a 
+            href={`https://wa.me/${settings.whatsappNumber.replace(/[^0-9]/g, '')}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold"
+          >
+            <PhoneCall className="w-3 h-3" />
+            <span>Hotline: {settings.whatsappNumber}</span>
+          </a>
+        </div>
       </div>
 
-      {/* Main Amazon-Style Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Left: Mobile Menu & Brand Logo */}
-        <div className="flex items-center gap-3">
-          {onToggleSidebar && (
-            <button
-              onClick={onToggleSidebar}
-              className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg lg:hidden"
-              aria-label="Open Menu"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          )}
-
-          <a href="#" className="flex items-center gap-2 group flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-700 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform flex items-center justify-center">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Crown className="w-5 h-5 text-amber-400" />
-              </div>
+      {/* Main Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-6">
+        
+        {/* Logo */}
+        <div 
+          onClick={() => {
+            setSelectedCategory('All');
+            setSearchQuery('');
+          }}
+          className="flex items-center gap-2.5 cursor-pointer flex-shrink-0 group"
+        >
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+              <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-lg sm:text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-amber-400 bg-clip-text text-transparent leading-none">
-                ROYAL STEPZ
-              </span>
-              <span className="text-[10px] tracking-[0.25em] font-bold text-amber-400 uppercase">
-                ZONE • QATAR
-              </span>
-            </div>
-          </a>
-
-          {/* Deliver to Qatar Pill (Amazon style) */}
-          <div
-            className="relative hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:border hover:border-slate-700 cursor-pointer text-xs"
-            onClick={() => setShowLocationTooltip(!showLocationTooltip)}
-          >
-            <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0" />
-            <div className="flex flex-col text-left">
-              <span className="text-[11px] text-slate-400 leading-tight">Deliver to</span>
-              <span className="font-bold text-slate-100 flex items-center gap-1">
-                Doha, Qatar 🇶🇦
-              </span>
-            </div>
-
-            {showLocationTooltip && (
-              <div className="absolute top-12 left-0 w-64 bg-slate-900 border border-slate-700 rounded-lg p-3 shadow-2xl z-50 text-xs">
-                <div className="font-bold text-amber-400 mb-1">Coverage in Qatar</div>
-                <p className="text-slate-300">
-                  We offer 24h express delivery to all municipalities: Doha, Lusail, Al Rayyan, Al Wakrah, Al Khor, and Umm Salal.
-                </p>
-                <div className="mt-2 text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Cash on Delivery available
-                </div>
-              </div>
-            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-base sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-1">
+              Royal <span className="text-amber-400">Stepz</span>
+            </span>
+            <span className="text-[9px] sm:text-[10px] font-bold tracking-widest text-slate-400 uppercase -mt-1">
+              Zone Qatar
+            </span>
           </div>
         </div>
 
-        {/* Center: Amazon-Style Search Bar */}
-        <form
+        {/* Global Search Bar (Amazon Style) */}
+        <form 
           onSubmit={handleSearchSubmit}
-          className="flex-1 max-w-2xl mx-1 sm:mx-2 flex items-center rounded-lg overflow-hidden bg-slate-900 border border-slate-700 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/30 transition-all"
+          className="flex-1 max-w-xl mx-1 sm:mx-4 relative"
         >
-          {/* Category Dropdown */}
-          <div className="relative hidden md:block">
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              aria-label="Filter by Category"
-              className="h-10 bg-slate-800 text-slate-200 text-xs font-medium px-3 pr-7 border-r border-slate-700 focus:outline-none cursor-pointer appearance-none"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat === 'All Categories' ? 'All' : cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-3 pointer-events-none" />
-          </div>
-
-          {/* Search Input */}
-          <div className="relative flex-1 flex items-center">
+          <div className="relative flex items-center">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search sneakers, loafers, running shoes in QAR..."
-              className="w-full h-10 px-3.5 bg-slate-900 text-slate-100 text-sm placeholder:text-slate-500 focus:outline-none"
+              placeholder="Search Nike, Adidas, Jordan, Qatar Sneaker..."
+              className="w-full bg-slate-900/90 text-slate-100 placeholder-slate-400 text-xs sm:text-sm rounded-xl pl-9 pr-8 py-2 sm:py-2.5 border border-slate-800 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all shadow-inner"
             />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 pointer-events-none" />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2 p-1 text-slate-400 hover:text-white"
+                className="absolute right-3 text-slate-400 hover:text-slate-200 text-xs"
               >
-                <X className="w-4 h-4" />
+                ✕
               </button>
             )}
           </div>
-
-          {/* Search Button */}
-          <button
-            type="submit"
-            aria-label="Submit search"
-            className="h-10 px-4 sm:px-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold transition-colors flex items-center justify-center flex-shrink-0"
-          >
-            <Search className="w-4 h-4" />
-          </button>
         </form>
 
-        {/* Right Action Icons & User Controls */}
+        {/* Action Controls */}
         <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-          {/* Qatar Flag & Currency */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 text-xs text-slate-300 font-semibold border border-slate-800 rounded-md bg-slate-900/60">
-            <span className="text-sm">🇶🇦</span>
-            <span>QAR</span>
-          </div>
-
-          {/* Customer Notifications Bell */}
+          
+          {/* Notifications & Orders Bell */}
           <button
             onClick={() => setIsNotificationsOpen(true)}
-            className="relative p-2 text-slate-300 hover:text-amber-400 hover:bg-slate-800/80 rounded-lg transition-colors"
-            title="Notifications & Order Updates"
-            aria-label="View notifications"
+            className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-900 border border-slate-800/80 transition-all relative flex items-center gap-1.5"
+            title="Orders & Notifications"
           >
-            <Bell className="w-5 h-5" />
-            {unreadNotificationsCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white font-bold text-[10px] rounded-full flex items-center justify-center animate-pulse">
-                {unreadNotificationsCount}
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+            <span className="hidden md:inline text-xs font-semibold">Orders</span>
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                {unreadNotifications}
               </span>
             )}
           </button>
 
-          {/* Account / User Menu Dropdown (Amazon style) */}
+          {/* User Account / Sign In Dropdown */}
           <div className="relative">
             <button
               onClick={() => {
-                if (!user) {
-                  setIsAuthModalOpen(true);
-                } else {
+                if (user) {
                   setIsUserMenuOpen(!isUserMenuOpen);
+                } else {
+                  setIsAuthModalOpen(true);
                 }
               }}
-              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all text-left"
+              className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-slate-200 hover:bg-slate-900 border border-slate-800/80 transition-all flex items-center gap-1.5"
             >
-              <div className="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400">
-                {user?.isAdmin ? (
-                  <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-amber-400 font-bold text-xs">
+                {user ? (
+                  user.name.charAt(0).toUpperCase()
                 ) : (
                   <UserIcon className="w-4 h-4" />
                 )}
@@ -265,43 +168,71 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                 <div className="p-2 border-b border-slate-800">
                   <div className="flex items-center justify-between">
                     <p className="font-bold text-slate-100 truncate">{user.name}</p>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded font-mono">Customer</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-slate-800 text-slate-300 rounded font-mono">
+                      {user.isAdmin ? 'Admin' : 'Customer'}
+                    </span>
                   </div>
                   <p className="text-xs text-slate-400 truncate mt-0.5">
                     {user.isAdmin ? 'Qatar Store Headquarters' : user.email}
                   </p>
                   {user.isAdmin && (
-                    <span className="inline-block mt-1.5 px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full border border-amber-500/30">
-                      Master Administrator 👑
+                    <span className="mt-1.5 inline-block text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-bold">
+                      👑 Master Store Admin
                     </span>
                   )}
                 </div>
 
                 <div className="py-1">
-                  {/* ADMIN DASHBOARD LINK - ONLY APPEARS IF USER IS THE STRICT MASTER ADMIN! */}
-                  {user.isAdmin && (
-                    <button
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        setIsAdminDashboardOpen(true);
-                      }}
-                      className="w-full text-left px-3 py-2 text-amber-400 hover:bg-amber-500/10 font-bold rounded-lg flex items-center gap-2"
-                    >
-                      <Crown className="w-4 h-4 text-amber-400" />
-                      Admin Dashboard
-                    </button>
-                  )}
+                  {/* ADMIN DASHBOARD LINK */}
+                  {user.isAdmin ? (
+                    <>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsAdminDashboardOpen(true);
+                        }}
+                        className="w-full text-left px-3 py-2 text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 font-bold rounded-lg flex items-center gap-2 text-xs border border-amber-500/20 mb-1"
+                      >
+                        <Crown className="w-4 h-4 text-amber-400" />
+                        <span>Master Admin Dashboard</span>
+                      </button>
 
-                  <button
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      setIsNotificationsOpen(true);
-                    }}
-                    className="w-full text-left px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg flex items-center gap-2 text-xs"
-                  >
-                    <PackageCheck className="w-4 h-4 text-amber-400" />
-                    My Orders & Notifications
-                  </button>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsNotificationsOpen(true);
+                        }}
+                        className="w-full text-left px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg flex items-center gap-2 text-xs"
+                      >
+                        <PackageCheck className="w-4 h-4 text-amber-400" />
+                        <span>স্টোর অর্ডার ও নোটিফিকেশন</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsNotificationsOpen(true);
+                        }}
+                        className="w-full text-left px-3 py-2 text-slate-200 hover:bg-slate-800 hover:text-white rounded-lg flex items-center gap-2 text-xs font-semibold"
+                      >
+                        <UserIcon className="w-4 h-4 text-amber-400" />
+                        <span>কাস্টমার প্রোফাইল ও হিস্ট্রি</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsNotificationsOpen(true);
+                        }}
+                        className="w-full text-left px-3 py-2 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg flex items-center gap-2 text-xs"
+                      >
+                        <PackageCheck className="w-4 h-4 text-emerald-400" />
+                        <span>আমার অর্ডারসমূহ (Order History)</span>
+                      </button>
+                    </>
+                  )}
                 </div>
 
                 <div className="border-t border-slate-800 pt-1.5">
@@ -323,30 +254,27 @@ export const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
             )}
           </div>
 
-          {/* Cart Icon & Total (Amazon style) */}
+          {/* Cart Drawer Button */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="relative flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all text-slate-100"
-            title="View Cart"
-            aria-label="View shopping cart"
+            className="p-2 sm:px-3 sm:py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-xl font-bold transition-all shadow-md shadow-amber-500/20 flex items-center gap-2"
           >
             <div className="relative">
-              <ShoppingCart className="w-5 h-5 text-amber-400" />
-              {cartTotalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-                  {cartTotalItems}
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950" />
+              {totalCartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-slate-950 text-amber-400 text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-amber-400">
+                  {totalCartCount}
                 </span>
               )}
             </div>
-            <div className="hidden md:flex flex-col text-left leading-none">
-              <span className="text-[10px] text-amber-400 font-semibold">Cart</span>
-              <span className="text-xs font-bold text-white">
-                QAR {cartTotalPriceQAR}
-              </span>
-            </div>
+            <span className="hidden sm:inline text-xs font-black">
+              Cart
+            </span>
           </button>
         </div>
       </div>
     </header>
   );
 };
+
+export default Header;
