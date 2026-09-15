@@ -6,6 +6,10 @@
     <title>Royal Stepz Zone - Qatar's Ultimate Footwear</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- OFFICIAL EMAILJS BROWSER SDK (Direct Gmail Sender) -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <style>
         body { background-color: #eaeded; font-family: Arial, sans-serif; user-select: none; }
         .amzn-header { background-color: #131921; color: white; }
@@ -228,7 +232,6 @@
                         <p class="text-xs text-gray-500">Security code sent to your registered Gmail & WhatsApp</p>
                     </div>
 
-                    <!-- Instant Gmail Dispatcher Box -->
                     <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-2">
                         <div class="flex justify-between items-center text-amber-900 font-bold">
                             <span>Admin Verification Code:</span>
@@ -263,7 +266,7 @@
             </div>
         </div>
 
-        <!-- MASTER ADMIN DASHBOARD -->
+        <!-- MASTER ADMIN DASHBOARD WITH EMAILJS CONFIGURATION -->
         <div id="page-admin-dashboard" class="hidden bg-white p-6 rounded shadow max-w-7xl mx-auto space-y-6 text-sm">
             <div class="flex justify-between items-center border-b pb-3">
                 <div class="flex items-center gap-2">
@@ -271,6 +274,27 @@
                     <h2 class="text-xl font-bold text-red-600"><i class="fa-solid fa-user-shield"></i> Master Admin Control Panel (2FA Verified)</h2>
                 </div>
                 <button onclick="logoutAdmin()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-1.5 rounded text-xs font-bold cursor-pointer">Exit Admin</button>
+            </div>
+
+            <!-- EmailJS Live Gmail API Setup (Admin UI Setting) -->
+            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200 space-y-2">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-indigo-900 flex items-center gap-2">
+                        <i class="fa-solid fa-envelope-open-text text-indigo-600 text-base"></i>
+                        Direct Gmail Delivery (EmailJS Configuration)
+                    </h3>
+                    <span class="text-[11px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded font-bold">Client-Side Integrated</span>
+                </div>
+                <p class="text-xs text-indigo-700">Enter your EmailJS keys to automatically send OTP codes directly to customer Gmail inboxes:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                    <input type="text" id="cfgEmailJsServiceId" placeholder="Service ID (e.g. service_xxxx)" class="border p-2 rounded text-xs bg-white">
+                    <input type="text" id="cfgEmailJsTemplateId" placeholder="Template ID (e.g. template_xxxx)" class="border p-2 rounded text-xs bg-white">
+                    <input type="text" id="cfgEmailJsPublicKey" placeholder="Public Key (e.g. user_xxxx)" class="border p-2 rounded text-xs bg-white">
+                </div>
+                <button onclick="saveEmailJsConfig()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded font-bold text-xs cursor-pointer shadow transition">
+                    Save EmailJS Keys
+                </button>
             </div>
 
             <!-- WhatsApp Configuration -->
@@ -355,10 +379,8 @@
                     <p id="authSubtitle" class="text-xs text-gray-500">Sign in to your Royal Stepz Zone account</p>
                 </div>
 
-                <!-- DYNAMIC ERROR / WARNING ALERT BOX -->
                 <div id="customerAuthAlert" class="hidden p-2.5 bg-red-50 text-red-700 text-xs rounded border border-red-200 leading-relaxed"></div>
 
-                <!-- Registration Only Fields -->
                 <div id="authNameContainer" class="hidden space-y-1">
                     <label class="block text-xs font-bold text-gray-700">Full Name</label>
                     <input type="text" id="authName" placeholder="e.g. Tariq Al-Kuwari" class="w-full border p-2 rounded text-xs outline-none focus:border-amber-500">
@@ -396,7 +418,6 @@
                 <h3 class="text-base font-bold text-gray-900">Verify Your Account</h3>
                 <p class="text-xs text-gray-500">Enter the verification code sent to your Gmail / Qatar Phone</p>
                 
-                <!-- Instant Gmail Notification Token Box -->
                 <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs space-y-2 text-left">
                     <div class="flex justify-between items-center text-amber-900 font-bold">
                         <span>Your Verification Code:</span>
@@ -489,7 +510,7 @@
         </div>
     </footer>
 
-    <!-- Anti-Inspect & High-Security 2FA Engine -->
+    <!-- Script Engine -->
     <script>
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         document.addEventListener('keydown', function(e) {
@@ -499,6 +520,37 @@
             }
             if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
         });
+
+        // EmailJS Configuration Manager
+        let emailJsConfig = getStored('rsz_emailjs_cfg', {
+            serviceId: '',
+            templateId: '',
+            publicKey: ''
+        });
+
+        if (window.emailjs && emailJsConfig.publicKey) {
+            try {
+                emailjs.init(emailJsConfig.publicKey);
+            } catch(e) {
+                console.log("EmailJS init:", e);
+            }
+        }
+
+        function saveEmailJsConfig() {
+            let sId = document.getElementById('cfgEmailJsServiceId').value.trim();
+            let tId = document.getElementById('cfgEmailJsTemplateId').value.trim();
+            let pKey = document.getElementById('cfgEmailJsPublicKey').value.trim();
+
+            emailJsConfig = { serviceId: sId, templateId: tId, publicKey: pKey };
+            setStored('rsz_emailjs_cfg', emailJsConfig);
+
+            if (window.emailjs && pKey) {
+                try {
+                    emailjs.init(pKey);
+                } catch(e) {}
+            }
+            alert('EmailJS settings saved successfully! Direct Gmail delivery is active.');
+        }
 
         // State variables
         let generatedAdminOTP = null;
@@ -536,7 +588,7 @@
                 const val = localStorage.getItem(key);
                 if (!val) return def;
                 const parsed = JSON.parse(val);
-                return Array.isArray(parsed) && parsed.length ? parsed : (typeof parsed === 'object' ? parsed : def);
+                return parsed || def;
             } catch(e) {
                 return def;
             }
@@ -916,7 +968,6 @@
             }
         }
 
-        // CUSTOMER AUTHENTICATION LOGIC WITH SPECIFIC ACCOUNT EXISTENCE WARNINGS
         function openAuthModal() {
             if(currentUser) {
                 if(confirm("Currently logged in as " + currentUser.name + " (" + currentUser.email + ").\n\nDo you want to log out?")) {
@@ -979,7 +1030,6 @@
             }
 
             if (isRegisterMode) {
-                // REGISTRATION
                 let name = document.getElementById('authName').value.trim();
                 let phone = document.getElementById('authPhone').value.trim();
 
@@ -1004,10 +1054,9 @@
                     joinedDate: new Date().toISOString().split('T')[0]
                 };
 
-                sendCustomerOTP(phone, email);
+                sendCustomerOTP(phone, email, name);
 
             } else {
-                // SIGN IN CHECK (Accurate error distinction)
                 let userByEmail = registeredCustomers.find(c => c.email.toLowerCase() === email);
 
                 if (!userByEmail) {
@@ -1020,7 +1069,6 @@
                     return;
                 }
 
-                // Password & Email matched!
                 currentUser = {
                     id: userByEmail.id,
                     name: userByEmail.name,
@@ -1035,8 +1083,8 @@
             }
         }
 
-        // CUSTOMER OTP GENERATION & GMAIL APP DISPATCHER
-        function sendCustomerOTP(phone, email) {
+        // DUAL SENDER: EMAILJS GMAIL DISPATCH + INLINE FALLBACK
+        function sendCustomerOTP(phone, email, name) {
             generatedCustomerOTP = Math.floor(100000 + Math.random() * 900000).toString();
             customerOtpExpirationTimestamp = Date.now() + (3 * 60 * 1000);
 
@@ -1044,25 +1092,36 @@
             document.getElementById('customerOTPVerifyView').classList.remove('hidden');
             document.getElementById('customerInputOTP').value = '';
 
-            // Display verification token in box
             const tokenEl = document.getElementById('customerDisplayToken');
             if(tokenEl) tokenEl.innerText = generatedCustomerOTP;
 
-            // Prepare Direct Gmail Link with pre-filled message
+            // 1. Attempt Real EmailJS Delivery if configured
+            if (window.emailjs && emailJsConfig.serviceId && emailJsConfig.templateId) {
+                emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, {
+                    to_name: name || 'Customer',
+                    to_email: email,
+                    otp_code: generatedCustomerOTP
+                }).then(function(res) {
+                    console.log("EmailJS Sent to Gmail!", res.status);
+                }).catch(function(err) {
+                    console.log("EmailJS fallback:", err);
+                });
+            }
+
+            // 2. Direct Gmail Web App Link
             const gmailSubject = encodeURIComponent("Royal Stepz Zone - Verification OTP Code");
             const gmailBody = encodeURIComponent(`Your Qatar Account Verification OTP Code is: ${generatedCustomerOTP}\n\nValid for 3 minutes.`);
             const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${gmailSubject}&body=${gmailBody}`;
             const gmailBtn = document.getElementById('btnCustomerOpenGmail');
             if(gmailBtn) gmailBtn.href = gmailUrl;
 
-            // Timer
             if (customerOtpInterval) clearInterval(customerOtpInterval);
             customerOtpInterval = setInterval(updateCustomerOTPTimer, 1000);
         }
 
         function resendCustomerOTP() {
             if (pendingCustomerRegistration) {
-                sendCustomerOTP(pendingCustomerRegistration.phone, pendingCustomerRegistration.email);
+                sendCustomerOTP(pendingCustomerRegistration.phone, pendingCustomerRegistration.email, pendingCustomerRegistration.name);
             }
         }
 
@@ -1209,19 +1268,25 @@
             if(otpTimerInterval) clearInterval(otpTimerInterval);
             otpTimerInterval = setInterval(updateOTPTimer, 1000);
 
-            // Display Admin OTP in box
             const displayEl = document.getElementById('adminDisplayToken');
             if(displayEl) displayEl.innerText = generatedAdminOTP;
 
-            // Direct Gmail App Dispatcher Link for Admin
+            // Admin EmailJS Dispatch
             const adminEmail = 'yeasinarafat1.qa@gmail.com';
+            if (window.emailjs && emailJsConfig.serviceId && emailJsConfig.templateId) {
+                emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, {
+                    to_name: 'Master Admin',
+                    to_email: adminEmail,
+                    otp_code: generatedAdminOTP
+                }).catch(e => {});
+            }
+
             const gSubject = encodeURIComponent("Royal Stepz Zone - Admin 2FA Security Code");
             const gBody = encodeURIComponent(`Your Admin Master Security Code is: ${generatedAdminOTP}\n\nValid for 3 minutes.`);
             const gUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(adminEmail)}&su=${gSubject}&body=${gBody}`;
             const gmailBtn = document.getElementById('btnAdminOpenGmail');
             if(gmailBtn) gmailBtn.href = gUrl;
 
-            // WhatsApp Direct Dispatcher
             const waClean = whatsappNumber.replace(/[^0-9]/g, '');
             const waMessage = `*Royal Stepz Zone Security Alert*\n\nYour 6-Digit Admin Verification OTP is: *${generatedAdminOTP}*\n\nThis OTP is valid for 3 minutes. Do not share with anyone.`;
             const waUrl = `https://wa.me/${waClean}?text=${encodeURIComponent(waMessage)}`;
@@ -1272,6 +1337,14 @@
         function renderAdminDashboard() {
             const waInput = document.getElementById('adminWhatsAppNum');
             if(waInput) waInput.value = whatsappNumber;
+
+            // Load EmailJS config inputs
+            const sEl = document.getElementById('cfgEmailJsServiceId');
+            const tEl = document.getElementById('cfgEmailJsTemplateId');
+            const kEl = document.getElementById('cfgEmailJsPublicKey');
+            if(sEl) sEl.value = emailJsConfig.serviceId || '';
+            if(tEl) tEl.value = emailJsConfig.templateId || '';
+            if(kEl) kEl.value = emailJsConfig.publicKey || '';
             
             // 1. Render Products
             let pList = document.getElementById('adminProductList');
