@@ -470,1137 +470,741 @@
         <div class="bg-[#232f3e] text-white py-10 px-4 border-b border-gray-700 text-xs">
             <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div>
-                    <h3 class="font-bold text-sm text-amber-400 mb-3">Get to Know Us</h3>
+                    <h3 class="font-bold text-sm mb-3">Get to Know Us</h3>
                     <ul class="space-y-2 text-gray-300">
-                        <li class="hover:underline cursor-pointer" onclick="showPage('home')">About Royal Stepz Zone</li>
-                        <li class="hover:underline cursor-pointer" onclick="showPage('home')">Doha Store Locations</li>
+                        <li><a href="javascript:void(0)" onclick="showPage('home')" class="hover:underline">About Royal Stepz</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('delivery-rates')" class="hover:underline">Qatar Delivery Zones</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('returns-policy')" class="hover:underline">Returns & Replacements</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="font-bold text-sm text-amber-400 mb-3">Qatar Delivery</h3>
+                    <h3 class="font-bold text-sm mb-3">Make Money with Us</h3>
                     <ul class="space-y-2 text-gray-300">
-                        <li class="hover:underline cursor-pointer" onclick="showPage('delivery-rates')">Qatar Delivery Rates & Zones</li>
-                        <li class="hover:underline cursor-pointer" onclick="showPage('returns-policy')">Returns & Replacements</li>
+                        <li><a href="javascript:void(0)" onclick="openAdminLogin()" class="hover:underline">Admin Portal (Ctrl+F12)</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('my-orders')" class="hover:underline">Customer Dashboard</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="font-bold text-sm text-amber-400 mb-3">Qatar Payments</h3>
+                    <h3 class="font-bold text-sm mb-3">Payment & Security</h3>
                     <ul class="space-y-2 text-gray-300">
-                        <li>Cash on Delivery across Qatar</li>
-                        <li>Card on Delivery (POS)</li>
+                        <li>Cash on Delivery (Qatar)</li>
+                        <li>Verified Customer Account</li>
+                        <li>2FA OTP Protection</li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="font-bold text-sm text-amber-400 mb-3">Direct Support</h3>
+                    <h3 class="font-bold text-sm mb-3">Let Us Help You</h3>
                     <ul class="space-y-2 text-gray-300">
-                        <li class="hover:underline cursor-pointer" onclick="showPage('my-orders')">Your Account & Orders</li>
-                        <li class="hover:underline cursor-pointer text-emerald-400 font-bold" onclick="openWhatsAppSupport()"><i class="fa-brands fa-whatsapp"></i> WhatsApp: +974 3040 8610</li>
+                        <li><a href="javascript:void(0)" onclick="showPage('my-orders')" class="hover:underline">Track Your Order</a></li>
+                        <li><a href="javascript:void(0)" onclick="showPage('cart')" class="hover:underline">Shopping Cart</a></li>
+                        <li><span>WhatsApp Support (Doha)</span></li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <div class="bg-[#131921] text-white text-center py-6 space-y-2 text-xs">
-            <div class="flex items-center justify-center space-x-1 cursor-pointer" onclick="showPage('home')">
-                <span class="text-lg font-bold tracking-tight text-amber-400">ROYAL <span class="text-white">STEPZ ZONE</span></span>
-                <span class="text-[10px] text-amber-400 font-semibold">.qa</span>
-            </div>
-            <p class="text-gray-400">Doha, Al Wakrah, Lusail, Rayyan — Qatar</p>
-            <p class="text-gray-500 text-[11px] pt-1">&copy; 2026 Royal Stepz Zone, Inc. All rights reserved.</p>
+        <div class="bg-[#131921] text-gray-400 text-center py-6 text-xs space-y-2">
+            <p class="font-bold text-amber-400 text-sm">ROYAL STEPZ ZONE .QA</p>
+            <p>© 2026 Royal Stepz Zone, Doha, Qatar. All Rights Reserved.</p>
         </div>
     </footer>
 
-    <!-- Script Engine -->
+    <!-- COMPLETE CORE JAVASCRIPT LOGIC -->
     <script>
-        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' && !e.ctrlKey) { e.preventDefault(); return false; }
-            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
-                e.preventDefault(); return false;
-            }
-            if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) { e.preventDefault(); return false; }
-        });
-
-        // EmailJS Configuration Manager
-        let emailJsConfig = getStored('rsz_emailjs_cfg', {
-            serviceId: '',
-            templateId: '',
-            publicKey: ''
-        });
-
-        if (window.emailjs && emailJsConfig.publicKey) {
-            try {
-                emailjs.init(emailJsConfig.publicKey);
-            } catch(e) {
-                console.log("EmailJS init:", e);
-            }
-        }
-
-        function saveEmailJsConfig() {
-            let sId = document.getElementById('cfgEmailJsServiceId').value.trim();
-            let tId = document.getElementById('cfgEmailJsTemplateId').value.trim();
-            let pKey = document.getElementById('cfgEmailJsPublicKey').value.trim();
-
-            emailJsConfig = { serviceId: sId, templateId: tId, publicKey: pKey };
-            setStored('rsz_emailjs_cfg', emailJsConfig);
-
-            if (window.emailjs && pKey) {
-                try {
-                    emailjs.init(pKey);
-                } catch(e) {}
-            }
-            alert('EmailJS settings saved successfully! Direct Gmail delivery is active.');
-        }
-
-        // State variables
-        let generatedAdminOTP = null;
-        let otpExpirationTimestamp = 0;
-        let otpTimerInterval = null;
-
-        let pendingCustomerRegistration = null;
-        let generatedCustomerOTP = null;
-        let customerOtpExpirationTimestamp = 0;
-        let customerOtpInterval = null;
-
-        function safeGetPrice(item) {
-            if (!item) return 250;
-            if (typeof item.price === 'number' && !isNaN(item.price)) return item.price;
-            if (typeof item.priceQAR === 'number' && !isNaN(item.priceQAR)) return item.priceQAR;
-            if (typeof item.price === 'string') {
-                let p = parseFloat(item.price);
-                if (!isNaN(p)) return p;
-            }
-            if (typeof item.priceQAR === 'string') {
-                let p = parseFloat(item.priceQAR);
-                if (!isNaN(p)) return p;
-            }
-            return 250;
-        }
-
-        const DEFAULT_PRODUCTS = [
-            { id: 1, name: 'Royal Classic Leather Sneaker', price: 290, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80', desc: 'Premium handcrafted leather sneaker for ultimate comfort and royal style across Doha streets.' },
-            { id: 2, name: 'Doha Urban Street Runner', price: 350, image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80', desc: 'Lightweight modern design optimized for running, fitness, and casual daily wear in Qatar.' },
-            { id: 3, name: 'Executive Formal Oxford', price: 420, image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?auto=format&fit=crop&w=400&q=80', desc: 'Elegant formal shoes crafted for business meetings, events, and professional environments.' }
+        // Initial Mock Database
+        let products = JSON.parse(localStorage.getItem('rsz_products')) || [
+            { id: 1, name: "Nike Air Max Pulse Doha Edition", price: 580, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" },
+            { id: 2, name: "Adidas Ultraboost Light Qatar", price: 620, image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80" },
+            { id: 3, name: "Puma RS-X Luxury Sneaker", price: 450, image: "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=600&q=80" },
+            { id: 4, name: "New Balance 9060 Classic", price: 530, image: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&w=600&q=80" }
         ];
 
-        function getStored(key, def) {
-            try {
-                const val = localStorage.getItem(key);
-                if (!val) return def;
-                const parsed = JSON.parse(val);
-                return parsed || def;
-            } catch(e) {
-                return def;
-            }
-        }
+        let cart = JSON.parse(localStorage.getItem('rsz_cart')) || [];
+        let orders = JSON.parse(localStorage.getItem('rsz_orders')) || [];
+        let customers = JSON.parse(localStorage.getItem('rsz_customers')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('rsz_current_user')) || null;
+        let whatsappNum = localStorage.getItem('rsz_whatsapp') || "+97455123456";
 
-        function setStored(key, val) {
-            try {
-                localStorage.setItem(key, JSON.stringify(val));
-            } catch(e) {
-                console.error("Storage error:", e);
-            }
-        }
+        let emailJsConfig = JSON.parse(localStorage.getItem('rsz_emailjs')) || { serviceId: '', templateId: '', publicKey: '' };
 
-        let products = getStored('rsz_products', null) || getStored('royal_products', null) || DEFAULT_PRODUCTS;
-        products = products.map(p => ({ ...p, price: safeGetPrice(p) }));
+        let generatedAdminOTP = "";
+        let generatedCustomerOTP = "";
+        let pendingCustomerData = null;
 
-        let cart = getStored('rsz_cart', []);
-        let orders = getStored('rsz_orders', []);
-        let notifications = getStored('rsz_notifications', []);
-        let registeredCustomers = getStored('rsz_customers_db', [
-            {
-                id: 'cust-demo-1',
-                name: 'Tariq Al-Mansoor',
-                email: 'tariq.qa@gmail.com',
-                phone: '+974 5521 8932',
-                status: 'Verified',
-                joinedDate: '2026-09-10',
-                password: 'password123'
-            }
-        ]);
+        // On Page Load Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCartCount();
+            updateNavAuth();
+            renderNotifications();
+            renderMyOrders();
 
-        let whatsappNumber = localStorage.getItem('rsz_whatsapp') || '+974 3040 8610';
-        let currentUser = getStored('rsz_current_user', null);
-        let isRegisterMode = false;
+            // Keyboard shortcut Ctrl + F12 for Admin Login
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'F12') {
+                    e.preventDefault();
+                    openAdminLogin();
+                }
+            });
+        });
 
+        // Page Navigation Controller
         function showPage(pageId) {
-            ['home', 'details', 'cart', 'checkout', 'success', 'my-orders', 'admin-dashboard', 'delivery-rates', 'returns-policy'].forEach(p => {
+            const pages = ['home', 'details', 'cart', 'checkout', 'success', 'my-orders', 'delivery-rates', 'returns-policy', 'admin-dashboard'];
+            pages.forEach(p => {
                 const el = document.getElementById('page-' + p);
                 if (el) el.classList.add('hidden');
             });
+
             const target = document.getElementById('page-' + pageId);
-            if (target) target.classList.remove('hidden');
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
 
-            if(pageId === 'home') renderProducts();
-            if(pageId === 'cart') renderCart();
-            if(pageId === 'checkout') renderCheckoutPage();
-            if(pageId === 'my-orders') renderMyOrdersAndNotifications();
-            if(pageId === 'admin-dashboard') renderAdminDashboard();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (pageId === 'cart') renderCartItems();
+            if (pageId === 'my-orders') {
+                renderNotifications();
+                renderMyOrders();
+            }
+            if (pageId === 'admin-dashboard') {
+                renderAdminCatalog();
+                renderAdminOrders();
+                renderAdminCustomers();
+                document.getElementById('adminWhatsAppNum').value = whatsappNum;
+                document.getElementById('cfgEmailJsServiceId').value = emailJsConfig.serviceId;
+                document.getElementById('cfgEmailJsTemplateId').value = emailJsConfig.templateId;
+                document.getElementById('cfgEmailJsPublicKey').value = emailJsConfig.publicKey;
+            }
         }
 
-        function openWhatsAppSupport() {
-            let waNum = whatsappNumber.replace(/[^0-9]/g, '');
-            let msg = `Hello Royal Stepz Zone, I need help regarding my footwear order/support in Qatar.`;
-            window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        function renderProducts(list = null) {
-            const displayList = list || products;
+        // Render Products Catalog
+        function renderProducts(list = products) {
             const grid = document.getElementById('productGrid');
-            if(!grid) return;
+            if (!grid) return;
             grid.innerHTML = '';
-            if(displayList.length === 0) {
-                grid.innerHTML = '<p class="col-span-full text-center text-gray-500 py-6">No footwear products found.</p>';
+            if (list.length === 0) {
+                grid.innerHTML = '<p class="text-xs text-gray-500 col-span-full text-center py-6">No footwear products found matching your search.</p>';
                 return;
             }
-            displayList.forEach(p => {
-                const itemPrice = safeGetPrice(p);
+            list.forEach(p => {
                 grid.innerHTML += `
-                    <div class="bg-white p-3 rounded shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
+                    <div class="bg-white p-3 rounded shadow hover:shadow-md transition flex flex-col justify-between">
                         <div>
-                            <div onclick="showProductDetails('${p.id}')" class="h-44 bg-cover bg-center rounded mb-2 cursor-pointer" style="background-image: url('${p.image}')"></div>
-                            <h3 onclick="showProductDetails('${p.id}')" class="font-bold text-gray-900 text-sm line-clamp-2 cursor-pointer hover:text-amber-600">${p.name}</h3>
-                            <p class="text-amber-700 font-bold text-base mt-1">QAR <span class="text-lg font-black">${itemPrice}</span></p>
-                            <p class="text-[11px] text-green-700 font-semibold">In Stock - Qatar Delivery</p>
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-44 object-cover rounded cursor-pointer" onclick="viewProductDetails(${p.id})">
+                            <h3 class="font-bold text-sm mt-2 text-gray-800 cursor-pointer hover:text-amber-600 line-clamp-1" onclick="viewProductDetails(${p.id})">${p.name}</h3>
+                            <p class="text-xs text-amber-600 font-extrabold mt-1">QAR ${p.price}</p>
                         </div>
                         <div class="mt-3 flex gap-2">
-                            <button onclick="showProductDetails('${p.id}')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-black py-1.5 rounded font-bold text-xs border cursor-pointer">Details</button>
-                            <button onclick="addToCart('${p.id}')" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-1.5 rounded font-bold text-xs shadow-sm cursor-pointer">Add to Cart</button>
+                            <button onclick="addToCart(${p.id})" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-1.5 rounded text-xs font-bold cursor-pointer">Add to Cart</button>
+                            <button onclick="viewProductDetails(${p.id})" class="bg-gray-100 hover:bg-gray-200 px-2 py-1.5 rounded text-xs font-bold cursor-pointer"><i class="fa-solid fa-eye"></i></button>
                         </div>
                     </div>
                 `;
             });
-            updateCartCount();
         }
 
-        function showProductDetails(id) {
-            let p = products.find(prod => String(prod.id) === String(id));
-            if(!p) return;
+        // Product Search
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
+            showPage('home');
+            renderProducts(filtered);
+        }
 
-            const itemPrice = safeGetPrice(p);
-            let container = document.getElementById('productDetailsContent');
-            if(!container) return;
-            container.innerHTML = `
+        // View Product Details
+        function viewProductDetails(id) {
+            const p = products.find(item => item.id === id);
+            if (!p) return;
+            showPage('details');
+            document.getElementById('productDetailsContent').innerHTML = `
                 <div>
-                    <img src="${p.image}" class="w-full h-80 sm:h-96 object-cover rounded shadow border">
+                    <img src="${p.image}" alt="${p.name}" class="w-full h-80 object-cover rounded shadow">
                 </div>
                 <div class="space-y-4">
-                    <h2 class="text-2xl font-bold text-gray-900">${p.name}</h2>
-                    <p class="text-2xl font-bold text-amber-700">QAR ${itemPrice}</p>
-                    <p class="text-xs text-green-700 font-bold">✔ In Stock (Fast delivery across Doha, Al Wakrah, Lusail)</p>
-                    <hr>
-                    <div>
-                        <h4 class="font-bold text-sm text-gray-800 mb-1">About this item:</h4>
-                        <p class="text-xs text-gray-600 leading-relaxed">${p.desc || p.description || 'High quality durable footwear designed for premium comfort and long-lasting style.'}</p>
+                    <h2 class="text-xl font-bold text-gray-900">${p.name}</h2>
+                    <p class="text-2xl font-black text-amber-600">QAR ${p.price}</p>
+                    <p class="text-xs text-gray-600 leading-relaxed">Genuine premium quality footwear designed for maximum comfort. Sourced directly for Qatar express delivery.</p>
+                    
+                    <div class="space-y-2 pt-2">
+                        <label class="block text-xs font-bold text-gray-700">Select Size (EU / UK)</label>
+                        <div class="flex gap-2">
+                            <button onclick="selectSize(this)" class="size-btn border px-3 py-1 rounded text-xs font-bold hover:border-amber-500 cursor-pointer">40</button>
+                            <button onclick="selectSize(this)" class="size-btn border px-3 py-1 rounded text-xs font-bold hover:border-amber-500 cursor-pointer">41</button>
+                            <button onclick="selectSize(this)" class="border px-3 py-1 rounded text-xs font-bold border-amber-500 bg-amber-50 cursor-pointer size-btn">42</button>
+                            <button onclick="selectSize(this)" class="size-btn border px-3 py-1 rounded text-xs font-bold hover:border-amber-500 cursor-pointer">43</button>
+                            <button onclick="selectSize(this)" class="size-btn border px-3 py-1 rounded text-xs font-bold hover:border-amber-500 cursor-pointer">44</button>
+                        </div>
                     </div>
-                    <div class="pt-4 flex gap-3">
-                        <button onclick="addToCart('${p.id}')" class="flex-1 bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Add to Cart</button>
-                        <button onclick="addToCart('${p.id}'); proceedToCheckoutGuard();" class="flex-1 bg-[#ffa41c] hover:bg-[#fa8900] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer">Buy Now</button>
-                    </div>
+
+                    <button onclick="addToCart(${p.id})" class="w-full bg-[#ffd814] hover:bg-[#f7ca00] text-black py-2.5 rounded font-bold text-xs shadow cursor-pointer mt-4">Add to Cart</button>
                 </div>
             `;
-            showPage('details');
         }
 
-        function searchProducts() {
-            let input = document.getElementById('searchInput');
-            if(!input) return;
-            let query = input.value.toLowerCase().trim();
-            let results = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
-            showPage('home');
-            renderProducts(results);
+        function selectSize(btn) {
+            document.querySelectorAll('.size-btn').forEach(b => {
+                b.classList.remove('border-amber-500', 'bg-amber-50');
+            });
+            btn.classList.add('border-amber-500', 'bg-amber-50');
         }
 
+        // Cart Management
         function addToCart(id) {
-            let p = products.find(prod => String(prod.id) === String(id));
-            if(!p) return;
-            const itemPrice = safeGetPrice(p);
-            let existing = cart.find(item => String(item.id) === String(id));
-            if(existing) { 
-                existing.qty += 1; 
-            } else { 
-                cart.push({...p, price: itemPrice, qty: 1}); 
+            const p = products.find(item => item.id === id);
+            if (!p) return;
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...p, qty: 1 });
             }
-            setStored('rsz_cart', cart);
+            localStorage.setItem('rsz_cart', JSON.stringify(cart));
             updateCartCount();
 
-            const nameEl = document.getElementById('modalPopupItemName');
-            if(nameEl) nameEl.innerText = p.name;
-            const modalEl = document.getElementById('cartModalPopup');
-            if(modalEl) modalEl.classList.remove('hidden');
+            document.getElementById('modalPopupItemName').innerText = p.name;
+            document.getElementById('cartModalPopup').classList.remove('hidden');
         }
 
         function closeCartPopup() {
-            const modalEl = document.getElementById('cartModalPopup');
-            if(modalEl) modalEl.classList.add('hidden');
+            document.getElementById('cartModalPopup').classList.add('hidden');
         }
 
         function updateCartCount() {
-            let count = cart.reduce((acc, item) => acc + item.qty, 0);
-            const countEl = document.getElementById('cartCount');
-            if(countEl) countEl.innerText = count;
+            const total = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartCount').innerText = total;
         }
 
-        function renderCart() {
-            let list = document.getElementById('cartItemsList');
-            if(!list) return;
+        function renderCartItems() {
+            const list = document.getElementById('cartItemsList');
+            const totalEl = document.getElementById('cartTotalPrice');
             list.innerHTML = '';
-            let total = 0;
-            if(cart.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-500 py-4 text-xs">Your Cart is currently empty.</p>';
-                document.getElementById('cartTotalPrice').innerText = 'QAR 0.00';
+            if (cart.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500 py-4 text-center">Your shopping cart is empty.</p>';
+                totalEl.innerText = 'QAR 0.00';
                 return;
             }
-            cart.forEach((item, index) => {
-                const pPrice = safeGetPrice(item);
-                total += pPrice * item.qty;
+            let subtotal = 0;
+            cart.forEach((item, idx) => {
+                subtotal += item.price * item.qty;
                 list.innerHTML += `
-                    <div class="py-2.5 flex justify-between items-center text-xs">
-                        <div class="flex items-center space-x-2">
-                            <img src="${item.image}" class="w-10 h-10 object-cover rounded border">
+                    <div class="py-3 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.image}" class="w-12 h-12 object-cover rounded">
                             <div>
-                                <h4 class="font-bold text-gray-900">${item.name}</h4>
-                                <p class="text-gray-500">QAR ${pPrice} x ${item.qty}</p>
+                                <h4 class="font-bold text-xs text-gray-800">${item.name}</h4>
+                                <p class="text-xs text-amber-600 font-bold">QAR ${item.price} x ${item.qty}</p>
                             </div>
                         </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-600 font-bold hover:underline cursor-pointer">Delete</button>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeQty(${idx}, 1)" class="bg-gray-200 px-2 py-0.5 rounded text-xs font-bold cursor-pointer">+</button>
+                            <span class="text-xs font-bold">${item.qty}</span>
+                            <button onclick="changeQty(${idx}, -1)" class="bg-gray-200 px-2 py-0.5 rounded text-xs font-bold cursor-pointer">-</button>
+                            <button onclick="removeFromCart(${idx})" class="text-red-600 hover:text-red-800 ml-3 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+                        </div>
                     </div>
                 `;
             });
-            document.getElementById('cartTotalPrice').innerText = 'QAR ' + total.toFixed(2);
+            totalEl.innerText = 'QAR ' + subtotal.toFixed(2);
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            setStored('rsz_cart', cart);
-            renderCart();
+        function changeQty(idx, delta) {
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) cart.splice(idx, 1);
+            localStorage.setItem('rsz_cart', JSON.stringify(cart));
             updateCartCount();
+            renderCartItems();
         }
 
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            localStorage.setItem('rsz_cart', JSON.stringify(cart));
+            updateCartCount();
+            renderCartItems();
+        }
+
+        // Checkout Guard
         function proceedToCheckoutGuard() {
             if (cart.length === 0) {
-                alert('Your cart is empty! Please select footwear to purchase.');
+                alert('Your cart is empty.');
                 return;
             }
-
-            if (!currentUser || !currentUser.email) {
-                alert('Account Required:\n\nFor verified footwear delivery in Qatar, please Sign In or Create an Account first.');
+            if (!currentUser) {
+                alert('Please sign in with your verified customer account before proceeding to checkout.');
                 openAuthModal();
                 return;
             }
-
             showPage('checkout');
+            document.getElementById('chkName').value = currentUser.name;
+            document.getElementById('chkPhone').value = currentUser.phone || '';
         }
 
-        function renderCheckoutPage() {
-            if(!currentUser) {
-                showPage('cart');
-                return;
-            }
-
-            const chkName = document.getElementById('chkName');
-            const chkPhone = document.getElementById('chkPhone');
-            if(chkName) chkName.value = currentUser.name || '';
-            if(chkPhone) chkPhone.value = currentUser.phone || '';
-        }
-
+        // Submit Order
         function submitOrder(e) {
             e.preventDefault();
-            if(cart.length === 0) return alert('Your Cart is empty!');
+            const name = document.getElementById('chkName').value;
+            const phone = document.getElementById('chkPhone').value;
+            const address = document.getElementById('chkAddress').value;
+            const notes = document.getElementById('chkNotes').value;
 
-            if (!currentUser) {
-                alert('Please sign in with a verified Qatar account first.');
-                openAuthModal();
-                return;
-            }
+            const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const orderId = 'RSZ-' + Math.floor(100000 + Math.random() * 900000);
 
-            let name = document.getElementById('chkName').value.trim();
-            let phone = document.getElementById('chkPhone').value.trim();
-            let address = document.getElementById('chkAddress').value.trim();
-            let notes = document.getElementById('chkNotes').value.trim();
-
-            let total = cart.reduce((acc, item) => acc + (safeGetPrice(item) * item.qty), 0);
-            let orderId = 'RSZ-' + Math.floor(100000 + Math.random() * 900000);
-
-            let order = {
-                orderId, customer: name, phone, address, notes, items: [...cart], total,
-                status: 'Pending Verification', date: new Date().toLocaleString(),
-                userEmail: currentUser.email
+            const newOrder = {
+                id: orderId,
+                customerName: name,
+                customerPhone: phone,
+                address: address,
+                notes: notes,
+                items: [...cart],
+                total: totalAmount,
+                status: 'Order Placed',
+                date: new Date().toLocaleDateString()
             };
 
-            orders.unshift(order);
-            setStored('rsz_orders', orders);
+            orders.unshift(newOrder);
+            localStorage.setItem('rsz_orders', JSON.stringify(orders));
 
-            notifications.unshift({
-                email: currentUser.email,
-                text: `Order ID ${orderId} placed successfully. Total: QAR ${total}`,
-                date: new Date().toLocaleString()
-            });
-            setStored('rsz_notifications', notifications);
+            // Update customer total orders count
+            if (currentUser) {
+                const cIndex = customers.findIndex(c => c.email === currentUser.email);
+                if (cIndex !== -1) {
+                    customers[cIndex].ordersCount = (customers[cIndex].ordersCount || 0) + 1;
+                    localStorage.setItem('rsz_customers', JSON.stringify(customers));
+                }
+            }
 
-            cart = [];
-            setStored('rsz_cart', cart);
-            updateCartCount();
-
-            let waNum = whatsappNumber.replace(/[^0-9]/g, '');
-            let msg = `*New Order Confirmed - Royal Stepz Zone*\n\nOrder ID: ${orderId}\nCustomer: ${name} (${currentUser.email})\nPhone: ${phone}\nAddress: ${address}\nNotes: ${notes}\n\n*Items:*`;
-            order.items.forEach(i => { msg += `\n- ${i.name} (Qty: ${i.qty}) - QAR ${safeGetPrice(i) * i.qty}`; });
-            msg += `\n\n*Total Amount: QAR ${total}*`;
-
-            window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
-
+            // Success Display
             document.getElementById('successDetails').innerHTML = `
                 <p><b>Order ID:</b> ${orderId}</p>
-                <p><b>Customer Name:</b> ${name}</p>
-                <p><b>Qatar Address:</b> ${address}</p>
-                <p><b>Total Confirmed:</b> QAR ${total}</p>
+                <p><b>Name:</b> ${name}</p>
+                <p><b>Phone:</b> ${phone}</p>
+                <p><b>Delivery Address:</b> ${address}</p>
+                <p><b>Total Amount:</b> QAR ${totalAmount}</p>
             `;
+
+            // WhatsApp Forwarding
+            let waText = `🛍️ *NEW ORDER - ROYAL STEPZ ZONE*\n\n*Order ID:* ${orderId}\n*Name:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n*Notes:* ${notes || 'None'}\n\n*Items:*`;
+            cart.forEach(i => { waText += `\n- ${i.name} (x${i.qty}) - QAR ${i.price * i.qty}`; });
+            waText += `\n\n*Total:* QAR ${totalAmount}`;
+
+            cart = [];
+            localStorage.setItem('rsz_cart', JSON.stringify(cart));
+            updateCartCount();
+
             showPage('success');
+
+            const waURL = `https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}?text=` + encodeURIComponent(waText);
+            window.open(waURL, '_blank');
         }
 
-        // CUSTOMER DASHBOARD
-        function renderMyOrdersAndNotifications() {
-            if (!currentUser) {
-                let notifArea = document.getElementById('notificationArea');
-                let myOrdList = document.getElementById('myOrdersList');
-                if(notifArea) notifArea.innerHTML = '<p class="text-gray-500 text-xs py-2">Please Sign in to view account notifications.</p>';
-                if(myOrdList) myOrdList.innerHTML = '<div class="text-center py-6 bg-gray-50 rounded border"><p class="text-gray-600 text-xs mb-2">Please Sign In to track and manage your footwear orders.</p><button onclick="openAuthModal()" class="bg-[#ffd814] px-4 py-1.5 rounded font-bold text-xs cursor-pointer">Sign In to Account</button></div>';
-                return;
-            }
-
-            let email = currentUser.email;
-            let myOrders = orders.filter(o => o.userEmail === email);
-            let myNotifs = notifications.filter(n => n.email === email);
-
-            let notifArea = document.getElementById('notificationArea');
-            if(notifArea) {
-                notifArea.innerHTML = myNotifs.length ? '' : '<p class="text-gray-500 text-xs">No notifications yet.</p>';
-                myNotifs.forEach(n => {
-                    notifArea.innerHTML += `<div class="bg-blue-50 border-l-2 border-blue-600 p-2 text-xs"><b>${n.date}:</b> ${n.text}</div>`;
-                });
-            }
-
-            let myOrdList = document.getElementById('myOrdersList');
-            if(myOrdList) {
-                myOrdList.innerHTML = myOrders.length ? '' : '<p class="text-gray-500 text-xs py-4 text-center">You have no order history yet.</p>';
-                myOrders.forEach((o) => {
-                    let isCancelable = o.status !== 'Delivered' && o.status !== 'Cancelled';
-                    myOrdList.innerHTML += `
-                        <div class="border p-4 rounded-lg bg-gray-50 space-y-2 text-xs shadow-sm">
-                            <div class="flex justify-between items-center font-bold">
-                                <span class="font-mono text-gray-800 text-sm">Order: ${o.orderId}</span>
-                                <span class="px-2.5 py-0.5 rounded text-[11px] font-bold ${o.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800'}">${o.status}</span>
-                            </div>
-                            <p class="text-gray-700"><b>Deliver to:</b> ${o.customer} | <b>Phone:</b> ${o.phone}</p>
-                            <p class="text-gray-700"><b>Qatar Delivery Address:</b> ${o.address}</p>
-                            
-                            <div class="border-t pt-2 flex flex-wrap justify-between items-center gap-2">
-                                <span class="font-black text-gray-900 text-sm">Total: QAR ${o.total}</span>
-                                
-                                <div class="flex gap-2">
-                                    ${isCancelable ? `
-                                        <button onclick="customerEditOrder('${o.orderId}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer transition">
-                                            <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Delivery Info
-                                        </button>
-                                        <button onclick="customerCancelOrder('${o.orderId}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold cursor-pointer transition">
-                                            <i class="fa-solid fa-xmark mr-1"></i> Cancel Order
-                                        </button>
-                                    ` : `
-                                        <span class="text-gray-400 text-[11px] italic">Order status is ${o.status}</span>
-                                    `}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-        }
-
-        function customerEditOrder(orderId) {
-            let ord = orders.find(o => String(o.orderId) === String(orderId));
-            if(!ord) return;
-
-            let newName = prompt("Update your Name:", ord.customer);
-            if(newName === null) return;
-
-            let newPhone = prompt("Update your Qatar Phone / WhatsApp:", ord.phone);
-            if(newPhone === null) return;
-
-            let newAddress = prompt("Update your Qatar Delivery Location (Zone, Street, Building):", ord.address);
-            if(newAddress === null) return;
-
-            if(newName.trim()) ord.customer = newName.trim();
-            if(newPhone.trim()) ord.phone = newPhone.trim();
-            if(newAddress.trim()) ord.address = newAddress.trim();
-
-            setStored('rsz_orders', orders);
-
-            notifications.unshift({
-                email: ord.userEmail,
-                text: `You updated delivery details for Order ID ${ord.orderId}.`,
-                date: new Date().toLocaleString()
-            });
-            setStored('rsz_notifications', notifications);
-
-            alert("Your delivery details have been updated successfully!");
-            renderMyOrdersAndNotifications();
-        }
-
-        function customerCancelOrder(orderId) {
-            let ord = orders.find(o => String(o.orderId) === String(orderId));
-            if(!ord) return;
-
-            if(confirm(`Are you sure you want to cancel Order ${orderId}?`)) {
-                ord.status = 'Cancelled';
-                setStored('rsz_orders', orders);
-
-                notifications.unshift({
-                    email: ord.userEmail,
-                    text: `Order ID ${ord.orderId} was cancelled by you.`,
-                    date: new Date().toLocaleString()
-                });
-                setStored('rsz_notifications', notifications);
-
-                alert(`Order ${orderId} has been cancelled.`);
-                renderMyOrdersAndNotifications();
-            }
-        }
-
+        // Customer Authentication Logic
+        let isSignUpMode = false;
         function openAuthModal() {
-            if(currentUser) {
-                if(confirm("Currently logged in as " + currentUser.name + " (" + currentUser.email + ").\n\nDo you want to log out?")) {
-                    currentUser = null;
-                    localStorage.removeItem('rsz_current_user');
-                    updateNavUserDisplay();
-                    alert('Logged out successfully.');
-                    showPage('home');
-                }
-                return;
-            }
-
-            const alertEl = document.getElementById('customerAuthAlert');
-            if(alertEl) alertEl.classList.add('hidden');
-
             document.getElementById('authModal').classList.remove('hidden');
             document.getElementById('customerAuthFormView').classList.remove('hidden');
             document.getElementById('customerOTPVerifyView').classList.add('hidden');
         }
-
-        function closeAuthModal() { 
-            document.getElementById('authModal').classList.add('hidden'); 
-            if (customerOtpInterval) clearInterval(customerOtpInterval);
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
         }
 
         function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            const alertEl = document.getElementById('customerAuthAlert');
-            if(alertEl) alertEl.classList.add('hidden');
+            isSignUpMode = !isSignUpMode;
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const btn = document.getElementById('authBtn');
+            const prompt = document.getElementById('toggleAuthPrompt');
+            const link = document.getElementById('toggleAuthLink');
 
-            document.getElementById('authTitle').innerText = isRegisterMode ? 'Create Qatar Account' : 'Customer Sign In';
-            document.getElementById('authSubtitle').innerText = isRegisterMode ? 'Verify your Qatar Phone & Email to start ordering' : 'Sign in to your Royal Stepz Zone account';
-            document.getElementById('authNameContainer').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('authPhoneContainer').classList.toggle('hidden', !isRegisterMode);
-            document.getElementById('authBtn').innerText = isRegisterMode ? 'Send Verification Code' : 'Sign In';
-            document.getElementById('toggleAuthPrompt').innerText = isRegisterMode ? 'Already have an account?' : 'New to Royal Stepz?';
-            document.getElementById('toggleAuthLink').innerText = isRegisterMode ? 'Sign In' : 'Create an account';
-        }
+            document.getElementById('customerAuthAlert').classList.add('hidden');
 
-        function showCustomerAuthError(msg) {
-            const alertEl = document.getElementById('customerAuthAlert');
-            if(alertEl) {
-                alertEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-red-600"></i> ${msg}`;
-                alertEl.classList.remove('hidden');
+            if (isSignUpMode) {
+                title.innerText = "Create Account";
+                subtitle.innerText = "Register a verified Qatar customer account";
+                btn.innerText = "Continue to Verification";
+                prompt.innerText = "Already have an account?";
+                link.innerText = "Sign in";
+                document.getElementById('authNameContainer').classList.remove('hidden');
+                document.getElementById('authPhoneContainer').classList.remove('hidden');
             } else {
-                alert(msg);
+                title.innerText = "Customer Sign In";
+                subtitle.innerText = "Sign in to your Royal Stepz Zone account";
+                btn.innerText = "Sign In";
+                prompt.innerText = "New to Royal Stepz?";
+                link.innerText = "Create an account";
+                document.getElementById('authNameContainer').classList.add('hidden');
+                document.getElementById('authPhoneContainer').classList.add('hidden');
             }
         }
 
         function handleUserAuthSubmit() {
-            const alertEl = document.getElementById('customerAuthAlert');
-            if(alertEl) alertEl.classList.add('hidden');
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+            const alertBox = document.getElementById('customerAuthAlert');
+            alertBox.classList.add('hidden');
 
-            let email = document.getElementById('authEmail').value.trim().toLowerCase();
-            let pass = document.getElementById('authPassword').value.trim();
-
-            if (!email || !pass) {
-                showCustomerAuthError('Please provide both your Email and Password.');
+            if (!email || !password) {
+                alertBox.innerText = "Please fill in all required fields.";
+                alertBox.classList.remove('hidden');
                 return;
             }
 
-            if (isRegisterMode) {
-                let name = document.getElementById('authName').value.trim();
-                let phone = document.getElementById('authPhone').value.trim();
-
+            if (isSignUpMode) {
+                const name = document.getElementById('authName').value.trim();
+                const phone = document.getElementById('authPhone').value.trim();
                 if (!name || !phone) {
-                    showCustomerAuthError('Please fill in your Full Name and Qatar Phone number.');
+                    alertBox.innerText = "Please enter your Name and Qatar Phone number.";
+                    alertBox.classList.remove('hidden');
                     return;
                 }
 
-                let existing = registeredCustomers.find(c => c.email.toLowerCase() === email);
-                if (existing) {
-                    showCustomerAuthError('An account with this email already exists. Please switch to "Sign In" above.');
-                    return;
+                pendingCustomerData = { name, phone, email, password, status: 'Verified', joined: new Date().toLocaleDateString(), ordersCount: 0 };
+                generatedCustomerOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+                document.getElementById('customerDisplayToken').innerText = generatedCustomerOTP;
+                document.getElementById('customerAuthFormView').classList.add('hidden');
+                document.getElementById('customerOTPVerifyView').classList.remove('hidden');
+
+                // Send Email via EmailJS if configured
+                if (emailJsConfig.serviceId && emailJsConfig.templateId && emailJsConfig.publicKey) {
+                    emailjs.init(emailJsConfig.publicKey);
+                    emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, {
+                        to_email: email,
+                        to_name: name,
+                        otp_code: generatedCustomerOTP
+                    }).catch(err => console.log('EmailJS client error:', err));
                 }
-
-                pendingCustomerRegistration = {
-                    id: 'cust-' + Date.now(),
-                    name,
-                    phone,
-                    email,
-                    password: pass,
-                    status: 'Verified',
-                    joinedDate: new Date().toISOString().split('T')[0]
-                };
-
-                sendCustomerOTP(phone, email, name);
-
             } else {
-                let userByEmail = registeredCustomers.find(c => c.email.toLowerCase() === email);
-
-                if (!userByEmail) {
-                    showCustomerAuthError('❌ <b>Account Not Found!</b> This email is not registered with Royal Stepz Zone. Please click <b>"Create an account"</b> below to register first.');
-                    return;
+                // Sign in
+                const found = customers.find(c => c.email === email && c.password === password);
+                if (found) {
+                    currentUser = found;
+                    localStorage.setItem('rsz_current_user', JSON.stringify(currentUser));
+                    updateNavAuth();
+                    closeAuthModal();
+                    alert('Successfully signed in!');
+                } else {
+                    alertBox.innerText = "Invalid email or password. Please check or create an account.";
+                    alertBox.classList.remove('hidden');
                 }
-
-                if (userByEmail.password !== pass) {
-                    showCustomerAuthError('❌ <b>Incorrect Password!</b> The password you entered is incorrect. Please check and try again.');
-                    return;
-                }
-
-                currentUser = {
-                    id: userByEmail.id,
-                    name: userByEmail.name,
-                    email: userByEmail.email,
-                    phone: userByEmail.phone,
-                    status: userByEmail.status
-                };
-                setStored('rsz_current_user', currentUser);
-                updateNavUserDisplay();
-                closeAuthModal();
-                alert(`Welcome back, ${currentUser.name}! You are signed in.`);
-            }
-        }
-
-        // DUAL SENDER: EMAILJS GMAIL DISPATCH + INLINE FALLBACK
-        function sendCustomerOTP(phone, email, name) {
-            generatedCustomerOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            customerOtpExpirationTimestamp = Date.now() + (3 * 60 * 1000);
-
-            document.getElementById('customerAuthFormView').classList.add('hidden');
-            document.getElementById('customerOTPVerifyView').classList.remove('hidden');
-            document.getElementById('customerInputOTP').value = '';
-
-            const tokenEl = document.getElementById('customerDisplayToken');
-            if(tokenEl) tokenEl.innerText = generatedCustomerOTP;
-
-            // 1. Attempt Real EmailJS Delivery if configured
-            if (window.emailjs && emailJsConfig.serviceId && emailJsConfig.templateId) {
-                emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, {
-                    to_name: name || 'Customer',
-                    to_email: email,
-                    otp_code: generatedCustomerOTP
-                }).then(function(res) {
-                    console.log("EmailJS Sent to Gmail!", res.status);
-                }).catch(function(err) {
-                    console.log("EmailJS fallback:", err);
-                });
-            }
-
-            // 2. Direct Gmail Web App Link
-            const gmailSubject = encodeURIComponent("Royal Stepz Zone - Verification OTP Code");
-            const gmailBody = encodeURIComponent(`Your Qatar Account Verification OTP Code is: ${generatedCustomerOTP}\n\nValid for 3 minutes.`);
-            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${gmailSubject}&body=${gmailBody}`;
-            const gmailBtn = document.getElementById('btnCustomerOpenGmail');
-            if(gmailBtn) gmailBtn.href = gmailUrl;
-
-            if (customerOtpInterval) clearInterval(customerOtpInterval);
-            customerOtpInterval = setInterval(updateCustomerOTPTimer, 1000);
-        }
-
-        function resendCustomerOTP() {
-            if (pendingCustomerRegistration) {
-                sendCustomerOTP(pendingCustomerRegistration.phone, pendingCustomerRegistration.email, pendingCustomerRegistration.name);
-            }
-        }
-
-        function updateCustomerOTPTimer() {
-            const timeLeft = Math.max(0, Math.floor((customerOtpExpirationTimestamp - Date.now()) / 1000));
-            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const seconds = (timeLeft % 60).toString().padStart(2, '0');
-            const timerEl = document.getElementById('customerOtpTimer');
-            if(timerEl) timerEl.innerText = `${minutes}:${seconds}`;
-
-            if(timeLeft <= 0) {
-                clearInterval(customerOtpInterval);
-                generatedCustomerOTP = null;
-                if(timerEl) timerEl.innerText = 'EXPIRED';
             }
         }
 
         function verifyCustomerRegistrationOTP() {
-            let entered = document.getElementById('customerInputOTP').value.trim();
-
-            if (!entered) {
-                alert('Please enter the 6-digit verification code.');
-                return;
-            }
-
-            if (Date.now() > customerOtpExpirationTimestamp || !generatedCustomerOTP) {
-                alert('Security code expired. Please click "Resend" to get a new code.');
-                return;
-            }
-
-            if (entered === generatedCustomerOTP && pendingCustomerRegistration) {
-                if (customerOtpInterval) clearInterval(customerOtpInterval);
-
-                registeredCustomers.push(pendingCustomerRegistration);
-                setStored('rsz_customers_db', registeredCustomers);
-
-                currentUser = {
-                    id: pendingCustomerRegistration.id,
-                    name: pendingCustomerRegistration.name,
-                    email: pendingCustomerRegistration.email,
-                    phone: pendingCustomerRegistration.phone,
-                    status: 'Verified'
-                };
-                setStored('rsz_current_user', currentUser);
-                updateNavUserDisplay();
-
-                pendingCustomerRegistration = null;
-                generatedCustomerOTP = null;
+            const inputOtp = document.getElementById('customerInputOTP').value.trim();
+            if (inputOtp === generatedCustomerOTP) {
+                customers.push(pendingCustomerData);
+                localStorage.setItem('rsz_customers', JSON.stringify(customers));
+                currentUser = pendingCustomerData;
+                localStorage.setItem('rsz_current_user', JSON.stringify(currentUser));
+                updateNavAuth();
                 closeAuthModal();
+                alert('Account verified and created successfully!');
+                showPage('home');
+            } else {
+                alert('Invalid OTP code. Please check your verification code.');
+            }
+        }
 
-                alert(`Account Verified & Activated Successfully!\n\nWelcome to Royal Stepz Zone, ${currentUser.name}. You can now place orders.`);
-                
-                if (cart.length > 0) {
-                    showPage('checkout');
+        function resendCustomerOTP() {
+            alert('Verification code resent: ' + generatedCustomerOTP);
+        }
+
+        function updateNavAuth() {
+            if (currentUser) {
+                document.getElementById('navUserName').innerText = currentUser.name.split(' ')[0];
+                document.getElementById('navUserSubtitle').innerText = "Account & Orders";
+                document.getElementById('userAuthSection').onclick = () => {
+                    if (confirm('Sign out from Royal Stepz Zone?')) {
+                        currentUser = null;
+                        localStorage.removeItem('rsz_current_user');
+                        updateNavAuth();
+                        showPage('home');
+                    }
+                };
+            } else {
+                document.getElementById('navUserName').innerText = "Sign in";
+                document.getElementById('navUserSubtitle').innerText = "Account & Lists";
+                document.getElementById('userAuthSection').onclick = openAuthModal;
+            }
+        }
+
+        // Customer Notifications & Order Management
+        function renderNotifications() {
+            const area = document.getElementById('notificationArea');
+            if (!area) return;
+            area.innerHTML = `
+                <div class="p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-900 flex items-center justify-between">
+                    <div>
+                        <p class="font-bold">Welcome to Royal Stepz Zone .qa</p>
+                        <p>Enjoy fast express delivery across Doha, Al Wakrah, and Lusail.</p>
+                    </div>
+                    <span class="text-[10px] bg-blue-200 px-2 py-0.5 rounded font-bold">Active</span>
+                </div>
+            `;
+        }
+
+        function renderMyOrders() {
+            const list = document.getElementById('myOrdersList');
+            if (!list) return;
+            list.innerHTML = '';
+            const userOrders = currentUser ? orders.filter(o => o.customerPhone === currentUser.phone || o.customerName === currentUser.name) : orders;
+
+            if (userOrders.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500 py-3">No orders found in your history.</p>';
+                return;
+            }
+
+            userOrders.forEach(ord => {
+                list.innerHTML += `
+                    <div class="border p-3 rounded space-y-2 bg-gray-50">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xs text-indigo-700">${ord.id}</span>
+                            <span class="text-xs px-2 py-0.5 rounded font-bold bg-amber-100 text-amber-800">${ord.status}</span>
+                        </div>
+                        <p class="text-xs text-gray-600"><b>Date:</b> ${ord.date} | <b>Total:</b> QAR ${ord.total}</p>
+                        <p class="text-xs text-gray-600"><b>Address:</b> ${ord.address}</p>
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="cancelMyOrder('${ord.id}')" class="bg-red-100 text-red-700 hover:bg-red-200 px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer">Cancel Order</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function cancelMyOrder(orderId) {
+            if (confirm('Are you sure you want to cancel order ' + orderId + '?')) {
+                const idx = orders.findIndex(o => o.id === orderId);
+                if (idx !== -1) {
+                    orders[idx].status = 'Cancelled by Customer';
+                    localStorage.setItem('rsz_orders', JSON.stringify(orders));
+                    renderMyOrders();
+                    alert('Order has been cancelled.');
                 }
-            } else {
-                alert('Invalid Verification Code! Please check and enter the 6-digit code shown in the box.');
             }
         }
 
-        function updateNavUserDisplay() {
-            const nameEl = document.getElementById('navUserName');
-            const subEl = document.getElementById('navUserSubtitle');
-            if (currentUser && currentUser.name) {
-                if(nameEl) nameEl.innerText = currentUser.name.split(' ')[0];
-                if(subEl) subEl.innerText = 'Account & Orders';
-            } else {
-                if(nameEl) nameEl.innerText = 'Sign in';
-                if(subEl) subEl.innerText = 'Account & Lists';
-            }
+        // Admin 2FA Login & Control Panel
+        function openAdminLogin() {
+            document.getElementById('page-admin-login').classList.remove('hidden');
+            document.getElementById('adminStepPassword').classList.remove('hidden');
+            document.getElementById('adminStepOTP').classList.add('hidden');
         }
-
-        // Secret Admin Listener (Ctrl + F12)
-        window.addEventListener('keydown', function(e) {
-            if((e.ctrlKey || e.metaKey) && (e.key === 'F12' || e.code === 'F12')) {
-                e.preventDefault();
-                openAdminLoginModal();
-            }
-        });
-
-        function openAdminLoginModal() {
-            const modal = document.getElementById('page-admin-login');
-            if(modal) {
-                modal.classList.remove('hidden');
-                document.getElementById('adminStepPassword').classList.remove('hidden');
-                document.getElementById('adminStepOTP').classList.add('hidden');
-                document.getElementById('adminEmail').value = '';
-                document.getElementById('adminPass').value = '';
-                document.getElementById('adminOTPInput').value = '';
-                const alertEl = document.getElementById('adminAuthAlert');
-                if(alertEl) alertEl.classList.add('hidden');
-            }
-        }
-
-        function closeAdminLogin() { 
-            const modal = document.getElementById('page-admin-login');
-            if(modal) modal.classList.add('hidden'); 
-            if(otpTimerInterval) clearInterval(otpTimerInterval);
+        function closeAdminLogin() {
+            document.getElementById('page-admin-login').classList.add('hidden');
         }
 
         function verifyAdminStep1() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
             const alertEl = document.getElementById('adminAuthAlert');
-            if(alertEl) alertEl.classList.add('hidden');
+            alertEl.classList.add('hidden');
 
-            let email = document.getElementById('adminEmail').value.trim().toLowerCase();
-            let pass = document.getElementById('adminPass').value.trim();
-
-            if (!email || !pass) {
-                if(alertEl) {
-                    alertEl.innerText = 'Please enter Admin Email and Password';
-                    alertEl.classList.remove('hidden');
-                }
-                return;
-            }
-
-            const isEmailValid = (
-                email === 'yeasinarafat1.qa@gmail.com' || 
-                email === 'admin@royalstepz.com' ||
-                email === 'royalstepz@gmail.com'
-            );
-
-            const isPassValid = (
-                pass === 'Ar@2925' || 
-                pass === 'admin123' ||
-                pass === 'royal2025'
-            );
-
-            if(isEmailValid && isPassValid) {
+            if (email === "yeasinarafat1.qa@gmail.com" && pass === "Ar@2925") {
                 sendAdminOTP();
-                document.getElementById('adminStepPassword').classList.add('hidden');
-                document.getElementById('adminStepOTP').classList.remove('hidden');
             } else {
-                if(alertEl) {
-                    alertEl.innerHTML = '❌ <b>Access Denied:</b> Incorrect Email or Password.<br>Use: <b>yeasinarafat1.qa@gmail.com</b> and Password: <b>Ar@2925</b>';
-                    alertEl.classList.remove('hidden');
-                }
+                alertEl.innerText = "Incorrect Admin Email or Password.";
+                alertEl.classList.remove('hidden');
             }
         }
 
         function sendAdminOTP() {
             generatedAdminOTP = Math.floor(100000 + Math.random() * 900000).toString();
-            otpExpirationTimestamp = Date.now() + (3 * 60 * 1000);
+            document.getElementById('adminDisplayToken').innerText = generatedAdminOTP;
+            
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=yeasinarafat1.qa@gmail.com&su=Admin+OTP+Code&body=Your+Admin+Verification+Code+is:+${generatedAdminOTP}`;
+            document.getElementById('btnAdminOpenGmail').href = gmailUrl;
+            
+            const waUrl = `https://wa.me/97455123456?text=` + encodeURIComponent(`🔐 *ROYAL STEPZ ADMIN OTP*\nYour 2FA Security Code is: *${generatedAdminOTP}*`);
+            document.getElementById('btnOtpWhatsAppFallback').href = waUrl;
 
-            if(otpTimerInterval) clearInterval(otpTimerInterval);
-            otpTimerInterval = setInterval(updateOTPTimer, 1000);
-
-            const displayEl = document.getElementById('adminDisplayToken');
-            if(displayEl) displayEl.innerText = generatedAdminOTP;
-
-            // Admin EmailJS Dispatch
-            const adminEmail = 'yeasinarafat1.qa@gmail.com';
-            if (window.emailjs && emailJsConfig.serviceId && emailJsConfig.templateId) {
-                emailjs.send(emailJsConfig.serviceId, emailJsConfig.templateId, {
-                    to_name: 'Master Admin',
-                    to_email: adminEmail,
-                    otp_code: generatedAdminOTP
-                }).catch(e => {});
-            }
-
-            const gSubject = encodeURIComponent("Royal Stepz Zone - Admin 2FA Security Code");
-            const gBody = encodeURIComponent(`Your Admin Master Security Code is: ${generatedAdminOTP}\n\nValid for 3 minutes.`);
-            const gUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(adminEmail)}&su=${gSubject}&body=${gBody}`;
-            const gmailBtn = document.getElementById('btnAdminOpenGmail');
-            if(gmailBtn) gmailBtn.href = gUrl;
-
-            const waClean = whatsappNumber.replace(/[^0-9]/g, '');
-            const waMessage = `*Royal Stepz Zone Security Alert*\n\nYour 6-Digit Admin Verification OTP is: *${generatedAdminOTP}*\n\nThis OTP is valid for 3 minutes. Do not share with anyone.`;
-            const waUrl = `https://wa.me/${waClean}?text=${encodeURIComponent(waMessage)}`;
-            const waBtn = document.getElementById('btnOtpWhatsAppFallback');
-            if(waBtn) waBtn.href = waUrl;
-        }
-
-        function updateOTPTimer() {
-            const timeLeft = Math.max(0, Math.floor((otpExpirationTimestamp - Date.now()) / 1000));
-            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const seconds = (timeLeft % 60).toString().padStart(2, '0');
-            const timerEl = document.getElementById('otpTimer');
-            if(timerEl) timerEl.innerText = `${minutes}:${seconds}`;
-
-            if(timeLeft <= 0) {
-                clearInterval(otpTimerInterval);
-                generatedAdminOTP = null;
-                if(timerEl) timerEl.innerText = 'EXPIRED';
-            }
+            document.getElementById('adminStepPassword').classList.add('hidden');
+            document.getElementById('adminStepOTP').classList.remove('hidden');
         }
 
         function verifyAdminOTP() {
-            const enteredOTP = document.getElementById('adminOTPInput').value.trim();
-
-            if(!enteredOTP) {
-                alert('Please enter the 6-digit OTP code');
-                return;
-            }
-
-            if(Date.now() > otpExpirationTimestamp || !generatedAdminOTP) {
-                alert('Security OTP expired! Please click "Resend OTP".');
-                return;
-            }
-
-            if(enteredOTP === generatedAdminOTP) {
-                if(otpTimerInterval) clearInterval(otpTimerInterval);
+            const val = document.getElementById('adminOTPInput').value.trim();
+            if (val === generatedAdminOTP) {
                 closeAdminLogin();
                 showPage('admin-dashboard');
-                alert('Identity Verified Successfully! Welcome to Master Admin Dashboard.');
             } else {
-                alert('Invalid OTP code! Enter the 6-digit code shown in the Security Box.');
+                alert('Invalid 2FA OTP code.');
             }
         }
 
-        function logoutAdmin() { showPage('home'); }
-
-        // ADMIN DASHBOARD
-        function renderAdminDashboard() {
-            const waInput = document.getElementById('adminWhatsAppNum');
-            if(waInput) waInput.value = whatsappNumber;
-
-            // Load EmailJS config inputs
-            const sEl = document.getElementById('cfgEmailJsServiceId');
-            const tEl = document.getElementById('cfgEmailJsTemplateId');
-            const kEl = document.getElementById('cfgEmailJsPublicKey');
-            if(sEl) sEl.value = emailJsConfig.serviceId || '';
-            if(tEl) tEl.value = emailJsConfig.templateId || '';
-            if(kEl) kEl.value = emailJsConfig.publicKey || '';
-            
-            // 1. Render Products
-            let pList = document.getElementById('adminProductList');
-            if(pList) {
-                pList.innerHTML = '';
-                products.forEach(p => {
-                    const price = safeGetPrice(p);
-                    pList.innerHTML += `
-                        <div class="flex justify-between items-center bg-white p-2 border rounded text-xs">
-                            <div class="flex items-center space-x-2">
-                                <img src="${p.image}" class="w-8 h-8 object-cover rounded">
-                                <span><b>${p.name}</b> - QAR ${price}</span>
-                            </div>
-                            <div class="space-x-1">
-                                <button onclick="adminEditProduct('${p.id}')" class="bg-blue-600 text-white px-2 py-0.5 rounded cursor-pointer">Edit</button>
-                                <button onclick="adminDeleteProduct('${p.id}')" class="bg-red-600 text-white px-2 py-0.5 rounded cursor-pointer">Del</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-
-            // 2. Render Orders
-            let oList = document.getElementById('adminOrdersList');
-            const countEl = document.getElementById('adminOrdersCount');
-            if(countEl) countEl.innerText = `${orders.length} Orders`;
-
-            if(oList) {
-                oList.innerHTML = '';
-                if(orders.length === 0) {
-                    oList.innerHTML = '<p class="text-gray-500 text-xs py-4 text-center">No orders recorded.</p>';
-                } else {
-                    orders.forEach(o => {
-                        oList.innerHTML += `
-                            <div class="bg-white p-3 border rounded shadow-sm text-xs space-y-2">
-                                <div class="flex justify-between items-center border-b pb-1">
-                                    <span class="font-mono font-bold text-gray-800">${o.orderId}</span>
-                                    <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${o.status}</span>
-                                </div>
-                                <div class="text-gray-700 space-y-0.5">
-                                    <p><b>Customer:</b> <span>${o.customer}</span> (<span class="text-blue-600 font-medium">${o.userEmail}</span>)</p>
-                                    <p><b>Phone:</b> <span>${o.phone}</span></p>
-                                    <p><b>Qatar Address:</b> <span>${o.address}</span></p>
-                                    <p><b>Total Amount:</b> QAR ${o.total}</p>
-                                </div>
-                                <div class="flex flex-wrap gap-1.5 pt-2 border-t">
-                                    <button onclick="adminEditCustomerInfo('${o.orderId}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition">
-                                        <i class="fa-solid fa-user-pen mr-1"></i> Edit Info
-                                    </button>
-                                    <button onclick="adminChangeOrderStatus('${o.orderId}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition">
-                                        <i class="fa-solid fa-truck-ramp-box mr-1"></i> Change Status
-                                    </button>
-                                    <button onclick="adminDeleteOrder('${o.orderId}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer transition">
-                                        <i class="fa-solid fa-trash mr-1"></i> Delete Order
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            }
-
-            renderAdminCustomerDatabase();
+        function logoutAdmin() {
+            showPage('home');
         }
 
-        function renderAdminCustomerDatabase() {
-            const tableBody = document.getElementById('adminCustomerTableBody');
-            const custCountEl = document.getElementById('adminCustomersCount');
-            if(custCountEl) custCountEl.innerText = `${registeredCustomers.length} Registered Customers`;
+        function saveEmailJsConfig() {
+            emailJsConfig = {
+                serviceId: document.getElementById('cfgEmailJsServiceId').value.trim(),
+                templateId: document.getElementById('cfgEmailJsTemplateId').value.trim(),
+                publicKey: document.getElementById('cfgEmailJsPublicKey').value.trim()
+            };
+            localStorage.setItem('rsz_emailjs', JSON.stringify(emailJsConfig));
+            alert('EmailJS settings saved successfully!');
+        }
 
-            if(!tableBody) return;
-            tableBody.innerHTML = '';
+        function saveWhatsAppNumber() {
+            whatsappNum = document.getElementById('adminWhatsAppNum').value.trim();
+            localStorage.setItem('rsz_whatsapp', whatsappNum);
+            alert('WhatsApp Business Number updated successfully!');
+        }
 
-            if(registeredCustomers.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No registered customers in database yet.</td></tr>`;
+        function addNewProduct() {
+            const name = document.getElementById('newProdName').value.trim();
+            const price = parseFloat(document.getElementById('newProdPrice').value);
+            const fileInput = document.getElementById('newProdImgFile');
+
+            if (!name || isNaN(price)) {
+                alert('Please enter valid product name and price.');
                 return;
             }
 
-            registeredCustomers.forEach(c => {
-                let customerOrders = orders.filter(o => o.userEmail && o.userEmail.toLowerCase() === c.email.toLowerCase());
-                let totalSpent = customerOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+            let imgUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80";
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgUrl = e.target.result;
+                    saveProductFinal(name, price, imgUrl);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                saveProductFinal(name, price, imgUrl);
+            }
+        }
 
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition">
+        function saveProductFinal(name, price, image) {
+            const newP = { id: Date.now(), name, price, image };
+            products.unshift(newP);
+            localStorage.setItem('rsz_products', JSON.stringify(products));
+            renderProducts();
+            renderAdminCatalog();
+            document.getElementById('newProdName').value = '';
+            document.getElementById('newProdPrice').value = '';
+            document.getElementById('newProdImgFile').value = '';
+            alert('Product published successfully!');
+        }
+
+        function renderAdminCatalog() {
+            const list = document.getElementById('adminProductList');
+            if (!list) return;
+            list.innerHTML = '';
+            products.forEach(p => {
+                list.innerHTML += `
+                    <div class="flex items-center justify-between bg-white p-2 rounded border">
+                        <div class="flex items-center space-x-2">
+                            <img src="${p.image}" class="w-10 h-10 object-cover rounded">
+                            <div>
+                                <p class="font-bold text-xs">${p.name}</p>
+                                <p class="text-[11px] text-amber-600 font-bold">QAR ${p.price}</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteProduct(${p.id})" class="text-red-600 hover:text-red-800 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Delete this product from catalog?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('rsz_products', JSON.stringify(products));
+                renderProducts();
+                renderAdminCatalog();
+            }
+        }
+
+        function renderAdminOrders() {
+            const list = document.getElementById('adminOrdersList');
+            const countEl = document.getElementById('adminOrdersCount');
+            if (!list) return;
+            list.innerHTML = '';
+            countEl.innerText = orders.length + ' Orders';
+
+            if (orders.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500 py-3">No customer orders recorded yet.</p>';
+                return;
+            }
+
+            orders.forEach(o => {
+                list.innerHTML += `
+                    <div class="border p-2.5 rounded bg-white space-y-1">
+                        <div class="flex justify-between font-bold text-xs">
+                            <span class="text-indigo-700">${o.id} - ${o.customerName}</span>
+                            <span>QAR ${o.total}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-600"><b>Phone:</b> ${o.customerPhone} | <b>Address:</b> ${o.address}</p>
+                        <div class="flex justify-between items-center pt-1">
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" class="border text-[11px] p-1 rounded font-bold">
+                                <option ${o.status === 'Order Placed' ? 'selected' : ''}>Order Placed</option>
+                                <option ${o.status === 'Out for Delivery (Qatar)' ? 'selected' : ''}>Out for Delivery (Qatar)</option>
+                                <option ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                                <option ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                            <button onclick="deleteAdminOrder('${o.id}')" class="text-red-600 text-xs cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const ord = orders.find(o => o.id === orderId);
+            if (ord) {
+                ord.status = newStatus;
+                localStorage.setItem('rsz_orders', JSON.stringify(orders));
+                renderAdminOrders();
+            }
+        }
+
+        function deleteAdminOrder(orderId) {
+            if (confirm('Delete order record?')) {
+                orders = orders.filter(o => o.id !== orderId);
+                localStorage.setItem('rsz_orders', JSON.stringify(orders));
+                renderAdminOrders();
+            }
+        }
+
+        function renderAdminCustomers() {
+            const tbody = document.getElementById('adminCustomerTableBody');
+            const countBadge = document.getElementById('adminCustomersCount');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            countBadge.innerText = customers.length + ' Registered Customers';
+
+            if (customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="p-3 text-center text-gray-500">No registered customers yet.</td></tr>';
+                return;
+            }
+
+            customers.forEach((c, idx) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
                         <td class="p-2.5 font-bold text-gray-900">${c.name}</td>
-                        <td class="p-2.5 font-mono text-gray-700">${c.phone}</td>
-                        <td class="p-2.5 text-blue-600 font-medium">${c.email}</td>
-                        <td class="p-2.5">
-                            <span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">
-                                <i class="fa-solid fa-circle-check"></i> ${c.status || 'Verified'}
-                            </span>
-                        </td>
-                        <td class="p-2.5 text-gray-500">${c.joinedDate || '2026-09-14'}</td>
-                        <td class="p-2.5 font-semibold text-gray-800">${customerOrders.length} orders (QAR ${totalSpent})</td>
-                        <td class="p-2.5 text-right space-x-1">
-                            <button onclick="adminInspectCustomerHistory('${c.email}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded text-[11px] font-bold cursor-pointer">
-                                <i class="fa-solid fa-clock-rotate-left"></i> History
-                            </button>
-                            <button onclick="adminDeleteCustomer('${c.id}')" class="bg-red-50 hover:bg-red-100 text-red-700 px-2 py-1 rounded text-[11px] font-bold cursor-pointer">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                        <td class="p-2.5">${c.phone}</td>
+                        <td class="p-2.5">${c.email}</td>
+                        <td class="p-2.5"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold text-[10px]">${c.status}</span></td>
+                        <td class="p-2.5">${c.joined || 'N/A'}</td>
+                        <td class="p-2.5 font-bold">${c.ordersCount || 0}</td>
+                        <td class="p-2.5 text-right">
+                            <button onclick="deleteCustomer(${idx})" class="text-red-600 hover:text-red-800 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
         }
 
-        function adminInspectCustomerHistory(email) {
-            let customerOrders = orders.filter(o => o.userEmail && o.userEmail.toLowerCase() === email.toLowerCase());
-            if(customerOrders.length === 0) {
-                alert(`Customer: ${email}\n\nNo orders placed yet.`);
-                return;
-            }
-
-            let msg = `Order History for: ${email}\nTotal Orders: ${customerOrders.length}\n\n`;
-            customerOrders.forEach(o => {
-                msg += `• [${o.orderId}] Total: QAR ${o.total} | Status: ${o.status} | Date: ${o.date}\n`;
-            });
-            alert(msg);
-        }
-
-        function adminDeleteCustomer(id) {
-            let cust = registeredCustomers.find(c => c.id === id);
-            if(!cust) return;
-
-            if(confirm(`Are you sure you want to remove customer "${cust.name}" (${cust.email}) from database?`)) {
-                registeredCustomers = registeredCustomers.filter(c => c.id !== id);
-                setStored('rsz_customers_db', registeredCustomers);
-                alert("Customer removed from database.");
-                renderAdminCustomerDatabase();
+        function deleteCustomer(idx) {
+            if (confirm('Remove customer record?')) {
+                customers.splice(idx, 1);
+                localStorage.setItem('rsz_customers', JSON.stringify(customers));
+                renderAdminCustomers();
             }
         }
-
-        function adminEditCustomerInfo(orderId) {
-            let ord = orders.find(o => String(o.orderId) === String(orderId));
-            if(!ord) return;
-
-            let newName = prompt("Edit Customer Name:", ord.customer);
-            if(newName === null) return;
-
-            let newPhone = prompt("Edit Qatar Phone/WhatsApp:", ord.phone);
-            if(newPhone === null) return;
-
-            let newAddress = prompt("Edit Delivery Location in Qatar:", ord.address);
-            if(newAddress === null) return;
-
-            if(newName.trim()) ord.customer = newName.trim();
-            if(newPhone.trim()) ord.phone = newPhone.trim();
-            if(newAddress.trim()) ord.address = newAddress.trim();
-
-            setStored('rsz_orders', orders);
-            alert("Customer order information updated successfully!");
-            renderAdminDashboard();
-        }
-
-        function adminChangeOrderStatus(orderId) {
-            let ord = orders.find(o => String(o.orderId) === String(orderId));
-            if(!ord) return;
-
-            let options = "Choose New Status for " + orderId + ":\n\n1: Confirmed\n2: Processing\n3: Out for Delivery\n4: Delivered\n5: Cancelled";
-            let choice = prompt(options, "1");
-            if(!choice) return;
-
-            let newStatus = ord.status;
-            if(choice === "1") newStatus = "Confirmed";
-            else if(choice === "2") newStatus = "Processing";
-            else if(choice === "3") newStatus = "Out for Delivery";
-            else if(choice === "4") newStatus = "Delivered";
-            else if(choice === "5") newStatus = "Cancelled";
-            else if(choice.trim().length > 2) newStatus = choice.trim();
-
-            ord.status = newStatus;
-            setStored('rsz_orders', orders);
-
-            notifications.unshift({
-                email: ord.userEmail,
-                text: `Order ${ord.orderId} status updated to: ${newStatus}`,
-                date: new Date().toLocaleString()
-            });
-            setStored('rsz_notifications', notifications);
-
-            alert("Order status changed to: " + newStatus);
-            renderAdminDashboard();
-        }
-
-        function adminDeleteOrder(orderId) {
-            if(confirm("Are you sure you want to completely delete Order " + orderId + "?")) {
-                orders = orders.filter(o => String(o.orderId) !== String(orderId));
-                setStored('rsz_orders', orders);
-                alert("Order removed from database.");
-                renderAdminDashboard();
-            }
-        }
-
-        function saveWhatsAppNumber() {
-            let num = document.getElementById('adminWhatsAppNum').value.trim();
-            whatsappNumber = num;
-            localStorage.setItem('rsz_whatsapp', num);
-            alert('WhatsApp number updated: ' + num);
-        }
-
-        function addNewProduct() {
-            let name = document.getElementById('newProdName').value.trim();
-            let price = parseFloat(document.getElementById('newProdPrice').value);
-            let fileInput = document.getElementById('newProdImgFile');
-
-            if(!name || isNaN(price) || !fileInput.files.length) {
-                alert('Please enter Name, Price, and choose an Image.');
-                return;
-            }
-
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                let newId = 'prod-' + Date.now();
-                products.push({ id: newId, name, price, image: e.target.result, desc: 'Premium Qatar collection.' });
-                setStored('rsz_products', products);
-                alert('Product added successfully!');
-                document.getElementById('newProdName').value = '';
-                document.getElementById('newProdPrice').value = '';
-                document.getElementById('newProdImgFile').value = '';
-                renderAdminDashboard();
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-
-        function adminEditProduct(id) {
-            let prod = products.find(p => String(p.id) === String(id));
-            if(!prod) return;
-
-            let currentPrice = safeGetPrice(prod);
-            let newName = prompt("Edit Shoe Name:", prod.name);
-            let newPrice = prompt("Edit Price (QAR):", currentPrice);
-
-            if(newName) prod.name = newName;
-            if(newPrice && !isNaN(parseFloat(newPrice))) {
-                prod.price = parseFloat(newPrice);
-                prod.priceQAR = parseFloat(newPrice);
-            }
-
-            setStored('rsz_products', products);
-            alert('Updated!');
-            renderAdminDashboard();
-        }
-
-        function adminDeleteProduct(id) {
-            if(confirm("Delete this shoe from catalog?")) {
-                products = products.filter(p => String(p.id) !== String(id));
-                setStored('rsz_products', products);
-                renderAdminDashboard();
-            }
-        }
-
-        // Initialize UI
-        updateNavUserDisplay();
-        renderProducts();
-        updateCartCount();
     </script>
+
 </body>
 </html>
